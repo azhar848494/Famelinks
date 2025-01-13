@@ -67,7 +67,7 @@ exports.findLocationsByText = (data) => {
           from: "locatns",
           let: { value: "$scopes" },
           pipeline: [
-            { $match: { $expr: { $in: ["$_id", "$$value"] } } },
+            { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
             { $project: { value: 1 } },
             { $sort: { _id: -1 } },
           ],
@@ -147,4 +147,8 @@ exports.getDistrictsByState = (country, state) => {
     { $group: { _id: null, districts: { $addToSet: '$district' } } },
     { $project: { _id: 0 } }
   ]);
+};
+
+exports.getLocationByName = (name) => {
+  return LocatnDB.findOne({ value: name });
 };

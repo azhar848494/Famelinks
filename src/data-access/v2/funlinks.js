@@ -35,7 +35,7 @@ exports.getFunLinks = (masterUserId, page, profileId, filterObj) => {
         isSafe: true,
         isBlocked: false,
         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-        $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
+        $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
       },
     },    
     //MasterIdMigration
@@ -80,7 +80,7 @@ exports.getFunLinks = (masterUserId, page, profileId, filterObj) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$challengeId"] },
+              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
               isDeleted: false,
             },
           },
@@ -96,7 +96,7 @@ exports.getFunLinks = (masterUserId, page, profileId, filterObj) => {
     //     pipeline: [
     //       {
     //         $match: {
-    //           $expr: { $in: ["$_id", "$$challengeId"] },
+    //           $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
     //           isDeleted: false,
     //           type: "funlinks",
     //         },
@@ -206,7 +206,7 @@ exports.getFunLinks = (masterUserId, page, profileId, filterObj) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$userId"] } ,
+              $expr: { $in: ["$_id", Array.isArray("$$userId") ? "$$userId" : []] } ,
             },
           },
           { $project: { username: 1 } },
@@ -221,7 +221,7 @@ exports.getFunLinks = (masterUserId, page, profileId, filterObj) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$userId"] },
+              $expr: { $in: ["$_id", Array.isArray("$$userId") ? "$$userId" : []] },
             },
           },
           { $project: { name: 1 } },
@@ -309,7 +309,7 @@ exports.getFunlinksFollowlinks = (funLinksId, userId, page, filterObj) => {
         isSafe: true,
         isBlocked: false,
         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-        $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
+        $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
       },
     },
     //MasterIdMigration
@@ -354,7 +354,7 @@ exports.getFunlinksFollowlinks = (funLinksId, userId, page, filterObj) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$challengeId"] },
+              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
               isDeleted: false,
             },
           },
@@ -370,7 +370,7 @@ exports.getFunlinksFollowlinks = (funLinksId, userId, page, filterObj) => {
     //     pipeline: [
     //       {
     //         $match: {
-    //           $expr: { $in: ["$_id", "$$challengeId"] },
+    //           $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
     //           isDeleted: false,
     //           type: "funlinks",
     //         },
@@ -480,7 +480,7 @@ exports.getFunlinksFollowlinks = (funLinksId, userId, page, filterObj) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$userId"] }
+              $expr: { $in: ["$_id", Array.isArray("$$userId") ? "$$userId" : []] }
             },
           },
           { $project: { username: 1 } },
@@ -495,7 +495,7 @@ exports.getFunlinksFollowlinks = (funLinksId, userId, page, filterObj) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$userId"] },
+              $expr: { $in: ["$_id", Array.isArray("$$userId") ? "$$userId" : []] },
             },
           },
           { $project: { name: 1 } },
@@ -623,7 +623,7 @@ exports.getMyFunLinks = (
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$challengeId"] },
+              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
               isDeleted: false,
             },
           },
@@ -1185,7 +1185,7 @@ exports.getFunLinksById = (userId, postId, profileId) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$challengeId"] },
+              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
               isDeleted: false,
             },
           },
@@ -1360,7 +1360,7 @@ exports.getFunlinksMusicPosts = (userId, musicId, page) => {
         $expr: {
           $and: [
             { $eq: [ObjectId(musicId), "$musicId"] },
-            { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
+            { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
           ],
         },
       },
@@ -1398,7 +1398,7 @@ exports.getFunlinksMusicPosts = (userId, musicId, page) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$challengeId"] },
+              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
               isDeleted: false,
             },
           },

@@ -170,6 +170,8 @@ module.exports = async (
       break;
     case "joblinks":
       try {
+        console.log('Profile :: ', profile)
+        console.log('type :: ', result.type)
         if (profile == "other") {
           return await getOtherProfileJoblinks(
             userId,
@@ -183,10 +185,6 @@ module.exports = async (
         if (result.type == "brand") {
           return await getBrandProfileJoblinks(userId, page);
         }
-
-        // if (result.type == "agency") {
-        //   return await getAgencyProfileJoblinks(result.profileJoblinks);
-        // }
 
         return await getProfileJoblinks(result.profileJoblinks, page);
       } catch (error) {

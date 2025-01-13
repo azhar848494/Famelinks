@@ -4,7 +4,6 @@ const shortlistServices = require("../../../services/v2/joblinks/shortlist");
 const checkApplication = require("../../../services/v2/joblinks/checkApplication");
 const checkJob = require("../../../services/v2/joblinks/checkJob");
 const sendNotificationsService = require("../../../services/v2/users/sendNotifications");
-const getMasterProfile = require("../../../services/v2/users/getMasterProfile");
 const { getOneUser } = require("../../../data-access/v2/users");
 
 module.exports = async (request) => {
@@ -18,8 +17,7 @@ module.exports = async (request) => {
   let userId = request.body.userId;
   let shortlist = request.body.shortlist;
 
-  const masterId = await getMasterProfile(userId);
-  const user = await getOneUser(masterId[0]._id)
+  const user = await getOneUser(userId)
 
   if (!isValidObjectId(jobId)) {
     return serializeHttpResponse(400, {

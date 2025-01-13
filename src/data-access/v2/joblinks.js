@@ -114,7 +114,7 @@ exports.getUserJobs = (joblinksId, page) => {
       },
     },
     { $addFields: { jobIds: "$jobsApplied.jobId" } },
-    { $match: { $expr: { $not: [{ $in: ["$_id", "$jobIds"] }] } } },
+    { $match: { $expr: { $not: [{ $in: ["$_id", Array.isArray("$jobIds") ? "$jobIds" : []] }] } } },
     {
       $lookup: {
         from: "jobcategories",
@@ -122,7 +122,7 @@ exports.getUserJobs = (joblinksId, page) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$jobCategory"] },
+              $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] },
             },
           },
           { $project: { _id: 1, jobName: 1, jobType: 1, jobCategory: 1 } },
@@ -167,7 +167,7 @@ exports.getUserJobs = (joblinksId, page) => {
       },
     },
     { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
-    { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
+    { $addFields: { savedStatus: { $in: ["$_id", Array.isArray("$savedJobs") ? "$savedJobs" : []] } } },
     {
       $lookup: {
         from: "locatns",
@@ -223,7 +223,7 @@ exports.getAgentJobs = (joblinksId, page) => {
       },
     },
     { $addFields: { jobIds: "$jobsApplied.jobId" } },
-    { $match: { $expr: { $not: [{ $in: ["$_id", "$jobIds"] }] } } },
+    { $match: { $expr: { $not: [{ $in: ["$_id", Array.isArray("$jobIds") ? "$jobIds" : []] }] } } },
     {
       $lookup: {
         from: "jobcategories",
@@ -231,7 +231,7 @@ exports.getAgentJobs = (joblinksId, page) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$jobCategory"] },
+              $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] },
             },
           },
           { $project: { _id: 0, jobName: 1, jobType: 1, jobCategory: 1 } },
@@ -349,7 +349,7 @@ exports.userExplore = (page, joblinksId, masterId) => {
                     from: "jobcategories",
                     let: { jobCategory: "$jobCategory" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
                       { $project: { _id: 0, jobName: 1, jobCategory: 1 } },
                     ],
                     as: "jobDetails",
@@ -368,8 +368,8 @@ exports.userExplore = (page, joblinksId, masterId) => {
                           $and: [
                             { $expr: { $eq: [2, { $size: "$members" }] } },
                             { isGroup: false },
-                            { $expr: { $in: ["$$member1", "$members"] } },
-                            { $expr: { $in: ["$$member2", "$members"] } },
+                            { $expr: { $in: ["$$member1", Array.isArray("$members") ? "$members" : []] } },
+                            { $expr: { $in: ["$$member2", Array.isArray("$members") ? "$members" : []] } },
                             { category: "jobChat" },
                             { $expr: { $eq: ["$jobId", "$$jobId"] } },
                           ],
@@ -581,7 +581,7 @@ exports.userExplore = (page, joblinksId, masterId) => {
                     from: "jobcategories",
                     let: { jobCategory: "$jobCategory" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
                       { $project: { _id: 0, jobName: 1, jobCategory: 1 } },
                     ],
                     as: "jobDetails",
@@ -598,8 +598,8 @@ exports.userExplore = (page, joblinksId, masterId) => {
                           $and: [
                             { $expr: { $eq: [2, { $size: "$members" }] } },
                             { isGroup: false },
-                            { $expr: { $in: ["$$member1", "$members"] } },
-                            { $expr: { $in: ["$$member2", "$members"] } },
+                            { $expr: { $in: ["$$member1", Array.isArray("$members") ? "$members" : []] } },
+                            { $expr: { $in: ["$$member2", Array.isArray("$members") ? "$members" : []] } },
                             { category: "jobChat" },
                             { $expr: { $eq: ["$jobId", "$$jobId"] } },
                           ],
@@ -811,7 +811,7 @@ exports.userExplore = (page, joblinksId, masterId) => {
                     from: "jobcategories",
                     let: { jobCategory: "$jobCategory" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
                       { $project: { _id: 0, jobName: 1, jobCategory: 1 } },
                     ],
                     as: "jobDetails",
@@ -828,8 +828,8 @@ exports.userExplore = (page, joblinksId, masterId) => {
                           $and: [
                             { $expr: { $eq: [2, { $size: "$members" }] } },
                             { isGroup: false },
-                            { $expr: { $in: ["$$member1", "$members"] } },
-                            { $expr: { $in: ["$$member2", "$members"] } },
+                            { $expr: { $in: ["$$member1", Array.isArray("$members") ? "$members" : []] } },
+                            { $expr: { $in: ["$$member2", Array.isArray("$members") ? "$members" : []] } },
                             { category: "jobChat" },
                             { $expr: { $eq: ["$jobId", "$$jobId"] } },
                           ],
@@ -993,7 +993,7 @@ exports.userExplore = (page, joblinksId, masterId) => {
               from: "jobs",
               let: { jobId: "$savedJobs" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", "$$jobId"] } } },
+                { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobId") ? "$$jobId" : []] } } },
                 {
                   $lookup: {
                     from: "locatns",
@@ -1029,7 +1029,7 @@ exports.userExplore = (page, joblinksId, masterId) => {
                     from: "jobcategories",
                     let: { jobCategory: "$jobCategory" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
                       { $project: { _id: 0, jobName: 1, jobCategory: 1 } },
                     ],
                     as: "jobDetails",
@@ -1046,8 +1046,8 @@ exports.userExplore = (page, joblinksId, masterId) => {
                           $and: [
                             { $expr: { $eq: [2, { $size: "$members" }] } },
                             { isGroup: false },
-                            { $expr: { $in: ["$$member1", "$members"] } },
-                            { $expr: { $in: ["$$member2", "$members"] } },
+                            { $expr: { $in: ["$$member1", Array.isArray("$members") ? "$members" : []] } },
+                            { $expr: { $in: ["$$member2", Array.isArray("$members") ? "$members" : []] } },
                             { category: "jobChat" },
                             { $expr: { $eq: ["$jobId", "$$jobId"] } },
                           ],
@@ -1165,7 +1165,7 @@ exports.brandAgencyExplore = (search, page, joblinksId) => {
           { $match: { $expr: { $eq: ["$_id", "$$joblinksId"] } } },
           { $project: { _id: 0, savedTalents: 1 } },
           {
-            $match: { $expr: { $in: ["$$profileJoblinks", "$savedTalents"] } },
+            $match: { $expr: { $in: ["$$profileJoblinks", Array.isArray("$savedTalents") ? "$savedTalents" : []] } },
           },
         ],
         as: "saved",
@@ -1244,7 +1244,7 @@ exports.getTalents = (page, masterId, joblinksId) => {
           { $match: { $expr: { $eq: ["$_id", "$$joblinksId"] } } },
           { $project: { _id: 0, savedTalents: "$profileJoblinks.savedTalents" } },
           {
-            $match: { $expr: { $in: ["$$profileJoblinks", "$savedTalents"] } },
+            $match: { $expr: { $in: ["$$profileJoblinks", Array.isArray("$savedTalents") ? "$savedTalents" : []] } },
           },
         ],
         as: "saved",
@@ -1477,13 +1477,13 @@ exports.getTalents = (page, masterId, joblinksId) => {
                     from: "locatns",
                     let: { value: "$interestedLoc" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", "$$value"] } } },
+                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
                       {
                         $lookup: {
                           from: "locatns",
                           let: { value: "$scopes" },
                           pipeline: [
-                            { $match: { $expr: { $in: ["$_id", "$$value"] } } },
+                            { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
                             { $project: { type: 1, value: 1, } },
                             { $sort: { _id: -1 } },
                           ],
@@ -1536,7 +1536,7 @@ exports.getTalents = (page, masterId, joblinksId) => {
                     from: "jobcategories",
                     let: { interestCat: "$interestCat" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", "$$interestCat"] } } },
+                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$interestCat") ? "$$interestCat" : []] } } },
                       { $project: { _id: 0, jobName: 1, jobCategory: 1 } },
                     ],
                     as: "interestCat",
@@ -1557,7 +1557,7 @@ exports.getTalents = (page, masterId, joblinksId) => {
                     from: "jobcategories",
                     let: { interestCat: "$interestCat" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", "$$interestCat"] } } },
+                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$interestCat") ? "$$interestCat" : []] } } },
                       { $project: { _id: 0, jobName: 1, jobCategory: 1 } },
                     ],
                     as: "interestCat",
@@ -1569,13 +1569,13 @@ exports.getTalents = (page, masterId, joblinksId) => {
                     from: "locatns",
                     let: { value: "$interestedLoc" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", "$$value"] } } },
+                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
                       {
                         $lookup: {
                           from: "locatns",
                           let: { value: "$scopes" },
                           pipeline: [
-                            { $match: { $expr: { $in: ["$_id", "$$value"] } } },
+                            { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
                             { $project: { type: 1, value: 1, } },
                             { $sort: { _id: -1 } },
                           ],
@@ -1644,7 +1644,7 @@ exports.getOpenJobs = (joblinksId, page, jobType) => {
         from: "jobcategories",
         let: { jobCategory: "$jobCategory" },
         pipeline: [
-          { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+          { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
           { $project: { jobName: 1, jobCategory: 1 } },
         ],
         as: "jobDetails",
@@ -1743,7 +1743,7 @@ exports.getClosedJobs = (joblinksId, page, jobType) => {
         from: "jobcategories",
         let: { jobCategory: "$jobCategory" },
         pipeline: [
-          { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+          { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
           { $project: { jobName: 1, jobCategory: 1 } },
         ],
         as: "jobDetails",
@@ -2126,8 +2126,8 @@ exports.getApplicantsFaces = (selfMasterId, jobId, page) => {
                     $and: [
                       { $expr: { $eq: [2, { $size: "$members" }] } },
                       { isGroup: false },
-                      { $expr: { $in: ["$$member1", "$members"] } },
-                      { $expr: { $in: ["$$member2", "$members"] } },
+                      { $expr: { $in: ["$$member1", Array.isArray("$members") ? "$members" : []] } },
+                      { $expr: { $in: ["$$member2", Array.isArray("$members") ? "$members" : []] } },
                       { category: "jobChat" },
                       { $expr: { $eq: ["$jobId", "$$jobId"] } },
                     ],
@@ -2396,8 +2396,8 @@ exports.getApplicantsCrew = (selfMasterId, jobId, page) => {
                     $and: [
                       { $expr: { $eq: [2, { $size: "$members" }] } },
                       { isGroup: false },
-                      { $expr: { $in: ["$$member1", "$members"] } },
-                      { $expr: { $in: ["$$member2", "$members"] } },
+                      { $expr: { $in: ["$$member1", Array.isArray("$members") ? "$members" : []] } },
+                      { $expr: { $in: ["$$member2", Array.isArray("$members") ? "$members" : []] } },
                       { category: "jobChat" },
                       { $expr: { $eq: ["$jobId", "$$jobId"] } },
                     ],
@@ -2568,7 +2568,7 @@ exports.searchJobs = (selfJoblinksId, title, page) => {
         from: "jobcategories",
         let: { jobCategory: "$jobCategory" },
         pipeline: [
-          { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+          { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
           { $project: { _id: 0, jobName: 1, jobCategory: 1 } },
         ],
         as: "jobDetails",
@@ -2579,7 +2579,7 @@ exports.searchJobs = (selfJoblinksId, title, page) => {
         from: "users",
         let: { jobId: "$_id" },
         pipeline: [
-          { $match: { $expr: { $in: ["$$jobId", "$profileJoblinks.savedJobs"] } } },
+          { $match: { $expr: { $in: ["$$jobId", Array.isArray("$profileJoblinks.savedJobs") ? "$profileJoblinks.savedJobs" : []] } } },
           { $project: { _id: 1 } },
         ],
         as: "savedStatus",
@@ -2658,7 +2658,7 @@ exports.getSavedTalents = (page, joblinksId) => {
         from: "hiringprofiles",
         let: { userId: "$profileJoblinks.savedTalents" },
         pipeline: [
-          { $match: { $expr: { $in: ["$_id", "$$userId"] } } },
+          { $match: { $expr: { $in: ["$_id", Array.isArray("$$userId") ? "$$userId" : []] } } },
           { $project: { userId: 1, type: 1 } },
           {
             $lookup: {
@@ -3076,8 +3076,8 @@ exports.getFacesShortlistedApplicant = (selfMasterId, jobId, page) => {
                     $and: [
                       { $expr: { $eq: [2, { $size: "$members" }] } },
                       { isGroup: false },
-                      { $expr: { $in: ["$$member1", "$members"] } },
-                      { $expr: { $in: ["$$member2", "$members"] } },
+                      { $expr: { $in: ["$$member1", Array.isArray("$members") ? "$members" : []] } },
+                      { $expr: { $in: ["$$member2", Array.isArray("$members") ? "$members" : []] } },
                       { category: "jobChat" },
                       { $expr: { $eq: ["$jobId", "$$jobId"] } },
                     ],
@@ -3317,8 +3317,8 @@ exports.getCrewShortlistedApplicant = (selfMasterId, jobId, page) => {
                     $and: [
                       { $expr: { $eq: [2, { $size: "$members" }] } },
                       { isGroup: false },
-                      { $expr: { $in: ["$$member1", "$members"] } },
-                      { $expr: { $in: ["$$member2", "$members"] } },
+                      { $expr: { $in: ["$$member1", Array.isArray("$members") ? "$members" : []] } },
+                      { $expr: { $in: ["$$member2", Array.isArray("$members") ? "$members" : []] } },
                       { category: "jobChat" },
                       { $expr: { $eq: ["$jobId", "$$jobId"] } },
                     ],
@@ -3649,8 +3649,8 @@ exports.getSotedApplicantsFaces = (selfMasterId, jobId, page, sort) => {
                     $and: [
                       { $expr: { $eq: [2, { $size: "$members" }] } },
                       { isGroup: false },
-                      { $expr: { $in: ["$$member1", "$members"] } },
-                      { $expr: { $in: ["$$member2", "$members"] } },
+                      { $expr: { $in: ["$$member1", Array.isArray("$members") ? "$members" : []] } },
+                      { $expr: { $in: ["$$member2", Array.isArray("$members") ? "$members" : []] } },
                       { category: "jobChat" },
                       { $expr: { $eq: ["$jobId", "$$jobId"] } },
                     ],
@@ -3891,8 +3891,8 @@ exports.getSortedApplicantsCrew = (selfMasterId, jobId, page, sort) => {
                     $and: [
                       { $expr: { $eq: [2, { $size: "$members" }] } },
                       { isGroup: false },
-                      { $expr: { $in: ["$$member1", "$members"] } },
-                      { $expr: { $in: ["$$member2", "$members"] } },
+                      { $expr: { $in: ["$$member1", Array.isArray("$members") ? "$members" : []] } },
+                      { $expr: { $in: ["$$member2", Array.isArray("$members") ? "$members" : []] } },
                       { category: "jobChat" },
                       { $expr: { $eq: ["$jobId", "$$jobId"] } },
                     ],
@@ -4242,8 +4242,8 @@ exports.getApplicantsFacesBySearch = (
                     $and: [
                       { $expr: { $eq: [2, { $size: "$members" }] } },
                       { isGroup: false },
-                      { $expr: { $in: ["$$member1", "$members"] } },
-                      { $expr: { $in: ["$$member2", "$members"] } },
+                      { $expr: { $in: ["$$member1", Array.isArray("$members") ? "$members" : []] } },
+                      { $expr: { $in: ["$$member2", Array.isArray("$members") ? "$members" : []] } },
                       { category: "jobChat" },
                       { $expr: { $eq: ["$jobId", "$$jobId"] } },
                     ],
@@ -4548,8 +4548,8 @@ exports.getApplicantsCrewBySearch = (
                     $and: [
                       { $expr: { $eq: [2, { $size: "$members" }] } },
                       { isGroup: false },
-                      { $expr: { $in: ["$$member1", "$members"] } },
-                      { $expr: { $in: ["$$member2", "$members"] } },
+                      { $expr: { $in: ["$$member1", Array.isArray("$members") ? "$members" : []] } },
+                      { $expr: { $in: ["$$member2", Array.isArray("$members") ? "$members" : []] } },
                       { category: "jobChat" },
                       { $expr: { $eq: ["$jobId", "$$jobId"] } },
                     ],
@@ -4710,7 +4710,7 @@ exports.getAppliedJobs = (page, joblinksId, masterId) => {
                     from: "jobcategories",
                     let: { jobCategory: "$jobCategory" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
                       { $project: { jobName: 1, jobCategory: 1 } },
                     ],
                     as: "jobDetails",
@@ -4889,7 +4889,7 @@ exports.getHiredJobs = (page, joblinksId, masterId) => {
                     from: "jobcategories",
                     let: { jobCategory: "$jobCategory" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
                       { $project: { jobName: 1, jobCategory: 1 } },
                     ],
                     as: "jobDetails",
@@ -5080,7 +5080,7 @@ exports.getShortlistedJobs = (page, joblinksId, masterId) => {
                     from: "jobcategories",
                     let: { jobCategory: "$jobCategory" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
                       { $project: { jobName: 1, jobCategory: 1 } },
                     ],
                     as: "jobDetails",
@@ -5153,7 +5153,7 @@ exports.getSavedJobs = (page, joblinksId, masterId) => {
               from: "jobs",
               let: { jobId: "$savedJobs" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", "$$jobId"] } } },
+                { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobId") ? "$$jobId" : []] } } },
                 {
                   $lookup: {
                     from: "locatns",
@@ -5188,7 +5188,7 @@ exports.getSavedJobs = (page, joblinksId, masterId) => {
                     from: "jobcategories",
                     let: { jobCategory: "$jobCategory" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
                       { $project: { jobName: 1, jobCategory: 1 } },
                     ],
                     as: "jobDetails",
@@ -5291,7 +5291,7 @@ exports.getJobInvites = (page, joblinksId, masterId) => {
               from: "jobcategories",
               let: { jobCategory: "$jobCategory" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+                { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
                 { $project: { jobName: 1, jobCategory: 1 } },
               ],
               as: "jobCategory",
@@ -5352,7 +5352,7 @@ exports.getMyOpenJobs = (joblinksId, page, userId, typeObj) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$jobCategory"] },
+              $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] },
             },
           },
           { $project: { _id: 0, jobName: 1, jobCategory: 1 } },
@@ -5505,7 +5505,7 @@ exports.getNewTalents = (page, masterId, joblinksId) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$interestCat"] },
+              $expr: { $in: ["$_id", Array.isArray("$$interestCat") ? "$$interestCat" : []] },
             },
           },
           { $project: { jobName: 1, jobCategory: 1 } },
@@ -5518,13 +5518,13 @@ exports.getNewTalents = (page, masterId, joblinksId) => {
         from: "locatns",
         let: { value: "$interestedLoc" },
         pipeline: [
-          { $match: { $expr: { $in: ["$_id", "$$value"] } } },
+          { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
           {
             $lookup: {
               from: "locatns",
               let: { value: "$scopes" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", "$$value"] } } },
+                { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
                 { $project: { type: 1, value: 1, } },
                 { $sort: { _id: -1 } },
               ],
@@ -5567,7 +5567,7 @@ exports.getNewTalents = (page, masterId, joblinksId) => {
           { $match: { $expr: { $eq: ["$_id", "$$joblinksId"] } } },
           { $project: { _id: 0, savedTalents: "$profileJoblinks.savedTalents" } },
           {
-            $match: { $expr: { $in: ["$$profileJoblinks", "$savedTalents"] } },
+            $match: { $expr: { $in: ["$$profileJoblinks", Array.isArray("$savedTalents") ? "$savedTalents" : []] } },
           },
         ],
         as: "saved",
@@ -5639,7 +5639,6 @@ exports.getNewTalents = (page, masterId, joblinksId) => {
               username: 1,
               profileImage: 1,
               profileImageType: 1,
-              profileFamelinks: 1,
               gender: 1,
               dob: 1,
               followersCount: 1,
@@ -5791,17 +5790,17 @@ exports.getNewTalents = (page, masterId, joblinksId) => {
             },
           },
           { $set: { trendsWon: { $first: "$trendsWon" } } },
-          {
-            $set: {
-              trendsWon: {
-                $cond: [
-                  { $ne: [0, { $size: "$trendsWon.trendWinner" }] },
-                  "Trend Setter",
-                  "",
-                ],
-              },
-            },
-          },
+          // {
+          //   $set: {
+          //     trendsWon: {
+          //       $cond: [
+          //         { $ne: [0, { $size: "$trendsWon.trendWinner" }] },
+          //         "Trend Setter",
+          //         "",
+          //       ],
+          //     },
+          //   },
+          // },
           {
             $set: {
               achievements: {
@@ -5837,8 +5836,8 @@ exports.getNewTalents = (page, masterId, joblinksId) => {
               $and: [
                 { $expr: { $eq: [2, { $size: "$members" }] } },
                 { isGroup: false },
-                { $expr: { $in: ["$$member1", "$members"] } },
-                { $expr: { $in: ["$$member2", "$members"] } },
+                { $expr: { $in: ["$$member1", Array.isArray("$members") ? "$members" : []] } },
+                { $expr: { $in: ["$$member2", Array.isArray("$members") ? "$members" : []] } },
                 { category: "conversation" },
               ],
             },

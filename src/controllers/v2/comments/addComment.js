@@ -4,7 +4,6 @@ const getOneCommentService = require("../../../services/v2/comments/getOneCommen
 const { isValidObjectId } = require("../../../utils/db");
 const getOneUserService = require("../../../services/v2/users/getOneUser");
 const sendNotificationsService = require("../../../services/v2/users/sendNotifications");
-const getMasterProfile = require("../../../services/v2/users/getMasterProfile");
 
 module.exports = async (request, postType) => {
   let linkType = postType;

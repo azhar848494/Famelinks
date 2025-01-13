@@ -135,7 +135,7 @@ exports.getUserChatRequestsCount = (userId) => {
       $match: {
         $expr: {
           $and: [
-            { $not: [{ $in: ["$members", "$blockedUserIds"] }] },
+            { $not: [{ $in: ["$members", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
             { $not: [{ $eq: [ObjectId(userId), "$members"] }] },
           ],
         },
@@ -181,7 +181,7 @@ exports.getUserJobChatRequests = (userId, page) => {
             from: "jobcategories",
             let: { jobCategory: "$jobCategory" },
             pipeline: [
-              { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+              { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
               { $project: { _id: 0, jobName: 1 } },
             ],
             as: "jobDetails",
@@ -250,7 +250,7 @@ exports.getUserJobChatRequestsCount = (userId) => {
       $match: {
         $expr: {
           $and: [
-            { $not: [{ $in: ["$members", "$blockedUserIds"] }] },
+            { $not: [{ $in: ["$members", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
             { $not: [{ $eq: [ObjectId(userId), "$members"] }] },
           ],
         },

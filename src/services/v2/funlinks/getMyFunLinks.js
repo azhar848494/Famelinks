@@ -17,7 +17,7 @@ module.exports = async (userId, userProfileId, selfMasterId, hashTagId) => {
     };
   } else {
     filterObj = {
-      userId: userId,
+      userId: ObjectId(userId),
       isDeleted: false,
       isSafe: true,
       isBlocked: false,

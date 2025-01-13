@@ -6,8 +6,6 @@ const getOneCommentService = require("../../../services/v2/comments/getOneCommen
 const getOneUserService = require("../../../services/v2/users/getOneUser");
 const sendNotificationsService = require("../../../services/v2/users/sendNotifications");
 
-const getMasterProfile = require("../../../services/v2/users/getMasterProfile");
-
 module.exports = async (request, postType) => {
   if (!isValidObjectId(request.params.id)) {
     return serializeHttpResponse(400, {
@@ -126,8 +124,7 @@ module.exports = async (request, postType) => {
         request.body.status
       );
       const onePost = await getOnePostService(oneComment.mediaId);
-      const masterUserId = await getMasterProfile(oneComment.userId);
-      const user = await getOneUserService(masterUserId[0]._id);
+      const user = await getOneUserService(oneComment.userId);
       if (user.pushToken) {
         await sendNotificationsService(
           "likeComment",

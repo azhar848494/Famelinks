@@ -1,7 +1,6 @@
 const serializeHttpResponse = require('../../../helpers/serialize-http-response');
 const getMyFameLinksService = require('../../../services/v2/famelinks/getMyFameLinks');
 const { isValidObjectId } = require('../../../utils/db');
-const getChildProfile = require('../../../services/v2/users/getChildProfile')
 
 module.exports = async (request) => {
     let hashTagId = request.query.hashTagId;
@@ -11,10 +10,8 @@ module.exports = async (request) => {
             message: 'Invalid Object Id'
         });
     }
-
-    let profileId = await getChildProfile(request.params.userId, 'famelinks')
     
-    const result = await getMyFameLinksService(profileId[0]._id, request.query.page, request.user._id, request.user._id, hashTagId);
+    const result = await getMyFameLinksService(request.params.userId, request.query.page, request.user._id, request.user._id, hashTagId);
     return serializeHttpResponse(200, {
         message: 'FameLinks Fetched',
         result

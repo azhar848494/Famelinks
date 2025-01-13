@@ -81,7 +81,7 @@ module.exports = async (userId, { type, ageGroup, gender, district, state, count
                     default: childProfile = user._id
                         break;
                 }
-                const [post] = await getUserMostLikedPost(childProfile);
+                const [post] = await getUserMostLikedPost(user._id);
                 if (post) {
                     user.media = [{
                         image: [

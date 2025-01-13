@@ -19,7 +19,7 @@ module.exports = async (
     };
   }
   const result = await getMyFollowLinks(
-    profileId,
+    ObjectId(profileId),
     page,
     selfProfileId,
     selfMasterId,

@@ -1,12 +1,10 @@
 const serializeHttpResponse = require('../../../helpers/serialize-http-response');
 const getMyFollowLinksService = require('../../../services/v2/followlinks/getMyFollowLinks');
 const { isValidObjectId } = require('../../../utils/db');
-const getFollowlinksProfile = require('../../../services/v2/users/getChildProfile')
 
 module.exports = async (request) => {
     let postId = request.query.postId;
     postId = postId ? postId : "*";
-    let profileId = await getFollowlinksProfile(request.params.userId, 'followlinks')
 
     if (!isValidObjectId(request.params.userId)) {
         return serializeHttpResponse(400, {
@@ -15,7 +13,7 @@ module.exports = async (request) => {
     }
     
     const result = await getMyFollowLinksService(
-        profileId[0]._id,
+        request.params.userId,
         request.query.page,
         request.user._id,
         request.user._id,

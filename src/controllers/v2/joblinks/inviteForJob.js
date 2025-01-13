@@ -3,7 +3,6 @@ const inviteForJob = require("../../../services/v2/joblinks/inviteForJob");
 const { checkInvitation } = require("../../../data-access/v2/users");
 const { isValidObjectId } = require("../../../utils/db");
 const sendNotificationsService = require("../../../services/v2/users/sendNotifications");
-const getMasterProfile = require("../../../services/v2/users/getMasterProfile");
 const {
   getOneUser,
   getHiringProfile,
@@ -58,9 +57,9 @@ module.exports = async (request) => {
   }
 
   if (hiringprofile) {
-    masterId = await getMasterProfile(hiringprofile.userId);
+    masterId = hiringprofile.userId;
   } else {
-    masterId = await getMasterProfile(userId);
+    masterId = userId;
   }
   const user = await getOneUser(masterId[0]._id);
   let invitation = await checkInvitation(

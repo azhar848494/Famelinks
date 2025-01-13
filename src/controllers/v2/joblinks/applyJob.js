@@ -32,10 +32,10 @@ module.exports = async (request) => {
     });
   }
 
-  const masterId = await getMasterProfile(job[0].createdBy[0]._id)
-  const user = await getOneUser(masterId[0]._id)
+  const masterId = job[0].createdBy[0]._id
+  const user = await getOneUser(masterId)
 
-  if (masterId[0]._id.toString() == request.user._id.toString()) {
+  if (masterId.toString() == request.user._id.toString()) {
     return serializeHttpResponse(400, {
       message: 'User cannot apply to the job created by himself/herself'
     })

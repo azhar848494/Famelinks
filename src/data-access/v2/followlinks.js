@@ -326,7 +326,7 @@ exports.getMyFollowLinks = (
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$challengeId"] },
+              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
               isDeleted: false,
             },
           },
@@ -506,7 +506,7 @@ exports.getFollowLinks = (followLinksId, userId, page, filterObj) => {
           isSafe: true,
           isBlocked: false,
           userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-          $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
+          $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
         },
       },
       //MasterIdMigration
@@ -551,7 +551,7 @@ exports.getFollowLinks = (followLinksId, userId, page, filterObj) => {
           pipeline: [
             {
               $match: {
-                $expr: { $in: ["$_id", "$$challengeId"] },
+                $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
                 isDeleted: false,
               },
             },
@@ -983,7 +983,7 @@ exports.getFollowLinksById = (profileId, userId, postId) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$challengeId"] },
+              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
               isDeleted: false,
             },
           },
@@ -999,7 +999,7 @@ exports.getFollowLinksById = (profileId, userId, postId) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$challengeId"] },
+              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
               isDeleted: false,
             },
           },

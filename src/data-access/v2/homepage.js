@@ -30,7 +30,7 @@ exports.getMostLikedPosts = (
         isSafe: true,
         isBlocked: false,
         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-        $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
+        $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
       },
     },
     // User
@@ -66,7 +66,7 @@ exports.getMostLikedPosts = (
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$challengeId"] },
+              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
               isDeleted: false,
             },
           },
