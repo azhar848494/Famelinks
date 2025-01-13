@@ -1,0 +1,87 @@
+module.exports = {
+  host: process.env.HOST,
+  port: parseInt(process.env.PORT),
+  dbUrl: process.env.NODE_ENV == 'prod' ? process.env.PROD_DB_URL : process.env.DEV_DB_URL,
+  jwt: {
+    secret: process.env.JWT_SECRET,
+    expiryTimeInSeconds: parseInt(process.env.JWT_EXPIRY),
+  },
+  otp: {
+    isEnabled: Boolean(parseInt(process.env.OTP_ENABLED)),
+    expiryTimeInSeconds: parseInt(process.env.OTP_EXPIRY),
+    length: parseInt(process.env.OTP_LENGTH),
+    value: parseInt(process.env.OTP_VALUE),
+    numberToIgnore: JSON.parse(process.env.OTP_PHONE_NUMBERS),
+  },
+  crypt: {
+    saltRounds: process.env.SALT_ROUNDS,
+    salt: process.env.SALT,
+  },
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackUrl: process.env.GOOGLE_CALLBACK_URL,
+    refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+    accessToken: process.env.GOOGLE_ACCESS_TOKEN,
+  },
+  fileUploadPath: process.env.FILE_UPLOAD_PATH,
+  sms: {
+    apiKey: process.env.SMS_API_KEY,
+    header: process.env.SMS_HEADER,
+    dltEntityId: process.env.DLT_ENTITY_ID,
+  },
+  s3: {
+    accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    accessKeySecret: process.env.S3_SECRET_ACCESS_KEY,
+    bucket: {
+      name: process.env.MAIN_BUCKET,
+      famelinks: `${process.env.FAMELINKS_BUCKET}`,
+      followlinks: `${process.env.FOLLOWLINKS_BUCKET}`,
+      profile: `${process.env.PROFILE_BUCKET}`,
+      funlinks: `${process.env.FUNLINKS_BUCKET}`,
+      funlinksMusic: `${process.env.FUNLINKS_MUSIC_BUCKET}`,
+      avatar: `${process.env.AVATAR_BUCKET}`,
+      joblinks: `${process.env.JOBLINKS}`,
+      cluboffer: `${process.env.CLUBOFFER}`,
+      challenges: `${process.env.CHALLENGES}`,
+      trendz: `${process.env.MAIN_BUCKET}/${process.env.CHALLENGES}`,
+      collablinks: `${process.env.COLLABLINKS_BUCKET}`,
+    },
+    s3UrlPath: process.env.S3_URL_PATH,
+  },
+  mail: {
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    fromMail: process.env.FAMELINKS_EMAIL,
+  },
+  codec: {
+    ffmpeg: process.env.FFMPEG_PATH,
+    ffprobe: process.env.FFPROBE_PATH,
+  },
+  mediaFilter: {
+    baseUrl: process.env.MEDIA_FILTER_URL,
+  },
+  userApi: {
+    baseUrl: process.env.USER_API_URL,
+  },
+  famelinks: {
+    officialId: process.env.FAMELINKS_OFFICIAL_ID,
+    supportId: process.env.FAMELINKS_SUPPORT_ID,
+  },
+  dailyPostLimit: process.env.DAILY_POST_LIMIT,
+  dailyInviteLimit: process.env.DAILY_INVITE_LIMIT,
+  settingsId: process.env.SETTINGS_ID,
+  redisHost: process.env.REDIS_HOST || "localhost:6379",
+  mediaLimit: {
+    video: parseInt(process.env.VIDEO_LIMIT) || 2000000,
+    image: parseInt(process.env.IMAGE_LIMIT) || 300000,
+    thumbnail: parseInt(process.env.TMB_LIMIT) || 10000,
+  },
+  Ad_frequency: {
+    Ad_freq_famelinks: parseInt(process.env.Ad_Freq_Famelinks) || 6,
+    Ad_freq_funlinks: parseInt(process.env.Ad_Freq_Funlinks) || 6,
+    Ad_freq_followerlinks: parseInt(process.env.Ad_Freq_Followlinks) || 6,
+    Ad_freq_joblinks: parseInt(process.env.Ad_Freq_Joblinks) || 6,
+  },
+};

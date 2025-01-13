@@ -1,0 +1,5 @@
+package-lock.json
+uploads
+.env
+configs/*.json
+node_modules
