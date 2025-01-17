@@ -1,7 +1,7 @@
 module.exports = {
   host: process.env.HOST,
   port: parseInt(process.env.PORT),
-  dbUrl: process.env.NODE_ENV == 'prod' ? process.env.PROD_DB_URL : process.env.DEV_DB_URL,
+  dbUrl: process.env.DB_URL,
   jwt: {
     secret: process.env.JWT_SECRET,
     expiryTimeInSeconds: parseInt(process.env.JWT_EXPIRY),
