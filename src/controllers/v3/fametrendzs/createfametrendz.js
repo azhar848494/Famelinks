@@ -9,13 +9,13 @@ module.exports = async (request) => {
   let payload = request.body;
   let selfUserId = request.user._id;
 
-  
-  payload.for = JSON.parse(payload.for);
+  if (payload.location) payload.location = JSON.parse(payload.location);
+  if (payload.for) payload.for = JSON.parse(payload.for);
 
   if (request.user.type == "individual") {
-      return serializeHttpResponse(400, {
-        message: "only brand or agency can create fametrendz",
-      });
+    return serializeHttpResponse(400, {
+      message: "only brand or agency can create fametrendz",
+    });
   }
 
   payload.sponsor = selfUserId;
@@ -31,16 +31,16 @@ module.exports = async (request) => {
     payload.txType
   );
 
-  if (payment){
+  if (payment) {
     await addPaymentId(result._id, payment._id);
   }
-    if (!result) {
-      return serializeHttpResponse(500, {
-        message: "Failed to create fametrendz",
-      });
-    }
+  if (!result) {
+    return serializeHttpResponse(500, {
+      message: "Failed to create fametrendz",
+    });
+  }
 
- 
+
   return serializeHttpResponse(200, {
     message: "fametrendz created successfuly",
     result,

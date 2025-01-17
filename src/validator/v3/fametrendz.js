@@ -34,7 +34,7 @@ module.exports = {
       category: joi.string().optional(),
       type: joi.string().optional(),
       for: joi.string().trim(),
-      location: joi.array().items(joi.string().trim()).optional(),
+      location: joi.string().trim(),
       startDate: joi.date().format("DD-MM-YYYY").utc().optional(),
       ageGroup: joi.array().items(joi.string().trim()),
       time: joi.string().optional(),
