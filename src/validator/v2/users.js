@@ -83,7 +83,7 @@ module.exports = {
           .trim()
           .valid("individual", "agency", "brand")
           .optional(),
-        location: joi.string().trim().required(),
+        location: joi.string().trim(),
         username: joi.string().trim().min(3).max(30).lowercase().optional(),
         ageGroup: joi
           .string()

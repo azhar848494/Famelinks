@@ -181,7 +181,7 @@ exports.getUserJobChatRequests = (userId, page) => {
             from: "jobcategories",
             let: { jobCategory: "$jobCategory" },
             pipeline: [
-              { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
+              { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
               { $project: { _id: 0, jobName: 1 } },
             ],
             as: "jobDetails",

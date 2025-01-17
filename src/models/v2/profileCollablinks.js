@@ -15,8 +15,8 @@ module.exports = mongoose.Schema(
     url: { type: String, default: null },
     profileImageType: {
       type: String,
-      default: "",
-      enum: ["avatar", "image", ""],
+      default: null,
+      enum: ["avatar", "image", null],
     },
     isSuspended: { type: Boolean, default: false },
   },

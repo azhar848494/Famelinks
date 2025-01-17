@@ -124,8 +124,8 @@ module.exports = mongoose.model(
         profileImage: { type: String, default: null },
         profileImageType: {
           type: String,
-          default: "",
-          enum: ["avatar", "image", ""],
+          default: null,
+          enum: ["avatar", "image", null],
         },
         settings: { type: SettingSchema, default: {} },
         isVerified: { type: Boolean, default: false },

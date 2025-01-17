@@ -689,7 +689,7 @@ exports.getChallengeFamelinks = (challengeId, page, userId, profileId) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+              $expr: { $in: ["$_id", "$$challengeId"] },
               isDeleted: false,
             },
           },
@@ -1015,7 +1015,7 @@ exports.getChallengeFunlinks = (challengeId, page, userId) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+              $expr: { $in: ["$_id", "$$challengeId"] },
               isDeleted: false,
             },
           },
@@ -1300,7 +1300,7 @@ exports.getChallengeFollowlinks = (challengeId, page, userId) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+              $expr: { $in: ["$_id", "$$challengeId"] },
               isDeleted: false,
             },
           },
@@ -1646,7 +1646,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
                 $expr: {
                   $and: [
                     { $in: ["$$challengeId", Array.isArray("$challengeId") ? "$challengeId" : []] },
-                    { $not: [{ $in: ["$userId", Array.isArray("$$blockedUserIds") ? "$$blockedUserIds" : []] }] },
+                    { $not: [{ $in: ["$userId", "$$blockedUserIds"] }] },
                   ],
                 },
               },
@@ -1778,7 +1778,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
                 $expr: {
                   $and: [
                     { $in: ["$$challengeId", Array.isArray("$challengeId") ? "$challengeId" : []] },
-                    { $not: [{ $in: ["$userId", Array.isArray("$$blockedUserIds") ? "$$blockedUserIds" : []] }] },
+                    { $not: [{ $in: ["$userId", "$$blockedUserIds"] }] },
                   ],
                 },
               },
@@ -1833,7 +1833,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
                 $expr: {
                   $and: [
                     { $in: ["$$challengeId", Array.isArray("$challengeId") ? "$challengeId" : []] },
-                    { $not: [{ $in: ["$userId", Array.isArray("$$blockedUserIds") ? "$$blockedUserIds" : []] }] },
+                    { $not: [{ $in: ["$userId", "$$blockedUserIds"] }] },
                   ],
                 },
               },
@@ -2015,7 +2015,7 @@ exports.exploreFunlinks = (page, userId, profileId) => {
         from: "users",
         let: { blockedUserIds: "$blockedUserIds" },
         pipeline: [
-          { $match: { $expr: { $in: ["$_id", Array.isArray("$$blockedUserIds") ? "$$blockedUserIds" : []] } } },
+          { $match: { $expr: { $in: ["$_id", "$$blockedUserIds"] } } },
           { $project: { profileFunlinks: 1, _id: 0 } },
         ],
         as: "blockedUserIds",
@@ -2034,7 +2034,7 @@ exports.exploreFunlinks = (page, userId, profileId) => {
                   { $in: ["$$challengeId", Array.isArray("$challengeId") ? "$challengeId" : []] },
                   {
                     $not: [
-                      { $in: ["$userId", Array.isArray("$$blockedUserIds.profileFunlinks") ? "$$blockedUserIds.profileFunlinks" : []] },
+                      { $in: ["$userId", "$$blockedUserIds.profileFunlinks"] },
                     ],
                   },
                 ],
@@ -2164,7 +2164,7 @@ exports.getFameLinksChallengesBySearch = (searchData, linkType) => {
 //         from: "famelinks",
 //         let: { winnerIds: "$winnerIds" },
 //         pipeline: [
-//           { $match: { $expr: { $in: ["$_id", Array.isArray("$$winnerIds") ? "$$winnerIds" : []] } } },
+//           { $match: { $expr: { $in: ["$_id", "$$winnerIds"] } } },
 //           {
 //             $project: {
 //               userId: 1,
@@ -2511,7 +2511,7 @@ exports.getChallengeWinners = (userId) => {
           from: "famelinks",
           let: { winnerIds: "$winnerIds" },
           pipeline: [
-            { $match: { $expr: { $in: ["$_id", Array.isArray("$$winnerIds") ? "$$winnerIds" : []] } } },
+            { $match: { $expr: { $in: ["$_id", "$$winnerIds"] } } },
             {
               $project: {
                 _id: 1,

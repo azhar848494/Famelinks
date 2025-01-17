@@ -6,7 +6,7 @@ const ObjectId = mongoose.Types.ObjectId;
 //MasterIdMigration
 module.exports = new Schema(
     {
-        name: { type: String, default: '' },
+        name: { type: String, default: null },
         bio: { type: String, default: '' },
         profession: { type: String, default: '' },
         isRegistered: { type: Boolean, default: false },
@@ -16,8 +16,8 @@ module.exports = new Schema(
         savedJobs: { type: [ObjectId], default: [] },
         profileImageType: {
             type: String,
-            default: "",
-            enum: ["avatar", "image", ""],
+            default: null,
+            enum: ["avatar", "image", null],
         },
         url: { type: String, default: '' }, //This is only for Agency
         savedTalents: { type: [ObjectId], default: [] }, //this is only for brand & agency

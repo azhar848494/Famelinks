@@ -170,7 +170,7 @@ exports.getBrandProducts = (brandId, page) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$profileFollowlinks._id", Array.isArray("$$tags") ? "$$tags" : []] },
+              $expr: { $in: ["$profileFollowlinks._id", "$$tags"] },
             },
           },
           {
@@ -202,7 +202,7 @@ exports.getBrandProducts = (brandId, page) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$profileFunlinks._id", Array.isArray("$$tags") ? "$$tags" : []] },
+              $expr: { $in: ["$profileFunlinks._id", "$$tags"] },
             },
           },
           {
@@ -343,7 +343,7 @@ exports.getMyBrandProducts = (userId, page, filterObj) => {
               from: "locatns",
               let: { value: "$scopes" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                 { $project: { type: 1, value: 1, } },
                 { $sort: { _id: -1 } },
               ],
@@ -468,7 +468,7 @@ exports.getBrandPosts = (userId, page) => {
     //     pipeline: [
     //       {
     //         $match: {
-    //           $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+    //           $expr: { $in: ["$_id", "$$challengeId"] },
     //           isDeleted: false,
     //         },
     //       },
@@ -748,7 +748,7 @@ exports.getsAdBrandPosts = (userId, page) => {
     //     pipeline: [
     //       {
     //         $match: {
-    //           $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+    //           $expr: { $in: ["$_id", "$$challengeId"] },
     //           isDeleted: false,
     //         },
     //       },
@@ -802,7 +802,7 @@ exports.getsAdBrandPosts = (userId, page) => {
               from: "locatns",
               let: { value: "$scopes" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                 { $project: { type: 1, value: 1, } },
                 { $sort: { _id: -1 } },
               ],
@@ -957,7 +957,7 @@ exports.getAdBrandPosts = (userId, page) => {
     //     pipeline: [
     //       {
     //         $match: {
-    //           $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+    //           $expr: { $in: ["$_id", "$$challengeId"] },
     //           isDeleted: false,
     //         },
     //       },

@@ -26,8 +26,8 @@ module.exports = new Schema(
     //contestWon: { type: [ObjectId] } fetch from contestWinner collection while aggregation
     profileImageType: {
       type: String,
-      default: "",
-      enum: ["avatar", "image", ""],
+      default: null,
+      enum: ["avatar", "image", null],
     },
     isSuspended: { type: Boolean, default: false },
   },

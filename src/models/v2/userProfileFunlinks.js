@@ -19,8 +19,8 @@ module.exports = new Schema(
     savedMusic: { type: [ObjectId] },
     profileImageType: {
       type: String,
-      default: "",
-      enum: ["avatar", "image", ""],
+      default: null,
+      enum: ["avatar", "image", null],
     },
     isSuspended: { type: Boolean, default: false },
   },

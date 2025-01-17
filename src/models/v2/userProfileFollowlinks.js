@@ -19,8 +19,8 @@ module.exports = new Schema(
     isDeleted: { type: Boolean, default: false },
     profileImageType: {
       type: String,
-      default: "",
-      enum: ["avatar", "image", ""],
+      default: null,
+      enum: ["avatar", "image", null],
     },
     isSuspended: { type: Boolean, default: false },
     clubCategory: { type: [ObjectId], default: [] }

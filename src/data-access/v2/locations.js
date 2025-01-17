@@ -67,7 +67,7 @@ exports.findLocationsByText = (data) => {
           from: "locatns",
           let: { value: "$scopes" },
           pipeline: [
-            { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+            { $match: { $expr: { $in: ["$_id", "$$value"] } } },
             { $project: { value: 1 } },
             { $sort: { _id: -1 } },
           ],

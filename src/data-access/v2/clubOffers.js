@@ -1292,7 +1292,7 @@ exports.searchClubOffersByName = (selfMasterId, search, followlinksId, funlinksI
                                 name: { $regex: `^${search}.*`, $options: "i" },
                                 isDeleted: false,
                                 isSuspended: false,
-                                $expr: { $not: { $in: ["$_id", Array.isArray("$$blockList") ? "$$blockList" : []] } },
+                                $expr: { $not: { $in: ["$_id", "$$blockList"] } },
                             },
                         },
                         { $project: { profileFollowlinks: 1, profileFunlinks: 1 } },
@@ -1372,7 +1372,7 @@ exports.searchClubOffersByName = (selfMasterId, search, followlinksId, funlinksI
                     from: "clubcategories",
                     let: { category: "$category" },
                     pipeline: [
-                        { $match: { $expr: { $in: ["$_id", Array.isArray("$$category") ? "$$category" : []] } } },
+                        { $match: { $expr: { $in: ["$_id", "$$category"] } } },
                         { $project: { name: 1 } },
                     ],
                     as: "category",
@@ -1711,7 +1711,7 @@ exports.getApplicants = (offerId) => {
                     {
                         $addFields: {
                             saved: {
-                                $in: ["$masterProfile._id", Array.isArray("$$savedPromoters") ? "$$savedPromoters" : []]
+                                $in: ["$masterProfile._id", "$$savedPromoters"]
                             },
                         },
                     },
@@ -1924,7 +1924,7 @@ exports.getApplicants = (offerId) => {
                     {
                         $addFields: {
                             saved: {
-                                $in: ["$masterProfile._id", Array.isArray("$$savedPromoters") ? "$$savedPromoters" : []]
+                                $in: ["$masterProfile._id", "$$savedPromoters"]
                             },
                         },
                     },

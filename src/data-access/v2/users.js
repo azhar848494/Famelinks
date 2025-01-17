@@ -1581,7 +1581,7 @@ exports.getProfileFamelinks = (profileId, followerId, page) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", Array.isArray("$$trendId") ? "$$trendId" : []] },
+              $expr: { $in: ["$_id", "$$trendId"] },
               winner: { $ne: null },
             },
           },
@@ -1705,7 +1705,7 @@ exports.getProfileFamelinks = (profileId, followerId, page) => {
               from: "famelinks",
               let: { postId: "$postId" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$postId") ? "$$postId" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$postId"] } } },
                 {
                   $project: {
                     _id: 0,
@@ -2148,9 +2148,12 @@ exports.createProfileFamelinks = async (data) => {
   return await UserDB.create(data);
 };
 
-exports.updateProfileFamelinks = (profileId, obj) => {
+exports.updateProfileFamelinks = (profileId, obj) => {  
+  obj = Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [`profileFamelinks.${key}`, value])
+  );
   //MasterIdMigration
-  return UserDB.updateOne({ _id: profileId }, { $set: { profileFamelinks: obj } });
+  return UserDB.updateOne({ _id: profileId }, { $set: obj });
 };
 
 //MasterIdMigration
@@ -2217,7 +2220,7 @@ exports.getProfileFollowlinks = async (profileId, followerId, page) => {
         from: "clubcategories",
         let: { category: "$profileFollowlinks.clubCategory" },
         pipeline: [
-          { $match: { $expr: { $in: ["$_id", Array.isArray("$$category") ? "$$category" : []] } } },
+          { $match: { $expr: { $in: ["$_id", "$$category"] } } },
           { $project: { name: 1 } },
         ],
         as: "clubCategory",
@@ -2599,9 +2602,12 @@ exports.createProfileFollowlinks = async (data) => {
 };
 
 exports.updateProfileFollowlinks = async (profileId, obj) => {
+  obj = Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [`profileFollowlinks.${key}`, value])
+  );
   return await UserDB.updateOne(
     { _id: profileId },
-    { $set: { profileFollowlinks: obj } }
+    { $set: obj }
   );
 };
 
@@ -2839,7 +2845,7 @@ exports.getOtherProfileFunlinks = async (profileId, followerId, page) => {
         from: "musics",
         let: { savedMusic: "$profileFunlinks.savedMusic" },
         pipeline: [
-          { $match: { $expr: { $in: ["$_id", Array.isArray("$$savedMusic") ? "$$savedMusic" : []] } } },
+          { $match: { $expr: { $in: ["$_id", "$$savedMusic"] } } },
           { $project: { music: 1, duration: 1, createdAt: 1, name: 1 } },
           {
             $lookup: {
@@ -3067,7 +3073,10 @@ exports.createProfileFunlinks = async (data) => {
 
 //MasterIdMigration
 exports.updateProfileFunlinks = (profileId, obj) => {
-  return UserDB.updateOne({ _id: profileId }, { $set: { profileFunlinks: obj } });
+  obj = Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [`profileFunlinks.${key}`, value])
+  );
+  return UserDB.updateOne({ _id: profileId }, { $set: obj });
 };
 
 exports.getProfileJoblinks = (profileId, page) => {
@@ -3095,13 +3104,13 @@ exports.getProfileJoblinks = (profileId, page) => {
               from: "locatns",
               let: { value: "$interestedLoc" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                 {
                   $lookup: {
                     from: "locatns",
                     let: { value: "$scopes" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                      { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                       { $project: { value: 1 } },
                       { $sort: { _id: -1 } },
                     ],
@@ -3162,7 +3171,7 @@ exports.getProfileJoblinks = (profileId, page) => {
               from: "jobcategories",
               let: { interestCat: "$interestCat" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$interestCat") ? "$$interestCat" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$interestCat"] } } },
                 { $project: { jobName: 1, jobCategory: 1 } },
               ],
               as: "interestCat",
@@ -3184,13 +3193,13 @@ exports.getProfileJoblinks = (profileId, page) => {
               from: "locatns",
               let: { value: "$interestedLoc" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                 {
                   $lookup: {
                     from: "locatns",
                     let: { value: "$scopes" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                      { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                       { $project: { value: 1 } },
                       { $sort: { _id: -1 } },
                     ],
@@ -3236,7 +3245,7 @@ exports.getProfileJoblinks = (profileId, page) => {
               from: "jobcategories",
               let: { interestCat: "$interestCat" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$interestCat") ? "$$interestCat" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$interestCat"] } } },
                 { $project: { jobName: 1, jobCategory: 1 } },
               ],
               as: "interestCat",
@@ -3415,7 +3424,7 @@ exports.getProfileJoblinks = (profileId, page) => {
               from: "jobcategories",
               let: { jobCategory: "$jobCategory" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
                 { $project: { jobName: 1, jobCategory: 1 } },
               ],
               as: "jobDetails",
@@ -3689,7 +3698,7 @@ exports.getOtherProfileJoblinks = (
           pipeline: [
             {
               $match: {
-                $expr: { $in: ["$_id", Array.isArray("$$trendId") ? "$$trendId" : []] },
+                $expr: { $in: ["$_id", "$$trendId"] },
                 winner: { $ne: null },
               },
             },
@@ -3813,7 +3822,7 @@ exports.getOtherProfileJoblinks = (
                 from: "famelinks",
                 let: { postId: "$postId" },
                 pipeline: [
-                  { $match: { $expr: { $in: ["$_id", Array.isArray("$$postId") ? "$$postId" : []] } } },
+                  { $match: { $expr: { $in: ["$_id", "$$postId"] } } },
                   {
                     $project: {
                       _id: 0,
@@ -3984,7 +3993,7 @@ exports.getOtherProfileJoblinks = (
                 from: "jobcategories",
                 let: { jobCategory: "$jobCategory" },
                 pipeline: [
-                  { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
+                  { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
                   { $project: { jobName: 1, jobCategory: 1 } },
                 ],
                 as: "jobDetails",
@@ -4188,7 +4197,7 @@ exports.getOtherProfileJoblinks = (
                 pipeline: [
                   {
                     $match: {
-                      $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] },
+                      $expr: { $in: ["$_id", "$$jobCategory"] },
                     },
                   },
                   {
@@ -4301,7 +4310,7 @@ exports.getOtherProfileJoblinks = (
                 pipeline: [
                   {
                     $match: {
-                      $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] },
+                      $expr: { $in: ["$_id", "$$jobCategory"] },
                     },
                   },
                   {
@@ -4529,13 +4538,13 @@ exports.getOtherProfileJoblinks = (
                 from: "locatns",
                 let: { value: "$interestedLoc" },
                 pipeline: [
-                  { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                  { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                   {
                     $lookup: {
                       from: "locatns",
                       let: { value: "$scopes" },
                       pipeline: [
-                        { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                        { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                         { $project: { type: 1, value: 1 } },
                         { $sort: { _id: -1 } },
                       ],
@@ -4595,7 +4604,7 @@ exports.getOtherProfileJoblinks = (
                 from: "jobcategories",
                 let: { interestCat: "$interestCat" },
                 pipeline: [
-                  { $match: { $expr: { $in: ["$_id", Array.isArray("$$interestCat") ? "$$interestCat" : []] } } },
+                  { $match: { $expr: { $in: ["$_id", "$$interestCat"] } } },
                   { $project: { jobName: 1, jobCategory: 1 } },
                 ],
                 as: "interestCat",
@@ -4617,13 +4626,13 @@ exports.getOtherProfileJoblinks = (
                 from: "locatns",
                 let: { value: "$interestedLoc" },
                 pipeline: [
-                  { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                  { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                   {
                     $lookup: {
                       from: "locatns",
                       let: { value: "$scopes" },
                       pipeline: [
-                        { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                        { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                         { $project: { type: 1, value: 1 } },
                         { $sort: { _id: -1 } },
                       ],
@@ -4679,7 +4688,7 @@ exports.getOtherProfileJoblinks = (
                 from: "jobcategories",
                 let: { interestCat: "$interestCat" },
                 pipeline: [
-                  { $match: { $expr: { $in: ["$_id", Array.isArray("$$interestCat") ? "$$interestCat" : []] } } },
+                  { $match: { $expr: { $in: ["$_id", "$$interestCat"] } } },
                   { $project: { jobName: 1, jobCategory: 1 } },
                 ],
                 as: "interestCat",
@@ -4962,7 +4971,7 @@ exports.getOtherProfileJoblinks = (
                 pipeline: [
                   {
                     $match: {
-                      $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] },
+                      $expr: { $in: ["$_id", "$$jobCategory"] },
                     },
                   },
                   {
@@ -5075,7 +5084,7 @@ exports.getOtherProfileJoblinks = (
                 pipeline: [
                   {
                     $match: {
-                      $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] },
+                      $expr: { $in: ["$_id", "$$jobCategory"] },
                     },
                   },
                   {
@@ -5546,7 +5555,10 @@ exports.getStorelinks = (profileId, followerId, page) => {
 };
 
 exports.updateStorelinks = (profileId, data) => {
-  return UserDB.updateOne({ _id: profileId }, { $set: { profileStorelinks: data } });
+  data = Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [`profileStorelinks.${key}`, value])
+  );
+  return UserDB.updateOne({ _id: profileId }, { $set: data });
 };
 
 exports.createCollablinks = async (data) => {
@@ -5610,7 +5622,7 @@ exports.getSelfCollablinks = (profileId, followerId, page, masterId) => {
               $and: [
                 {
                   $expr: {
-                    $in: ["$_id", Array.isArray("$$postId") ? "$$postId" : []],
+                    $in: ["$_id", "$$postId"],
                   },
                 },
                 { isDeleted: false },
@@ -5647,7 +5659,7 @@ exports.getSelfCollablinks = (profileId, followerId, page, masterId) => {
               $and: [
                 {
                   $expr: {
-                    $in: ["$_id", Array.isArray("$$postId") ? "$$postId" : []],
+                    $in: ["$_id", "$$postId"],
                   },
                 },
                 { isDeleted: false },
@@ -6106,7 +6118,7 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
               $and: [
                 {
                   $expr: {
-                    $in: ["$_id", Array.isArray("$$postId") ? "$$postId" : []],
+                    $in: ["$_id", "$$postId"],
                   },
                 },
                 { isDeleted: false },
@@ -6143,7 +6155,7 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
               $and: [
                 {
                   $expr: {
-                    $in: ["$_id", Array.isArray("$$postId") ? "$$postId" : []],
+                    $in: ["$_id", "$$postId"],
                   },
                 },
                 { isDeleted: false },
@@ -6425,7 +6437,7 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
               from: "jobcategories",
               let: { jobCategory: "$jobCategory" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
                 { $project: { _id: 0, jobName: 1, jobCategory: 1 } },
               ],
               as: "jobDetails",
@@ -6562,8 +6574,11 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
   ]);
 };
 
-exports.updateCollablinks = (profileId, data) => {
-  return UserDB.updateOne({ _id: profileId }, { $set: { profileCollablinks: data } });
+exports.updateCollablinks = (profileId, data) => {  
+  data = Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [`profileCollablinks.${key}`, value])
+  );
+  return UserDB.updateOne({ _id: profileId }, { $set: data });
 };
 
 exports.checkBrandVisit = (profileId, type, brandId) => {
@@ -6688,7 +6703,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
               from: "jobcategories",
               let: { jobCategory: "$jobCategory" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
                 { $project: { jobName: 1, jobCategory: 1 } },
               ],
               as: "jobDetails",
@@ -6841,7 +6856,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
               pipeline: [
                 {
                   $match: {
-                    $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] },
+                    $expr: { $in: ["$_id", "$$jobCategory"] },
                   },
                 },
                 { $project: { jobName: 1, jobCategory: 1 } },
@@ -6967,7 +6982,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
               pipeline: [
                 {
                   $match: {
-                    $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] },
+                    $expr: { $in: ["$_id", "$$jobCategory"] },
                   },
                 },
                 { $project: { jobName: 1, jobCategory: 1 } },
@@ -7169,7 +7184,7 @@ exports.getAgencyProfileJoblinks = (userId) => {
               from: "jobcategories",
               let: { interestCat: "$interestCat" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$interestCat") ? "$$interestCat" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$interestCat"] } } },
                 { $project: { jobName: 1, jobCategory: 1 } },
               ],
               as: "interestCat",
@@ -7180,13 +7195,13 @@ exports.getAgencyProfileJoblinks = (userId) => {
               from: "locatns",
               let: { value: "$interestedLoc" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                 {
                   $lookup: {
                     from: "locatns",
                     let: { value: "$scopes" },
                     pipeline: [
-                      { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                      { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                       { $project: { type: 1, value: 1 } },
                       { $sort: { _id: -1 } },
                     ],
@@ -7268,7 +7283,7 @@ exports.getAgencyProfileJoblinks = (userId) => {
               from: "jobcategories",
               let: { jobCategory: "$jobCategory" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$jobCategory") ? "$$jobCategory" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
                 { $project: { jobName: 1, jobCategory: 1 } },
               ],
               as: "jobDetails",
@@ -7331,7 +7346,7 @@ exports.getAgencyProfileJoblinks = (userId) => {
               from: "locatns",
               let: { value: "$jobLocation" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                 { $project: { type: 1, value: 1 } },
               ],
               as: "location",
@@ -7497,8 +7512,11 @@ exports.getAgencyProfileJoblinks = (userId) => {
   ]);
 };
 
-exports.updateProfileJoblinks = (userId, data) => {
-  return UserDB.updateOne({ _id: userId }, { $set: { profileJoblinks: data } });
+exports.updateProfileJoblinks = (userId, data) => {  
+  data = Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [`profileJoblinks.${key}`, value])
+  );
+  return UserDB.updateOne({ _id: userId }, { $set: data });
 };
 
 exports.createProfileJoblinks = (userData) => {

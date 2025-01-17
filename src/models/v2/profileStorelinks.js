@@ -16,8 +16,8 @@ module.exports = new mongoose.Schema(
     bannerMedia: { type: [String], default: null },
     profileImageType: {
       type: String,
-      default: "",
-      enum: ["avatar", "image", ""],
+      default: null,
+      enum: ["avatar", "image", null],
     },
     isSuspended: { type: Boolean, default: false },
   },

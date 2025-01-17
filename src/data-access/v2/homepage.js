@@ -66,7 +66,7 @@ exports.getMostLikedPosts = (
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+              $expr: { $in: ["$_id", "$$challengeId"] },
               isDeleted: false,
             },
           },

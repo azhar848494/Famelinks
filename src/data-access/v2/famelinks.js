@@ -69,7 +69,7 @@ exports.getFollowLinks = (userId, page) => {
         from: "challenges",
         let: { challengeId: "$challengeId" },
         pipeline: [
-          { $match: { $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] } } },
+          { $match: { $expr: { $in: ["$_id", "$$challengeId"] } } },
           { $project: { name: 1 } },
         ],
         as: "challenges",
@@ -151,7 +151,7 @@ exports.getFollowLinks = (userId, page) => {
               from: "locatns",
               let: { value: "$scopes" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", Array.isArray("$$value") ? "$$value" : []] } } },
+                { $match: { $expr: { $in: ["$_id", "$$value"] } } },
                 { $project: { type: 1, value: 1, } },
                 { $sort: { _id: -1 } },
               ],
@@ -464,7 +464,7 @@ exports.getMyFameLinks = (
           pipeline: [
             {
               $match: {
-                $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+                $expr: { $in: ["$_id", "$$challengeId"] },
                 isDeleted: false,
               },
             },
@@ -673,7 +673,7 @@ exports.getMyFameLinks = (
 //         pipeline: [
 //           {
 //             $match: {
-//               $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+//               $expr: { $in: ["$_id", "$$challengeId"] },
 //               isDeleted: false,
 //             },
 //           },
@@ -850,7 +850,7 @@ exports.getFameLinks = (profileId, masterUserId, page, filterObj, limit) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+              $expr: { $in: ["$_id", "$$challengeId"] },
               isDeleted: false,
             },
           },
@@ -1076,7 +1076,7 @@ exports.getAdFameLinks = (userId, page) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+              $expr: { $in: ["$_id", "$$challengeId"] },
               isDeleted: false,
             },
           },
@@ -1262,7 +1262,7 @@ exports.getFameLinksFollowlinks = (fameLinksId, userId, page, filterObj ) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+              $expr: { $in: ["$_id", "$$challengeId"] },
               isDeleted: false,
               // type: 'funlinks'
             },
@@ -1621,7 +1621,7 @@ exports.getUserMostLikedPost = (userId) => {
 //         pipeline: [
 //           {
 //             $match: {
-//               $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+//               $expr: { $in: ["$_id", "$$challengeId"] },
 //               isDeleted: false,
 //             },
 //           },
@@ -1797,7 +1797,7 @@ exports.getFameLinksById = (profileId, userId, postId) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", Array.isArray("$$challengeId") ? "$$challengeId" : []] },
+              $expr: { $in: ["$_id", "$$challengeId"] },
               isDeleted: false,
             },
           },
