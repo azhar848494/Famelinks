@@ -18,6 +18,7 @@ const { findUserByMobileNumber, insertUser, updateUser, findByAppleId,
 } = require('../../../data-access/v2/users');
 
 module.exports = async (payload) => {
+    let isWalkthrough = false;
     try {
         let user, decodedToken, result;
         let updateObj = {};
@@ -97,6 +98,7 @@ module.exports = async (payload) => {
         }
 
         if (!user) {
+            isWalkthrough = true
             let insertObj = { mobileNumber: payload.mobileNumber || decodedToken.mobileNumber };
             if (payload.appleId) {
                 insertObj.appleId = payload.appleId;
@@ -160,7 +162,8 @@ module.exports = async (payload) => {
         return {
             token,
             _id: user._id,
-            accountRecoveryOption: false
+            accountRecoveryOption: false,
+            isWalkthrough: isWalkthrough
         };
     } catch (error) {
         console.log(error)

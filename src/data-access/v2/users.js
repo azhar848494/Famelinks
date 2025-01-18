@@ -3080,6 +3080,7 @@ exports.updateProfileFunlinks = (profileId, obj) => {
 };
 
 exports.getProfileJoblinks = (profileId, page) => {
+  console.log('profileId :: ', profileId)
   return UserDB.aggregate([
     { $match: { _id: profileId } },
     {
@@ -3524,8 +3525,7 @@ exports.getProfileJoblinks = (profileId, page) => {
     { $set: { hired: { $size: "$hired" } } },
     { $set: { applied: { $size: "$applied" } } },
     { $set: { shortlisted: { $size: "$shortlisted" } } },
-    { $set: { savedTalents: { $size: "$savedTalents" } } },
-    { $set: { saved: { $size: "$savedJobs" } } },
+    { $set: { saved: { $size: "$profileJoblinks.savedJobs" } } },
     {
       $lookup: {
         from: "locatns",
@@ -7109,7 +7109,6 @@ exports.getBrandProfileJoblinks = (userId, page) => {
     { $set: { InvitesSent: { $size: "$InvitesSent" } } },
     { $set: { chats: { $size: "$chats" } } },
     { $set: { unreadChats: { $size: "$unreadChats" } } },
-    { $set: { savedTalents: { $size: "$savedTalents" } } },
     { $set: { openJobsCount: { $size: "$openJobs" } } },
     {
       $lookup: {
@@ -7462,7 +7461,6 @@ exports.getAgencyProfileJoblinks = (userId) => {
     { $set: { hired: { $size: "$hired" } } },
     { $set: { applied: { $size: "$applied" } } },
     { $set: { shortlisted: { $size: "$shortlisted" } } },
-    { $set: { savedTalents: { $size: "$savedTalents" } } },
     { $set: { chats: { $size: "$chats" } } },
     { $set: { unreadChats: { $size: "$unreadChats" } } },
     {

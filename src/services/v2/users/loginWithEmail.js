@@ -17,11 +17,11 @@ const { updateProfileFamelinks,
 } = require("../../../data-access/v2/users")
 
 module.exports = async (payload) => {
+    let isWalkthrough = false;
     try {
         let user, result;
         let updateObj = {};
         let MS_PER_DAY = 1000 * 24 * 60 * 60
-        let isWalkthrough = true;
 
         if (payload.email) {
             user = await findUserByEmail(payload.email);
@@ -31,7 +31,6 @@ module.exports = async (payload) => {
             }
 
             if (user) {
-                isWalkthrough = false;
                 if (user.deleteDate != null) {
 
                     if ((Math.abs(new Date() - user.deleteDate) / MS_PER_DAY) <= 30) {
@@ -64,6 +63,7 @@ module.exports = async (payload) => {
             }
 
             if (!user) {
+                isWalkthrough = true;
                 let insertObj = { email: payload.email };
 
                 if (payload.appleId) {

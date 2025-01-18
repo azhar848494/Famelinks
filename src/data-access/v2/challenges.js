@@ -1531,7 +1531,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
           foreignField: "_id",
           localField: "sponsor",
           pipeline: [
-            { $project: { _id: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+            { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
             {
               $set: {
                 profileImage: {

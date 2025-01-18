@@ -15,11 +15,6 @@ module.exports = async (request) => {
   let jobId = request.query.jobId;
   let jobType = request.query.jobType;
   let masterId;
-  // if (request.user.type == "individual") {
-  //   return serializeHttpResponse(400, {
-  //     message: "User cannot sent invitation to other user",
-  //   });
-  // }
 
   if (!isValidObjectId(userId)) {
     return serializeHttpResponse(400, {
@@ -58,10 +53,9 @@ module.exports = async (request) => {
 
   if (hiringprofile) {
     masterId = hiringprofile.userId;
-  } else {
-    masterId = userId;
   }
-  const user = await getOneUser(masterId[0]._id);
+  
+  const user = await getOneUser(masterId);
   let invitation = await checkInvitation(
     jobId,
     userId,

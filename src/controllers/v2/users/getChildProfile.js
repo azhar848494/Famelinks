@@ -9,8 +9,8 @@ module.exports = async (request) => {
     let masterUserId = convert(request.params.masterUserId);
     let linkType = request.params.linkType;
     let profile = 'self'
-
-    if (request.user._id != masterUserId) {
+    
+    if (request.user._id.toString() != masterUserId.toString()) {
       profile = 'other'
     }
 

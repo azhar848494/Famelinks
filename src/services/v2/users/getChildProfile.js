@@ -186,9 +186,10 @@ module.exports = async (
           return await getBrandProfileJoblinks(userId, page);
         }
 
-        return await getProfileJoblinks(result.profileJoblinks, page);
+        return await getProfileJoblinks(userId, page);
       } catch (error) {
         console.log('Error :: ', error)
+        console.log('stack :: ', error.stack)
       }
       break;
     case "storelinks":
