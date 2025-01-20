@@ -126,17 +126,7 @@ exports.getClubOffersNew = (followlinksId, funlinksId, userType, page) => {
                             }
                         },
                         { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-                        {
-                            $set: {
-                                profileImage: {
-                                    $cond: {
-                                        if: { $eq: [null, "$profileImage"] },
-                                        then: null,
-                                        else: { $concat: ["$profileImage", "-", "xs"] },
-                                    },
-                                },
-                            },
-                        },
+                        
                     ],
                     as: 'createdBy'
                 }
@@ -246,17 +236,7 @@ exports.getClubOffersNew = (followlinksId, funlinksId, userType, page) => {
                             }
                         },
                         { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-                        {
-                            $set: {
-                                profileImage: {
-                                    $cond: {
-                                        if: { $eq: [null, "$profileImage"] },
-                                        then: null,
-                                        else: { $concat: ["$profileImage", "-", "xs"] },
-                                    },
-                                },
-                            },
-                        },
+                        
                     ],
                     as: 'createdBy'
                 }
@@ -357,17 +337,7 @@ exports.getClubOffersApplied = (followlinksId, funlinksId, userType, page) => {
                             }
                         },
                         { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-                        {
-                            $set: {
-                                profileImage: {
-                                    $cond: {
-                                        if: { $eq: [null, "$profileImage"] },
-                                        then: null,
-                                        else: { $concat: ["$profileImage", "-", "xs"] },
-                                    },
-                                },
-                            },
-                        },
+                        
                     ],
                     as: 'createdBy'
                 }
@@ -459,17 +429,7 @@ exports.getClubOffersApplied = (followlinksId, funlinksId, userType, page) => {
                     let: { applications: '$applications' },
                     pipeline: [
                         { $match: { $expr: { $in: ['$_id', '$$applications.userId'] } } },
-                        {
-                            $set: {
-                                profileImage: {
-                                    $cond: {
-                                        if: { $eq: [null, "$profileImage"] },
-                                        then: null,
-                                        else: { $concat: ["$profileImage", "-", "xs"] },
-                                    },
-                                },
-                            },
-                        },
+                        
                         {
                             $project: {
                                 type: 1,
@@ -495,17 +455,7 @@ exports.getClubOffersApplied = (followlinksId, funlinksId, userType, page) => {
                     let: { applications: '$applications' },
                     pipeline: [
                         { $match: { $expr: { $in: ['$_id', '$$applications.userId'] } } },
-                        {
-                            $set: {
-                                profileImage: {
-                                    $cond: {
-                                        if: { $eq: [null, "$profileImage"] },
-                                        then: null,
-                                        else: { $concat: ["$profileImage", "-", "xs"] },
-                                    },
-                                },
-                            },
-                        },
+                        
                         {
                             $project: {
                                 type: 1,
@@ -539,17 +489,7 @@ exports.getClubOffersApplied = (followlinksId, funlinksId, userType, page) => {
                             }
                         },
                         { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-                        {
-                            $set: {
-                                profileImage: {
-                                    $cond: {
-                                        if: { $eq: [null, "$profileImage"] },
-                                        then: null,
-                                        else: { $concat: ["$profileImage", "-", "xs"] },
-                                    },
-                                },
-                            },
-                        },
+                        
                     ],
                     as: 'createdBy'
                 }
@@ -638,17 +578,7 @@ exports.getClubOffersInProgress = (followlinksId, funlinksId, userType, page) =>
                             }
                         },
                         { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-                        {
-                            $set: {
-                                profileImage: {
-                                    $cond: {
-                                        if: { $eq: [null, "$profileImage"] },
-                                        then: null,
-                                        else: { $concat: ["$profileImage", "-", "xs"] },
-                                    },
-                                },
-                            },
-                        },
+                        
                     ],
                     as: 'createdBy'
                 }
@@ -844,17 +774,7 @@ exports.getClubOffersInProgress = (followlinksId, funlinksId, userType, page) =>
                             }
                         },
                         { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-                        {
-                            $set: {
-                                profileImage: {
-                                    $cond: {
-                                        if: { $eq: [null, "$profileImage"] },
-                                        then: null,
-                                        else: { $concat: ["$profileImage", "-", "xs"] },
-                                    },
-                                },
-                            },
-                        },
+                        
                     ],
                     as: 'createdBy'
                 }
@@ -1041,17 +961,7 @@ exports.getClubOffersCompleted = (followlinksId, funlinksId, userType, page) => 
                             }
                         },
                         { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-                        {
-                            $set: {
-                                profileImage: {
-                                    $cond: {
-                                        if: { $eq: [null, "$profileImage"] },
-                                        then: null,
-                                        else: { $concat: ["$profileImage", "-", "xs"] },
-                                    },
-                                },
-                            },
-                        },
+                        
                     ],
                     as: 'createdBy'
                 }
@@ -1156,17 +1066,7 @@ exports.getClubOffersCompleted = (followlinksId, funlinksId, userType, page) => 
                             }
                         },
                         { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-                        {
-                            $set: {
-                                profileImage: {
-                                    $cond: {
-                                        if: { $eq: [null, "$profileImage"] },
-                                        then: null,
-                                        else: { $concat: ["$profileImage", "-", "xs"] },
-                                    },
-                                },
-                            },
-                        },
+                        
                     ],
                     as: 'createdBy'
                 }
@@ -1351,17 +1251,7 @@ exports.searchClubOffersByName = (selfMasterId, search, followlinksId, funlinksI
                             },
                         },
                         { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-                        {
-                            $set: {
-                                profileImage: {
-                                    $cond: {
-                                        if: { $eq: [null, "$profileImage"] },
-                                        then: null,
-                                        else: { $concat: ["$profileImage", "-", "xs"] },
-                                    },
-                                },
-                            },
-                        },
+                        
                     ],
                     as: "createdBy",
                 },
@@ -1471,17 +1361,7 @@ exports.searchClubOffersByName = (selfMasterId, search, followlinksId, funlinksI
                             }
                         },
                         { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-                        {
-                            $set: {
-                                profileImage: {
-                                    $cond: {
-                                        if: { $eq: [null, "$profileImage"] },
-                                        then: null,
-                                        else: { $concat: ["$profileImage", "-", "xs"] },
-                                    },
-                                },
-                            },
-                        },
+                        
                     ],
                     as: 'createdBy'
                 }
@@ -1660,17 +1540,7 @@ exports.getApplicants = (offerId) => {
                                     }
                                 },
                                 { $project: { name: 1, type: 1, usertype: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1, profileFollowlinks: 1, profileFunlinks: 1, followersCount: 1 } },
-                                {
-                                    $set: {
-                                        profileImage: {
-                                            $cond: {
-                                                if: { $eq: [null, "$profileImage"] },
-                                                then: null,
-                                                else: { $concat: ["$profileImage", "-", "xs"] },
-                                            },
-                                        },
-                                    },
-                                },
+                                
                                 {
                                     $lookup: {
                                         from: 'cluboffers',
@@ -1728,17 +1598,7 @@ exports.getApplicants = (offerId) => {
                 let: { applications: '$applications' },
                 pipeline: [
                     { $match: { $expr: { $in: ['$_id', '$$applications.userId'] } } },
-                    {
-                        $set: {
-                            profileImage: {
-                                $cond: {
-                                    if: { $eq: [null, "$profileImage"] },
-                                    then: null,
-                                    else: { $concat: ["$profileImage", "-", "xs"] },
-                                },
-                            },
-                        },
-                    },
+                    
                     { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } }
                 ],
                 as: 'followlinksApplicants'
@@ -1751,17 +1611,7 @@ exports.getApplicants = (offerId) => {
                 let: { applications: '$applications' },
                 pipeline: [
                     { $match: { $expr: { $in: ['$_id', '$$applications.userId'] } } },
-                    {
-                        $set: {
-                            profileImage: {
-                                $cond: {
-                                    if: { $eq: [null, "$profileImage"] },
-                                    then: null,
-                                    else: { $concat: ["$profileImage", "-", "xs"] },
-                                },
-                            },
-                        },
-                    },
+                    
                     { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } }
                 ],
                 as: 'funlinksApplicants'
@@ -1782,17 +1632,7 @@ exports.getApplicants = (offerId) => {
                         }
                     },
                     { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-                    {
-                        $set: {
-                            profileImage: {
-                                $cond: {
-                                    if: { $eq: [null, "$profileImage"] },
-                                    then: null,
-                                    else: { $concat: ["$profileImage", "-", "xs"] },
-                                },
-                            },
-                        },
-                    },
+                    
                 ],
                 as: 'createdBy'
             }
@@ -1875,17 +1715,7 @@ exports.getApplicants = (offerId) => {
                                     }
                                 },
                                 { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1, profileFollowlinks: 1, profileFunlinks: 1, followersCount: 1 } },
-                                {
-                                    $set: {
-                                        profileImage: {
-                                            $cond: {
-                                                if: { $eq: [null, "$profileImage"] },
-                                                then: null,
-                                                else: { $concat: ["$profileImage", "-", "xs"] },
-                                            },
-                                        },
-                                    },
-                                },
+                                
                                 {
                                     $lookup: {
                                         from: 'cluboffers',

@@ -245,7 +245,6 @@ exports.getRecentUsers = (limit) => {
     { $addFields: { cardTitle: "$name" } },
     { $project: { _id: 1, profileImage: 1, profileImageType: 1, type: 1, cardTitle: 1 } },
     { $set: { profileImageType: { $cond: [{ $ifNull: ["$profileImageType", false] }, '$profileImageType', ""] } } },
-    { $set: { profileImage: { $cond: { if: { $eq: [null, "$profileImage"] }, then: null, else: { $concat: ["$profileImage", "-", "xs"] } } } } },
     { $sort: { createdAt: -1 } },
     { $limit: limit }
   ])

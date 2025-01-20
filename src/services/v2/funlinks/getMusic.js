@@ -25,24 +25,11 @@ module.exports = async (page, search, type = 'trending', userId) => {
 
     if (result) {
         return result.map(item => {
-            const minutes = parseInt(item.duration / 60);
-            const seconds = parseInt(item.duration % 60);
-            if (minutes)
-                item.duration = `${minutes}m `;
-            else
-                item.duration = '';
-
-            if (seconds) {
-                item.duration += `${seconds}s`;
-            }
-
             if (music) {
                 item.isSaved = Boolean(music.savedMusic.find(musicId => musicId.toString() == item._id.toString()));
             } else {
                 item.isSaved = false;
             }
-
-            item.duration = item.duration.trim();
             return item;
         });
     }

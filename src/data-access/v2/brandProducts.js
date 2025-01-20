@@ -180,17 +180,6 @@ exports.getBrandProducts = (brandId, page) => {
               name: 1,
             },
           },
-          {
-            $set: {
-              profileImage: {
-                $cond: {
-                  if: { $eq: [null, "$profileImage"] },
-                  then: null,
-                  else: { $concat: ["$profileImage", "-", "xs"] },
-                },
-              },
-            },
-          },
         ],
         as: "followlinkTag",
       },
@@ -210,17 +199,6 @@ exports.getBrandProducts = (brandId, page) => {
               profileImage: 1,
               profileImageType: 1,
               name: 1,
-            },
-          },
-          {
-            $set: {
-              profileImage: {
-                $cond: {
-                  if: { $eq: [null, "$profileImage"] },
-                  then: null,
-                  else: { $concat: ["$profileImage", "-", "xs"] },
-                },
-              },
             },
           },
         ],

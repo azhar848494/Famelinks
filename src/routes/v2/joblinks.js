@@ -97,11 +97,17 @@ router.post('/shortlist',
   requestValidatorCallback(validator.shortlist),
   expressCallback(shortlist)
 );
+
 router.post('/saveTalent',
-  saveUnsaveTalent,
   requestValidatorCallback(validator.saveTalent),
   expressCallback(saveTalent)
 );
+
+router.get('/savedTalents',
+  requestValidatorCallback(validator.getSavedTalents),
+  expressCallback(getSavedTalents)
+);
+
 router.post('/greeting',
   uploadGreetingVideo,
   requestValidatorCallback(validator.greeting),
@@ -191,10 +197,7 @@ router.get('/savedJobs',
   requestValidatorCallback(validator.getSavedJobs),
   expressCallback(getSavedJobs)
 );
-router.get('/savedTalents',
-  requestValidatorCallback(validator.getSavedTalents),
-  expressCallback(getSavedTalents)
-);
+
 router.get('/jobInvites',
   requestValidatorCallback(validator.getJobInvites),
   expressCallback(getJobInvites)

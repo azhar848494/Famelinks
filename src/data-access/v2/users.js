@@ -211,17 +211,7 @@ exports.getUserByTag = (tag) => {
 exports.getUserProfileImages = (userId) => {
   return UserDB.aggregate([
     { $match: { _id: userId } },
-    {
-      $set: {
-        profileImage: {
-          $cond: {
-            if: { $eq: [null, "$profileImage"] },
-            then: null,
-            else: { $concat: ["$profileImage", "-", "xs"] },
-          },
-        },
-      },
-    },
+    
     {
       $set: {
         avatarImage: {
@@ -943,15 +933,15 @@ exports.updateUserLikesCount = (userId, obj) => {
 
 exports.getContestants = (search, page) => {
   return UserDB.aggregate([
-    {
-      $match:
-      {
-        $or: [
-          { name: { $regex: `^.*?${search}.*?$` } },
-          { username: { $regex: `^.*?${search}.*?$` } },
-        ]
-      },
-    },
+    // {
+    //   $match:
+    //   {
+    //     $or: [
+    //       { name: { $regex: `^.*?${search}.*?$` } },
+    //       { username: { $regex: `^.*?${search}.*?$` } },
+    //     ]
+    //   },
+    // },
     {
       $lookup: {
         from: "famelinks",
@@ -2161,17 +2151,7 @@ exports.getProfileFollowlinks = async (profileId, followerId, page) => {
   let pagination = page ? page : 1;
   return await UserDB.aggregate([
     { $match: { _id: profileId } },
-    {
-      $set: {
-        profileImage: {
-          $cond: {
-            if: { $eq: [null, "$profileImage"] },
-            then: null,
-            else: { $concat: ["$profileImage", "-", "xs"] },
-          },
-        },
-      },
-    },
+    
     //MasterIdMigration
     {
       $lookup: {
@@ -2616,17 +2596,7 @@ exports.getProfileFunlinks = async (profileId, followerId, page) => {
   let pagination = page ? page : 1;
   return await UserDB.aggregate([
     { $match: { _id: profileId } },
-    {
-      $set: {
-        profileImage: {
-          $cond: {
-            if: { $eq: [null, "$profileImage"] },
-            then: null,
-            else: { $concat: ["$profileImage", "-", "xs"] },
-          },
-        },
-      },
-    },
+    
     {
       $lookup: {
         from: "musics",
@@ -2829,17 +2799,7 @@ exports.getOtherProfileFunlinks = async (profileId, followerId, page) => {
   let pagination = page ? page : 1;
   return await UserDB.aggregate([
     { $match: { _id: profileId } },
-    {
-      $set: {
-        profileImage: {
-          $cond: {
-            if: { $eq: [null, "$profileImage"] },
-            then: null,
-            else: { $concat: ["$profileImage", "-", "xs"] },
-          },
-        },
-      },
-    },
+    
     {
       $lookup: {
         from: "musics",
@@ -3083,17 +3043,7 @@ exports.getProfileJoblinks = (profileId, page) => {
   console.log('profileId :: ', profileId)
   return UserDB.aggregate([
     { $match: { _id: profileId } },
-    {
-      $set: {
-        profileImage: {
-          $cond: {
-            if: { $eq: [null, "$profileImage"] },
-            then: null,
-            else: { $concat: ["$profileImage", "-", "xs"] },
-          },
-        },
-      },
-    },
+    
     {
       $lookup: {
         from: "hiringprofiles",
@@ -3591,17 +3541,7 @@ exports.getOtherProfileJoblinks = (
   if (profileType == "individual" || profileType == "agency") {
     return UserDB.aggregate([
       { $match: { _id: userId } },
-      {
-        $set: {
-          profileImage: {
-            $cond: {
-              if: { $eq: [null, "$profileImage"] },
-              then: null,
-              else: { $concat: ["$profileImage", "-", "xs"] },
-            },
-          },
-        },
-      },
+      
       {
         $lookup: {
           from: "ambassadors",
@@ -4761,17 +4701,7 @@ exports.getOtherProfileJoblinks = (
   if (profileType == "brand") {
     return UserDB.aggregate([
       { $match: { _id: userId } },
-      {
-        $set: {
-          profileImage: {
-            $cond: {
-              if: { $eq: [null, "$profileImage"] },
-              then: null,
-              else: { $concat: ["$profileImage", "-", "xs"] },
-            },
-          },
-        },
-      },
+      
       {
         $lookup: {
           from: "jobs",
@@ -5243,17 +5173,7 @@ exports.getStorelinks = (profileId, followerId, page) => {
   let pagination = page ? page : 1;
   return UserDB.aggregate([
     { $match: { _id: profileId } },
-    {
-      $set: {
-        profileImage: {
-          $cond: {
-            if: { $eq: [null, "$profileImage"] },
-            then: null,
-            else: { $concat: ["$profileImage", "-", "xs"] },
-          },
-        },
-      },
-    },
+    
     {
       $lookup: {
         from: "visits",
@@ -5571,17 +5491,7 @@ exports.getSelfCollablinks = (profileId, followerId, page, masterId) => {
   let pagination = page ? page : 1;
   return UserDB.aggregate([
     { $match: { _id: profileId } },
-    {
-      $set: {
-        profileImage: {
-          $cond: {
-            if: { $eq: [null, "$profileImage"] },
-            then: null,
-            else: { $concat: ["$profileImage", "-", "xs"] },
-          },
-        },
-      },
-    },
+    
     {
       $set: {
         "profile.profileImage": {
@@ -5686,17 +5596,6 @@ exports.getSelfCollablinks = (profileId, followerId, page, masterId) => {
                     type: 1,
                     profileImage: 1,
                     profileImageType: 1,
-                  },
-                },
-                {
-                  $set: {
-                    profileImage: {
-                      $cond: {
-                        if: { $eq: [null, "$profileImage"] },
-                        then: null,
-                        else: { $concat: ["$profileImage", "-", "xs"] },
-                      },
-                    },
                   },
                 },
               ],
@@ -6078,17 +5977,7 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
   let pagination = page ? page : 1;
   return UserDB.aggregate([
     { $match: { _id: profileId } },
-    {
-      $set: {
-        profileImage: {
-          $cond: {
-            if: { $eq: [null, "$profileImage"] },
-            then: null,
-            else: { $concat: ["$profileImage", "-", "xs"] },
-          },
-        },
-      },
-    },
+    
     {
       $lookup: {
         from: "agencytags",
@@ -6182,17 +6071,6 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
                     type: 1,
                     profileImage: 1,
                     profileImageType: 1,
-                  },
-                },
-                {
-                  $set: {
-                    profileImage: {
-                      $cond: {
-                        if: { $eq: [null, "$profileImage"] },
-                        then: null,
-                        else: { $concat: ["$profileImage", "-", "xs"] },
-                      },
-                    },
                   },
                 },
               ],
@@ -6665,17 +6543,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
   let pagination = page ? page : 1;
   return UserDB.aggregate([
     { $match: { _id: userId } },
-    {
-      $set: {
-        profileImage: {
-          $cond: {
-            if: { $eq: [null, "$profileImage"] },
-            then: null,
-            else: { $concat: ["$profileImage", "-", "xs"] },
-          },
-        },
-      },
-    },
+    
     {
       $lookup: {
         from: "jobs",
@@ -7161,17 +7029,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
 exports.getAgencyProfileJoblinks = (userId) => {
   return UserDB.aggregate([
     { $match: { _id: userId } },
-    {
-      $set: {
-        profileImage: {
-          $cond: {
-            if: { $eq: [null, "$profileImage"] },
-            then: null,
-            else: { $concat: ["$profileImage", "-", "xs"] },
-          },
-        },
-      },
-    },
+    
     {
       $lookup: {
         from: "hiringprofiles",
@@ -7604,17 +7462,7 @@ exports.getInviteSuggestions = (selfMasterId, page) => {
       },
     },
     { $match: { $expr: { $eq: [0, { $size: "$followStatus" }] } } },
-    {
-      $set: {
-        profileImage: {
-          $cond: {
-            if: { $eq: [null, "$profileImage"] },
-            then: null,
-            else: { $concat: ["$profileImage", "-", "xs"] },
-          },
-        },
-      },
-    },
+    
     { $sort: { updatedAt: -1 } },
     { $project: { _id: 1, profileImage: 1, profileImageType: 1 } },
     { $skip: (pagination - 1) * 10 },
@@ -7709,17 +7557,7 @@ exports.getUsers = (selfMasterId, search, page) => {
         },
       },
     },
-    {
-      $set: {
-        profileImage: {
-          $cond: {
-            if: { $eq: [null, "$profileImage"] },
-            then: null,
-            else: { $concat: ["$profileImage", "-", "xs"] },
-          },
-        },
-      },
-    },
+    
     { $sort: { updatedAt: -1 } },
     { $skip: (pagination - 1) * 10 },
     { $limit: 10 },

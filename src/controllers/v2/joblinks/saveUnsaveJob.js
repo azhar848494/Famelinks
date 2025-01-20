@@ -30,11 +30,11 @@ module.exports = async (request) => {
 
     let jobType = job[0].jobType
 
-    if (request.user.type == 'agency' && jobType == 'faces') {
-        return serializeHttpResponse(400, {
-            message: "Operation denied. Agency cannot save any front faces jobs",
-        });
-    }
+    // if (request.user.type == 'agency' && jobType == 'faces') {
+    //     return serializeHttpResponse(400, {
+    //         message: "Operation denied. Agency cannot save any front faces jobs",
+    //     });
+    // }
 
     childProfileId = request.user._id
 

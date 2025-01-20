@@ -85,6 +85,7 @@ exports.checkJob = (jobId) => {
 
 //MasterIdMigration
 exports.updateSavedJobs = (userId, action, data) => {
+  console.log('Data :: ', data)
   if (action == "unsave") {
     return UsersDB.updateOne(
       { _id: userId },
@@ -285,7 +286,7 @@ exports.getAgentJobs = (joblinksId, page) => {
 exports.userExplore = (page, joblinksId, masterId) => {
   let pagination = page ? page : 1;
   return UsersDB.aggregate([
-    { $match: { profileJoblinks: joblinksId } },
+    { $match: { _id: joblinksId } },
     { $project: { _id: 1 } },
     {
       $lookup: {
@@ -409,17 +410,7 @@ exports.userExplore = (page, joblinksId, masterId) => {
                           },
                         },
                       },
-                      {
-                        $set: {
-                          profileImage: {
-                            $cond: {
-                              if: { $eq: [null, "$profileImage"] },
-                              then: null,
-                              else: { $concat: ["$profileImage", "-", "xs"] },
-                            },
-                          },
-                        },
-                      },
+
                     ],
                     as: "createdBy",
                   },
@@ -639,17 +630,7 @@ exports.userExplore = (page, joblinksId, masterId) => {
                           },
                         },
                       },
-                      {
-                        $set: {
-                          profileImage: {
-                            $cond: {
-                              if: { $eq: [null, "$profileImage"] },
-                              then: null,
-                              else: { $concat: ["$profileImage", "-", "xs"] },
-                            },
-                          },
-                        },
-                      },
+
                     ],
                     as: "createdBy",
                   },
@@ -869,17 +850,7 @@ exports.userExplore = (page, joblinksId, masterId) => {
                           },
                         },
                       },
-                      {
-                        $set: {
-                          profileImage: {
-                            $cond: {
-                              if: { $eq: [null, "$profileImage"] },
-                              then: null,
-                              else: { $concat: ["$profileImage", "-", "xs"] },
-                            },
-                          },
-                        },
-                      },
+
                     ],
                     as: "createdBy",
                   },
@@ -1203,7 +1174,7 @@ exports.saveUser = (profileId, data) => {
   return UsersDB.updateOne({ _id: profileId }, { $push: { "profileJoblinks.savedTalents": data } });
 };
 
-exports.unSaveUser = (profileId, userId) => {
+exports.unSaveUser = (profileId, data) => {
   return UsersDB.updateOne(
     { _id: profileId },
     { $pull: { "profileJoblinks.savedTalents": data } }
@@ -1286,7 +1257,7 @@ exports.getTalents = (page, masterId, joblinksId) => {
     {
       $lookup: {
         from: "users",
-        let: { profileJoblinks: "$profileJoblinks", profileFamelinks: "$profileFamelinks " },
+        let: { profileJoblinks: "$profileJoblinks", profileFamelinks: "$profileFamelinks" },
         pipeline: [
           {
             $match: {
@@ -2009,7 +1980,6 @@ exports.getApplicantsFaces = (selfMasterId, jobId, page) => {
                     dob: 1,
                     type: 1,
                     achievements: 1,
-                    profileFamelinks: 1,
                   },
                 },
                 {
@@ -2649,10 +2619,9 @@ exports.getJobDetails = (jobId) => {
   return jobs.findOne({ _id: jobId }).lean();
 };
 
-exports.getSavedTalents = (page, joblinksId) => {
-  let pagination = page ? page : 1;
+exports.getSavedTalents = (data) => {
   return UsersDB.aggregate([
-    { $match: { _id: joblinksId } },
+    { $match: { _id: data.userId } },
     {
       $lookup: {
         from: "hiringprofiles",
@@ -2693,7 +2662,7 @@ exports.getSavedTalents = (page, joblinksId) => {
                 //MasterIdMigration
                 {
                   $lookup: {
-                    from: "uers",
+                    from: "users",
                     let: { profileFamelinks: "$_id" },
                     pipeline: [
                       {
@@ -2784,7 +2753,7 @@ exports.getSavedTalents = (page, joblinksId) => {
           {
             $lookup: {
               from: "invitations",
-              let: { to: "$userId", from: joblinksId, type: "$type" },
+              let: { to: "$userId", from: data.userId, type: "$type" },
               pipeline: [
                 {
                   $match: {
@@ -2809,9 +2778,9 @@ exports.getSavedTalents = (page, joblinksId) => {
               },
             },
           },
-          { $project: { userId: 0 } },
+          { $project: { _id: 0 } },
           { $sort: { updatedAt: -1 } },
-          { $skip: (pagination - 1) * 10 },
+          { $skip: (data.page - 1) * 10 },
           { $limit: 10 },
         ],
         as: "savedTalents",
@@ -4646,7 +4615,7 @@ exports.getApplicantsCrewBySearch = (
 exports.getAppliedJobs = (page, joblinksId, masterId) => {
   let pagination = page ? page : 1;
   return UsersDB.aggregate([
-    { $match: { profileJoblinks: joblinksId } },
+    { $match: { _id: joblinksId } },
     { $project: { _id: 1 } },
     {
       $lookup: {
@@ -4825,7 +4794,7 @@ exports.getAppliedJobs = (page, joblinksId, masterId) => {
 exports.getHiredJobs = (page, joblinksId, masterId) => {
   let pagination = page ? page : 1;
   return UsersDB.aggregate([
-    { $match: { profileJoblinks: joblinksId } },
+    { $match: { _id: joblinksId } },
     { $project: { _id: 1 } },
     {
       $lookup: {
@@ -5016,7 +4985,7 @@ exports.getHiredJobs = (page, joblinksId, masterId) => {
 exports.getShortlistedJobs = (page, joblinksId, masterId) => {
   let pagination = page ? page : 1;
   return UsersDB.aggregate([
-    { $match: { profileJoblinks: joblinksId } },
+    { $match: { _id: joblinksId } },
     { $project: { _id: 1 } },
     {
       $lookup: {
@@ -5139,108 +5108,99 @@ exports.getShortlistedJobs = (page, joblinksId, masterId) => {
 exports.getSavedJobs = (page, joblinksId, masterId) => {
   let pagination = page ? page : 1;
   return UsersDB.aggregate([
-    { $match: { profileJoblinks: joblinksId } },
-    { $project: { _id: 1 } },
+    { $match: { _id: joblinksId } },
     {
       $lookup: {
-        from: "users",
-        let: { joblinksId: joblinksId },
+        from: "jobs",
+        let: { jobId: "$profileJoblinks.savedJobs" },
         pipeline: [
-          { $match: { $expr: { $eq: ["$_id", "$$joblinksId"] } } },
-          { $project: { _id: 0, savedJobs: "$profileJoblinks.savedJobs" } },
+          { $match: { $expr: { $in: ["$_id", "$$jobId"] } } },
           {
             $lookup: {
-              from: "jobs",
-              let: { jobId: "$savedJobs" },
+              from: "locatns",
+              let: { value: "$jobLocation" },
               pipeline: [
-                { $match: { $expr: { $in: ["$_id", "$$jobId"] } } },
-                {
-                  $lookup: {
-                    from: "locatns",
-                    let: { value: "$jobLocation" },
-                    pipeline: [
-                      { $match: { $expr: { $eq: ["$_id", "$$value"] } } },
-                      { $project: { type: 1, value: 1, } },
-                    ],
-                    as: "jobLocation",
-                  },
-                },
-                {
-                  $project: {
-                    createdAt: 1,
-                    jobType: 1,
-                    title: 1,
-                    jobLocation: { $first: "$jobLocation" },
-                    description: 1,
-                    experienceLevel: 1,
-                    startDate: 1,
-                    endDate: 1,
-                    deadline: 1,
-                    ageGroup: 1,
-                    height: 1,
-                    gender: 1,
-                    jobCategory: 1,
-                    createdBy: 1,
-                  },
-                },
-                {
-                  $lookup: {
-                    from: "jobcategories",
-                    let: { jobCategory: "$jobCategory" },
-                    pipeline: [
-                      { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
-                      { $project: { jobName: 1, jobCategory: 1 } },
-                    ],
-                    as: "jobDetails",
-                  },
-                },
-                //MasterIdMigration
-                {
-                  $lookup: {
-                    from: "users",
-                    let: { userId: "$createdBy" },
-                    pipeline: [
-                      { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
-                      {
-                        $project: {
-                          type: 1,
-                          name: 1,
-                          username: 1,
-                          profileImage: 1,
-                          profileImageType: 1,
-                          profile: {
-                            name: "$profileJoblinks.name",
-                            profileImage: "$profileJoblinks.profileImage",
-                            profileImageType: "$profileJoblinks.profileImageType",
-                          },
-                        },
-                      },
-                    ],
-                    as: "user",
-                  },
-                },
-                { $addFields: { user: { $first: "$user" } } },
-                {
-                  $project: {
-                    jobCategory: 0,
-                    createdBy: 0,
-                    chatDetails: 0,
-                  },
-                },
-                { $sort: { createdAt: -1 } },
-                { $skip: (pagination - 1) * 10 },
-                { $limit: 10 },
+                { $match: { $expr: { $eq: ["$_id", "$$value"] } } },
+                { $project: { type: 1, value: 1, } },
               ],
-              as: "job",
+              as: "jobLocation",
             },
           },
+          {
+            $project: {
+              createdAt: 1,
+              jobType: 1,
+              title: 1,
+              jobLocation: { $first: "$jobLocation" },
+              description: 1,
+              experienceLevel: 1,
+              startDate: 1,
+              endDate: 1,
+              deadline: 1,
+              ageGroup: 1,
+              height: 1,
+              gender: 1,
+              jobCategory: 1,
+              createdBy: 1,
+            },
+          },
+          {
+            $lookup: {
+              from: "jobcategories",
+              let: { jobCategory: "$jobCategory" },
+              pipeline: [
+                { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+                { $project: { jobName: 1, jobCategory: 1 } },
+              ],
+              as: "jobDetails",
+            },
+          },
+          //MasterIdMigration
+          {
+            $lookup: {
+              from: "users",
+              let: { userId: "$createdBy" },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                {
+                  $project: {
+                    type: 1,
+                    name: 1,
+                    username: 1,
+                    profileImage: 1,
+                    profileImageType: 1,
+                    profile: {
+                      name: "$profileJoblinks.name",
+                      profileImage: "$profileJoblinks.profileImage",
+                      profileImageType: "$profileJoblinks.profileImageType",
+                    },
+                  },
+                },
+              ],
+              as: "user",
+            },
+          },
+          { $addFields: { user: { $first: "$user" } } },
+          {
+            $project: {
+              jobCategory: 0,
+              createdBy: 0,
+              chatDetails: 0,
+            },
+          },
+          { $sort: { createdAt: -1 } },
+          { $skip: (pagination - 1) * 10 },
+          { $limit: 10 },
         ],
         as: "savedJobs",
       },
     },
-    { $addFields: { savedJobs: "$savedJobs.job" } },
-    { $addFields: { savedJobs: { $first: "$savedJobs" } } },
-    { $project: { _id: 0 } },
+    {
+      $project: {
+        _id: 1,
+        savedJobs: "$savedJobs",
+      }
+    },
   ]);
 };
 

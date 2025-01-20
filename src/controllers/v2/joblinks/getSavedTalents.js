@@ -3,18 +3,18 @@ const getSavedTalentsService = require("../../../services/v2/joblinks/getSavedTa
 const { isValidObjectId } = require("../../../utils/db");
 
 module.exports = async (request) => {
-  let page = request.query.page;
-  let joblinksId = request.user._id;
-  let masterId = request.user._id;
+  let userId = request.user._id;
+  let page = request.query.page || 1
 
-  let result = await getSavedTalentsService(page, joblinksId, masterId);
-  result = result[0].savedTalents;
+  let result = await getSavedTalentsService({ page, userId });
 
   if (!result) {
     return serializeHttpResponse(500, {
       message: "Failed to fetch Saved Talents",
     });
   }
+
+  result = result[0].savedTalents;
 
   return serializeHttpResponse(200, {
     message: "Saved Talents fetched succesfuly",

@@ -397,17 +397,7 @@ const getMyCollabLinks = (
               profileImageType: { $first: "$profileImageType" },
             },
           },
-          {
-            $set: {
-              profileImage: {
-                $cond: {
-                  if: { $eq: [null, "$profileImage"] },
-                  then: null,
-                  else: { $concat: ["$profileImage", "-", "xs"] },
-                },
-              },
-            },
-          },
+          
         ],
         as: "users",
       },

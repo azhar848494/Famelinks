@@ -9,13 +9,14 @@ module.exports = async (request) => {
 
 
   let result = await getAppliedJobsService(page, joblinksId, masterId);
-  result = result[0].applied;
 
   if (!result) {
     return serializeHttpResponse(500, {
       message: "Failed to fetch Applied jobs",
     });
   }
+  
+  result = result[0].applied;
 
   return serializeHttpResponse(200, {
     message: "Applied jobs fetched succesfuly",

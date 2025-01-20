@@ -235,6 +235,12 @@ module.exports = {
     }),
   },
 
+  getSavedTalents: {
+    query: joi.object({
+      page: joi.number().min(1),
+    }),
+  },
+
   greeting: {
     files: joi
       .object({
@@ -295,13 +301,6 @@ module.exports = {
       jobId: joi.string().trim().required(),
       userId: joi.string().trim().required(),
       shortlist: joi.boolean().required(),
-    }),
-  },
-
-  saveTalent: {
-    payload: joi.object({
-      userId: joi.string().trim().required(),
-      save: joi.boolean().required(),
     }),
   },
 
@@ -399,11 +398,6 @@ module.exports = {
     }),
   },
   getSavedJobs: {
-    query: joi.object({
-      page: joi.number().min(1).required(),
-    }),
-  },
-  getSavedTalents: {
     query: joi.object({
       page: joi.number().min(1).required(),
     }),

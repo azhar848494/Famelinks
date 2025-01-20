@@ -174,17 +174,7 @@ exports.getUpcomingFametrendzs = (page, type, filterObj, userId) => {
         pipeline: [
 
           { $project: { _id: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-          {
-            $set: {
-              profileImage: {
-                $cond: {
-                  if: { $eq: [null, "$profileImage"] },
-                  then: null,
-                  else: { $concat: ["$profileImage", "-", "xs"] },
-                },
-              },
-            },
-          },
+          
           {
             $set: {
               profileImageType: {
@@ -318,17 +308,7 @@ exports.getOneFunlinksChallenge = (challengeId) => {
         localField: "sponsor",
         pipeline: [
           { $project: { _id: 0, name: 1, profileImage: 1 } },
-          {
-            $set: {
-              profileImage: {
-                $cond: {
-                  if: { $eq: [null, "$profileImage"] },
-                  then: null,
-                  else: { $concat: ["$profileImage", "-", "xs"] },
-                },
-              },
-            },
-          },
+          
         ],
         as: "sponsor",
       },
@@ -373,17 +353,7 @@ exports.getOneFamelinksChallenge = (challengeId, userId) => {
           {
             $project: { _id: 0, name: 1, profileImage: 1, profileImageType: 1 },
           },
-          {
-            $set: {
-              profileImage: {
-                $cond: {
-                  if: { $eq: [null, "$profileImage"] },
-                  then: null,
-                  else: { $concat: ["$profileImage", "-", "xs"] },
-                },
-              },
-            },
-          },
+          
           {
             $set: {
               profileImageType: {
@@ -665,7 +635,6 @@ exports.getChallengeFamelinks = (challengeId, page, userId, profileId) => {
               username: 1,
               type: 1,
               dob: 1,
-              profileFamelinks: 1,
               profile: {
                 name: "$profileFamelinks.name",
                 bio: "$profileFamelinks.bio",
@@ -1532,17 +1501,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
           localField: "sponsor",
           pipeline: [
             { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-            {
-              $set: {
-                profileImage: {
-                  $cond: {
-                    if: { $eq: [null, "$profileImage"] },
-                    then: null,
-                    else: { $concat: ["$profileImage", "-", "xs"] },
-                  },
-                },
-              },
-            },
+            
             {
               $set: {
                 profileImageType: {
@@ -2281,17 +2240,7 @@ exports.getChallengeWinners = (userId) => {
           foreignField: "_id",
           pipeline: [
             { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-            {
-              $set: {
-                profileImage: {
-                  $cond: {
-                    if: { $eq: [null, "$profileImage"] },
-                    then: null,
-                    else: { $concat: ["$profileImage", "-", "xs"] },
-                  },
-                },
-              },
-            },
+            
             {
               $set: {
                 profileImageType: {
@@ -2541,17 +2490,7 @@ exports.getChallengeWinners = (userId) => {
                       profileImageType: 1,
                     },
                   },
-                  {
-                    $set: {
-                      profileImage: {
-                        $cond: {
-                          if: { $eq: [null, "$profileImage"] },
-                          then: null,
-                          else: { $concat: ["$profileImage", "-", "xs"] },
-                        },
-                      },
-                    },
-                  },
+                  
                 ],
                 as: "users",
               },
@@ -2566,17 +2505,7 @@ exports.getChallengeWinners = (userId) => {
                 profileImageType: { $first: "$users.profileImageType" },
               },
             },
-            {
-              $set: {
-                profileImage: {
-                  $cond: {
-                    if: { $eq: [null, "$profileImage"] },
-                    then: null,
-                    else: { $concat: ["$profileImage", "-", "xs"] },
-                  },
-                },
-              },
-            },
+            
             {
               $group: {
                 _id: "$masterId",
@@ -2685,17 +2614,7 @@ exports.getSavedFametrendzs = (page, userId) => {
         foreignField: "_id",
         pipeline: [
           { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-          {
-            $set: {
-              profileImage: {
-                $cond: {
-                  if: { $eq: [null, "$profileImage"] },
-                  then: null,
-                  else: { $concat: ["$profileImage", "-", "xs"] },
-                },
-              },
-            },
-          },
+          
           {
             $set: {
               profileImageType: {
@@ -2810,17 +2729,7 @@ exports.getUpcomingFamecontest = (
           {
             $project: { _id: 0, name: 1, profileImage: 1, profileImageType: 1 },
           },
-          {
-            $set: {
-              profileImage: {
-                $cond: {
-                  if: { $eq: [null, "$profileImage"] },
-                  then: null,
-                  else: { $concat: ["$profileImage", "-", "xs"] },
-                },
-              },
-            },
-          },
+          
           {
             $set: {
               profileImageType: {

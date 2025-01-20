@@ -350,7 +350,7 @@ module.exports = {
     payload: joi.object({
       search: joi.string().trim().min(2).required(),
       page: joi.number().min(1).required(),
-      type: joi.string().trim().valid("famelinks", "funlinks", "followlinks"),
+      type: joi.string().trim().valid("famelinks", "funlinks", "followlinks", "joblinks"),
     }),
   },
 
