@@ -34,6 +34,7 @@ module.exports = async (request) => {
 
   await followUserService(request.user._id, request.params.followeeId, false);
   return serializeHttpResponse(200, {
+    result: {},
     message: "Unfollow Success",
   });
 };

@@ -35,7 +35,7 @@ exports.getFunLinks = (masterUserId, page, profileId, filterObj) => {
         isSafe: true,
         isBlocked: false,
         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-        $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+        $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
       },
     },    
     //MasterIdMigration
@@ -180,7 +180,7 @@ exports.getFunLinks = (masterUserId, page, profileId, filterObj) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -309,7 +309,7 @@ exports.getFunlinksFollowlinks = (funLinksId, userId, page, filterObj) => {
         isSafe: true,
         isBlocked: false,
         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-        $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+        $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
       },
     },
     //MasterIdMigration
@@ -454,7 +454,7 @@ exports.getFunlinksFollowlinks = (funLinksId, userId, page, filterObj) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -707,7 +707,7 @@ exports.getMyFunLinks = (
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -1268,7 +1268,7 @@ exports.getFunLinksById = (userId, postId, profileId) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -1360,7 +1360,7 @@ exports.getFunlinksMusicPosts = (userId, musicId, page) => {
         $expr: {
           $and: [
             { $eq: [ObjectId(musicId), "$musicId"] },
-            { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+            { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
           ],
         },
       },
@@ -1469,7 +1469,7 @@ exports.getFunlinksMusicPosts = (userId, musicId, page) => {
           $switch: {
             branches: [
               { case: { $eq: ['$followStatus', 0] }, then: 'Follow' },
-              { case: { $eq: ['$followStatus', 1] }, then: 'Request Sent' },
+              { case: { $eq: ['$followStatus', 1] }, then: 'Requested' },
               { case: { $eq: ['$followStatus', 2] }, then: 'Following' }
             ],
             default: 'Follow'

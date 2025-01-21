@@ -390,7 +390,7 @@ exports.getMyFollowLinks = (
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -506,7 +506,7 @@ exports.getFollowLinks = (followLinksId, userId, page, filterObj) => {
           isSafe: true,
           isBlocked: false,
           userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-          $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+          $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
         },
       },
       //MasterIdMigration
@@ -652,7 +652,7 @@ exports.getFollowLinks = (followLinksId, userId, page, filterObj) => {
             $switch: {
               branches: [
                 { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-                { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+                { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
                 { case: { $eq: ["$followStatus", 2] }, then: "Following" },
               ],
               default: "Follow",
@@ -1082,7 +1082,7 @@ exports.getFollowLinksById = (profileId, userId, postId) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",

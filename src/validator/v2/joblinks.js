@@ -207,7 +207,7 @@ module.exports = {
 
   brandAgencyExplore: {
     query: joi.object({
-      page: joi.number().min(1).required(),
+      page: joi.number().min(1),
       search: joi.string().trim().allow("", null),
     }),
   },
@@ -436,7 +436,7 @@ module.exports = {
 
   getExploreTalents: {
     query: joi.object({
-      page: joi.number().min(1).required(),
+      page: joi.number().min(1),
     }),
   },
 

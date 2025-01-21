@@ -132,7 +132,7 @@ exports.getFollowLinks = (userId, page) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -528,7 +528,7 @@ exports.getMyFameLinks = (
             $switch: {
               branches: [
                 { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-                { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+                { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
                 { case: { $eq: ["$followStatus", 2] }, then: "Following" },
               ],
               default: "Follow",
@@ -637,7 +637,7 @@ exports.getMyFameLinks = (
 //         isSafe: true,
 //         isBlocked: false,
 //         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-//         $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+//         $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
 //       },
 //     },
 //     // User
@@ -803,7 +803,7 @@ exports.getFameLinks = (profileId, masterUserId, page, filterObj, limit) => {
         isSafe: true,
         isBlocked: false,
         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-        $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+        $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
       },
     },
     //MasterIdMigration
@@ -933,7 +933,7 @@ exports.getFameLinks = (profileId, masterUserId, page, filterObj, limit) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -1039,7 +1039,7 @@ exports.getAdFameLinks = (userId, page) => {
         isSafe: true,
         isBlocked: false,
         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-        $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+        $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
       },
     },
     // User
@@ -1215,7 +1215,7 @@ exports.getFameLinksFollowlinks = (fameLinksId, userId, page, filterObj ) => {
         isSafe: true,
         isBlocked: false,
         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-        $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+        $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
       },
     },
     //MasterIdMigration
@@ -1346,7 +1346,7 @@ exports.getFameLinksFollowlinks = (fameLinksId, userId, page, filterObj ) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -1880,7 +1880,7 @@ exports.getFameLinksById = (profileId, userId, postId) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -2080,7 +2080,7 @@ exports.getFameLinksOfficialPosts = (userId, page) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",

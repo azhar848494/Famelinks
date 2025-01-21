@@ -405,7 +405,7 @@ exports.getBrandPosts = (userId, page) => {
         isSafe: true,
         isBlocked: false,
         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-        $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+        $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
       },
     },
     //MasterIdMigration    
@@ -461,7 +461,7 @@ exports.getBrandPosts = (userId, page) => {
     //     from: "users",
     //     let: { id: "$_id" },
     //     pipeline: [
-    //       { $match: { $expr: { $in: ["$$id", Array.isArray("$savedProducts") ? "$savedProducts" : []] } } },
+    //       { $match: { $expr: { $in: ["$$id", "$savedProducts"] } } },
     //       { $project: { _id: 0, savedProducts: 1 } },
     //     ],
     //     as: "savedProducts",
@@ -481,7 +481,7 @@ exports.getBrandPosts = (userId, page) => {
     {
       $addFields: { savedProducts: { $first: "$savedProducts.savedProducts" } },
     },
-    { $addFields: { savedStatus: { $in: ["$_id", Array.isArray("$savedProducts") ? "$savedProducts" : []] } } },
+    { $addFields: { savedStatus: { $in: ["$_id", "$savedProducts"] } } },
     {
       $lookup: {
         from: "likes",
@@ -556,7 +556,7 @@ exports.getBrandPosts = (userId, page) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -677,7 +677,7 @@ exports.getsAdBrandPosts = (userId, page) => {
         isSafe: true,
         isBlocked: false,
         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-        $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+        $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
       },
     },
     {
@@ -898,7 +898,7 @@ exports.getAdBrandPosts = (userId, page) => {
         isSafe: true,
         isBlocked: false,
         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-        $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+        $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
       },
     },
     // User

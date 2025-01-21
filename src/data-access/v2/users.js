@@ -517,7 +517,7 @@ exports.getFollowers = (userId, page, selfUserId) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -597,7 +597,7 @@ exports.getFollowees = (userId, page, selfUserId) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -1798,7 +1798,7 @@ exports.getProfileFamelinks = (profileId, followerId, page) => {
         from: "contestwinner",
         let: { userId: profileId },
         pipeline: [
-          { $match: { $expr: { $in: ["$$userId", Array.isArray("$winner.userId") ? "$winner.userId" : []] } } },
+          { $match: { $expr: { $in: ["$$userId", "$winner.userId"] } } },
           {
             $project: {
               _id: 0,
@@ -1912,7 +1912,7 @@ exports.getProfileFamelinks = (profileId, followerId, page) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -2359,7 +2359,7 @@ exports.getProfileFollowlinks = async (profileId, followerId, page) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -2680,7 +2680,7 @@ exports.getProfileFunlinks = async (profileId, followerId, page) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -2917,7 +2917,7 @@ exports.getOtherProfileFunlinks = async (profileId, followerId, page) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -3301,9 +3301,9 @@ exports.getProfileJoblinks = (profileId, page) => {
           {
             $match: {
               $and: [
-                { $expr: { $in: ["$$masterUser", Array.isArray("$members") ? "$members" : []] } },
+                { $expr: { $in: ["$$masterUser", "$members"] } },
                 { category: "jobChat" },
-                { $expr: { $in: ["$$masterUser", Array.isArray("$readBy") ? "$readBy" : []] } },
+                { $expr: { $in: ["$$masterUser", "$readBy"] } },
               ],
             },
           },
@@ -3320,9 +3320,9 @@ exports.getProfileJoblinks = (profileId, page) => {
           {
             $match: {
               $and: [
-                { $expr: { $in: ["$$masterUser", Array.isArray("$members") ? "$members" : []] } },
+                { $expr: { $in: ["$$masterUser", "$members"] } },
                 { category: "jobChat" },
-                { $expr: { $not: { $in: ["$$masterUser", Array.isArray("$readBy") ? "$readBy" : []] } } },
+                { $expr: { $not: { $in: ["$$masterUser", "$readBy"] } } },
               ],
             },
           },
@@ -3865,7 +3865,7 @@ exports.getOtherProfileJoblinks = (
           from: "contestwinner",
           let: { userId: "$_id" },
           pipeline: [
-            { $match: { $expr: { $in: ["$$userId", Array.isArray("$winner.userId") ? "$winner.userId" : []] } } },
+            { $match: { $expr: { $in: ["$$userId", "$winner.userId"] } } },
             {
               $project: {
                 _id: 0,
@@ -4012,7 +4012,7 @@ exports.getOtherProfileJoblinks = (
             {
               $set: {
                 savedStatus: {
-                  $cond: [{ $in: ["$_id", Array.isArray("$savedJobs") ? "$savedJobs" : []] }, true, false],
+                  $cond: [{ $in: ["$_id", "$savedJobs"] }, true, false],
                 },
               },
             },
@@ -4129,7 +4129,7 @@ exports.getOtherProfileJoblinks = (
               },
             },
             { $addFields: { jobIds: "$jobsApplied.jobId" } },
-            { $match: { $expr: { $not: [{ $in: ["$_id", Array.isArray("$jobIds") ? "$jobIds" : []] }] } } },
+            { $match: { $expr: { $not: [{ $in: ["$_id", "$jobIds"] }] } } },
             {
               $lookup: {
                 from: "jobcategories",
@@ -4202,7 +4202,7 @@ exports.getOtherProfileJoblinks = (
               },
             },
             { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
-            { $addFields: { savedStatus: { $in: ["$_id", Array.isArray("$savedJobs") ? "$savedJobs" : []] } } },
+            { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
             {
               $project: {
                 jobIds: 0,
@@ -4242,7 +4242,7 @@ exports.getOtherProfileJoblinks = (
               },
             },
             { $addFields: { jobIds: "$jobsApplied.jobId" } },
-            { $match: { $expr: { $not: [{ $in: ["$_id", Array.isArray("$jobIds") ? "$jobIds" : []] }] } } },
+            { $match: { $expr: { $not: [{ $in: ["$_id", "$jobIds"] }] } } },
             {
               $lookup: {
                 from: "jobcategories",
@@ -4315,7 +4315,7 @@ exports.getOtherProfileJoblinks = (
               },
             },
             { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
-            { $addFields: { savedStatus: { $in: ["$_id", Array.isArray("$savedJobs") ? "$savedJobs" : []] } } },
+            { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
             {
               $project: {
                 jobIds: 0,
@@ -4458,7 +4458,7 @@ exports.getOtherProfileJoblinks = (
             $switch: {
               branches: [
                 { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-                { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+                { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
                 { case: { $eq: ["$followStatus", 2] }, then: "Following" },
               ],
               default: "Follow",
@@ -4866,7 +4866,7 @@ exports.getOtherProfileJoblinks = (
             $switch: {
               branches: [
                 { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-                { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+                { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
                 { case: { $eq: ["$followStatus", 2] }, then: "Following" },
               ],
               default: "Follow",
@@ -4893,7 +4893,7 @@ exports.getOtherProfileJoblinks = (
               },
             },
             { $addFields: { jobIds: "$jobsApplied.jobId" } },
-            { $match: { $expr: { $not: [{ $in: ["$_id", Array.isArray("$jobIds") ? "$jobIds" : []] }] } } },
+            { $match: { $expr: { $not: [{ $in: ["$_id", "$jobIds"] }] } } },
             {
               $lookup: {
                 from: "jobcategories",
@@ -4966,7 +4966,7 @@ exports.getOtherProfileJoblinks = (
               },
             },
             { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
-            { $addFields: { savedStatus: { $in: ["$_id", Array.isArray("$savedJobs") ? "$savedJobs" : []] } } },
+            { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
             {
               $project: {
                 jobIds: 0,
@@ -5006,7 +5006,7 @@ exports.getOtherProfileJoblinks = (
               },
             },
             { $addFields: { jobIds: "$jobsApplied.jobId" } },
-            { $match: { $expr: { $not: [{ $in: ["$_id", Array.isArray("$jobIds") ? "$jobIds" : []] }] } } },
+            { $match: { $expr: { $not: [{ $in: ["$_id", "$jobIds"] }] } } },
             {
               $lookup: {
                 from: "jobcategories",
@@ -5079,7 +5079,7 @@ exports.getOtherProfileJoblinks = (
               },
             },
             { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
-            { $addFields: { savedStatus: { $in: ["$_id", Array.isArray("$savedJobs") ? "$savedJobs" : []] } } },
+            { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
             {
               $project: {
                 jobIds: 0,
@@ -5355,7 +5355,7 @@ exports.getStorelinks = (profileId, followerId, page) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -5765,7 +5765,7 @@ exports.getSelfCollablinks = (profileId, followerId, page, masterId) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -6240,7 +6240,7 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -6327,7 +6327,7 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
               from: "users",
               let: { jobId: "$_id" },
               pipeline: [
-                { $match: { $expr: { $in: ["$$jobId", Array.isArray("$profileJoblinks.savedJobs") ? "$profileJoblinks.savedJobs" : []] } } },
+                { $match: { $expr: { $in: ["$$jobId", "$profileJoblinks.savedJobs"] } } },
                 { $project: { _id: 1 } },
               ],
               as: "status",
@@ -6690,7 +6690,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
             },
           },
           { $addFields: { jobIds: "$jobShortlisted.jobId" } },
-          { $match: { $expr: { $not: [{ $in: ["$_id", Array.isArray("$jobIds") ? "$jobIds" : []] }] } } },
+          { $match: { $expr: { $not: [{ $in: ["$_id", "$jobIds"] }] } } },
           {
             $lookup: {
               from: "jobapplications",
@@ -6768,7 +6768,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
             },
           },
           { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
-          { $addFields: { savedStatus: { $in: ["$_id", Array.isArray("$savedJobs") ? "$savedJobs" : []] } } },
+          { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
           {
             $project: {
               jobIds: 0,
@@ -6816,7 +6816,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
             },
           },
           { $addFields: { jobIds: "$jobsShortlisted.jobId" } },
-          { $match: { $expr: { $not: [{ $in: ["$_id", Array.isArray("$jobIds") ? "$jobIds" : []] }] } } },
+          { $match: { $expr: { $not: [{ $in: ["$_id", "$jobIds"] }] } } },
           {
             $lookup: {
               from: "jobapplications",
@@ -6894,7 +6894,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
             },
           },
           { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
-          { $addFields: { savedStatus: { $in: ["$_id", Array.isArray("$savedJobs") ? "$savedJobs" : []] } } },
+          { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
           {
             $project: {
               jobIds: 0,
@@ -6925,9 +6925,9 @@ exports.getBrandProfileJoblinks = (userId, page) => {
           {
             $match: {
               $and: [
-                { $expr: { $in: ["$$masterUser", Array.isArray("$members") ? "$members" : []] } },
+                { $expr: { $in: ["$$masterUser", "$members"] } },
                 { category: "jobChat" },
-                { $expr: { $in: ["$$masterUser", Array.isArray("$readBy") ? "$readBy" : []] } },
+                { $expr: { $in: ["$$masterUser", "$readBy"] } },
               ],
             },
           },
@@ -6944,9 +6944,9 @@ exports.getBrandProfileJoblinks = (userId, page) => {
           {
             $match: {
               $and: [
-                { $expr: { $in: ["$$masterUser", Array.isArray("$members") ? "$members" : []] } },
+                { $expr: { $in: ["$$masterUser", "$members"] } },
                 { category: "jobChat" },
-                { $expr: { $not: { $in: ["$$masterUser", Array.isArray("$readBy") ? "$readBy" : []] } } },
+                { $expr: { $not: { $in: ["$$masterUser", "$readBy"] } } },
               ],
             },
           },
@@ -7238,9 +7238,9 @@ exports.getAgencyProfileJoblinks = (userId) => {
           {
             $match: {
               $and: [
-                { $expr: { $in: ["$$masterUser", Array.isArray("$members") ? "$members" : []] } },
+                { $expr: { $in: ["$$masterUser", "$members"] } },
                 { category: "jobChat" },
-                { $expr: { $in: ["$$masterUser", Array.isArray("$readBy") ? "$readBy" : []] } },
+                { $expr: { $in: ["$$masterUser", "$readBy"] } },
               ],
             },
           },
@@ -7257,9 +7257,9 @@ exports.getAgencyProfileJoblinks = (userId) => {
           {
             $match: {
               $and: [
-                { $expr: { $in: ["$$masterUser", Array.isArray("$members") ? "$members" : []] } },
+                { $expr: { $in: ["$$masterUser", "$members"] } },
                 { category: "jobChat" },
-                { $expr: { $not: { $in: ["$$masterUser", Array.isArray("$readBy") ? "$readBy" : []] } } },
+                { $expr: { $not: { $in: ["$$masterUser", "$readBy"] } } },
               ],
             },
           },
@@ -7491,7 +7491,7 @@ exports.getUsers = (selfMasterId, search, page) => {
       },
     },
     { $addFields: { blockList: { $first: "$selfMasterProfile.blockList" } } },
-    { $match: { $expr: { $not: { $in: ["$_id", Array.isArray("$blockList") ? "$blockList" : []] } } } },
+    { $match: { $expr: { $not: { $in: ["$_id", "$blockList"] } } } },
     { $addFields: { followStatus: 0 } },
     {
       $lookup: {
@@ -7549,7 +7549,7 @@ exports.getUsers = (selfMasterId, search, page) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -7693,7 +7693,7 @@ exports.getAgencyBySearch = async (searchData, selfMasterId) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -7905,7 +7905,7 @@ exports.getSavedBrandProducts = (userId, page) => {
           { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
           { $project: { _id: 0, savedProducts: 1 } },
           {
-            $match: { $expr: { $in: ["$$productId", Array.isArray("$savedProducts") ? "$savedProducts" : []] } },
+            $match: { $expr: { $in: ["$$productId", "$savedProducts"] } },
           },
         ],
         as: "savedProducts",

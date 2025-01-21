@@ -267,7 +267,7 @@ const getBrandPostsStatus = (postIds, profileId, masterUserId) => {
                     $switch: {
                         branches: [
                             { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-                            { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+                            { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
                             { case: { $eq: ["$followStatus", 2] }, then: "Following" },
                         ],
                         default: "Follow",

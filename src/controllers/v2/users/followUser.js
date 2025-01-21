@@ -43,14 +43,14 @@ module.exports = async (request) => {
     });
   }
 
-  const resFollow = await canFollow({type: 'user', userId: request.user._id});
-  
+  const resFollow = await canFollow({ type: 'user', userId: request.user._id });
+
   if (resFollow == false) {
     return serializeHttpResponse(200, {
       message: "Follow limit reached. Try after some time",
     });
   }
-  
+
   if (user.profile_type == "private") {
     await followUserService(
       request.user._id,
@@ -80,6 +80,7 @@ module.exports = async (request) => {
       );
     }
     return serializeHttpResponse(200, {
+      result: { isPrivate: user.profile_type == 'private' },
       message: "Request Success",
     });
   }
@@ -114,6 +115,9 @@ module.exports = async (request) => {
     );
   }
   return serializeHttpResponse(200, {
+    result: {
+      isPrivate: user.profile_type == 'private'
+    },
     message: "Follow success",
   });
   // // NOTE:- Uncomment this if press follow button -> send request -> accept request -> following

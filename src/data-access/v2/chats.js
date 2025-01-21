@@ -135,7 +135,7 @@ exports.getUserChatRequestsCount = (userId) => {
       $match: {
         $expr: {
           $and: [
-            { $not: [{ $in: ["$members", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+            { $not: [{ $in: ["$members", "$blockedUserIds"] }] },
             { $not: [{ $eq: [ObjectId(userId), "$members"] }] },
           ],
         },
@@ -250,7 +250,7 @@ exports.getUserJobChatRequestsCount = (userId) => {
       $match: {
         $expr: {
           $and: [
-            { $not: [{ $in: ["$members", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+            { $not: [{ $in: ["$members", "$blockedUserIds"] }] },
             { $not: [{ $eq: [ObjectId(userId), "$members"] }] },
           ],
         },

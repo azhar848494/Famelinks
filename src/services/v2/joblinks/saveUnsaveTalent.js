@@ -1,16 +1,12 @@
 const { saveUser, unSaveUser } = require('../../../data-access/v2/joblinks')
 
 //MasterIdMigration
-module.exports = async (profileId, userId, save) => {
-    let updateObj = {}
-
-    if (save) {
-        let result = await saveUser(profileId, userId)
-        return result
+module.exports = async (data) => {
+    let result;
+    if (data.saveTalent) {
+        result = await saveUser(data)
+    } else {
+        result = await unSaveUser(data)
     }
-
-    if (!save) {
-        let result = await unSaveUser(profileId, userId)
-        return result
-    }
+    return result
 }

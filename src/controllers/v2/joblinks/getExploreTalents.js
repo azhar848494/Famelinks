@@ -3,11 +3,10 @@ const getTalentService = require("../../../services/v2/joblinks/getTalents");
 const { isValidObjectId } = require("../../../utils/db");
 
 module.exports = async (request) => {
-  let page = request.query.page;
-  let joblinksId = request.user._id;
-  let masterId = request.user._id;
+  const page = request.query.page || 1;
+  const userId = request.user._id;
 
-  let result = await getTalentService(page, masterId, joblinksId);
+  let result = await getTalentService({ page, userId });
 
   if (!result) {
     return serializeHttpResponse(500, {

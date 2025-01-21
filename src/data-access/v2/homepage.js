@@ -30,7 +30,7 @@ exports.getMostLikedPosts = (
         isSafe: true,
         isBlocked: false,
         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
-        $expr: { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+        $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
       },
     },
     // User
@@ -243,7 +243,7 @@ exports.getRecentUsers = (limit) => {
       }
     },
     { $addFields: { cardTitle: "$name" } },
-    { $project: { _id: 1, profileImage: 1, profileImageType: 1, type: 1, cardTitle: 1 } },
+    { $project: { _id: 1, name:1, username:1, profileImage: 1, profileImageType: 1, type: 1, cardTitle: 1 } },
     { $set: { profileImageType: { $cond: [{ $ifNull: ["$profileImageType", false] }, '$profileImageType', ""] } } },
     { $sort: { createdAt: -1 } },
     { $limit: limit }

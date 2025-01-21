@@ -2,14 +2,11 @@ const serializeHttpResponse = require('../../../helpers/serialize-http-response'
 const brandAgencyExplore = require('../../../services/v2/joblinks/brandAgencyExplore')
 
 module.exports = async (request) => {
-    let search = request.query.search
-    search = search ? search : "";
-    let page = request.query.page
-    let joblinksId = request.user._id
+    const userId = request.user._id
+    const search = request.query.search || ""
+    const page = request.query.page || 1
 
-    let result
-
-    result = await brandAgencyExplore(search, page, joblinksId)
+    const result = await brandAgencyExplore({ userId, search, page })
 
     if (!result) {
         return serializeHttpResponse(500, {

@@ -98,6 +98,11 @@ router.post('/shortlist',
   expressCallback(shortlist)
 );
 
+router.get('/exploreTalents',
+  requestValidatorCallback(validator.getExploreTalents),
+  expressCallback(getExploreTalents)
+);
+
 router.post('/saveTalent',
   requestValidatorCallback(validator.saveTalent),
   expressCallback(saveTalent)
@@ -205,11 +210,6 @@ router.get('/jobInvites',
 router.get('/openJobs',
   requestValidatorCallback(validator.getOpenJobs),
   expressCallback(getOpenJobs)
-);
-
-router.get('/exploreTalents',
-  requestValidatorCallback(validator.getExploreTalents),
-  expressCallback(getExploreTalents)
 );
 
 router.get('/pastJobs',

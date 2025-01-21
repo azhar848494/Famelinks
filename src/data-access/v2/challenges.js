@@ -243,7 +243,7 @@ exports.getUpcomingFametrendzs = (page, type, filterObj, userId) => {
                 $switch: {
                   branches: [
                     { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-                    { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+                    { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
                     { case: { $eq: ["$followStatus", 2] }, then: "Following" },
                   ],
                   default: "Follow",
@@ -612,7 +612,7 @@ exports.getChallengeFamelinks = (challengeId, page, userId, profileId) => {
         $expr: {
           $and: [
             { $in: [ObjectId(challengeId), "$challengeId"] },
-            { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+            { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
           ],
         },
       },
@@ -806,7 +806,7 @@ exports.getChallengeFamelinks = (challengeId, page, userId, profileId) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -918,7 +918,7 @@ exports.getChallengeFunlinks = (challengeId, page, userId) => {
         $expr: {
           $and: [
             { $in: [ObjectId(challengeId), "$challengeId"] },
-            { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+            { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
           ],
         },
       },
@@ -1139,7 +1139,7 @@ exports.getChallengeFunlinks = (challengeId, page, userId) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -1222,7 +1222,7 @@ exports.getChallengeFollowlinks = (challengeId, page, userId) => {
         $expr: {
           $and: [
             { $in: [ObjectId(challengeId), "$challengeId"] },
-            { $not: [{ $in: ["$userId", Array.isArray("$blockedUserIds") ? "$blockedUserIds" : []] }] },
+            { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
           ],
         },
       },
@@ -1426,7 +1426,7 @@ exports.getChallengeFollowlinks = (challengeId, page, userId) => {
           $switch: {
             branches: [
               { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
               { case: { $eq: ["$followStatus", 2] }, then: "Following" },
             ],
             default: "Follow",
@@ -1571,7 +1571,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
                   $switch: {
                     branches: [
                       { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-                      { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+                      { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
                       { case: { $eq: ["$followStatus", 2] }, then: "Following" },
                     ],
                     default: "Follow",
@@ -1604,7 +1604,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
               $match: {
                 $expr: {
                   $and: [
-                    { $in: ["$$challengeId", Array.isArray("$challengeId") ? "$challengeId" : []] },
+                    { $in: ["$$challengeId", "$challengeId"] },
                     { $not: [{ $in: ["$userId", "$$blockedUserIds"] }] },
                   ],
                 },
@@ -1736,7 +1736,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
               $match: {
                 $expr: {
                   $and: [
-                    { $in: ["$$challengeId", Array.isArray("$challengeId") ? "$challengeId" : []] },
+                    { $in: ["$$challengeId", "$challengeId"] },
                     { $not: [{ $in: ["$userId", "$$blockedUserIds"] }] },
                   ],
                 },
@@ -1791,7 +1791,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
               $match: {
                 $expr: {
                   $and: [
-                    { $in: ["$$challengeId", Array.isArray("$challengeId") ? "$challengeId" : []] },
+                    { $in: ["$$challengeId", "$challengeId"] },
                     { $not: [{ $in: ["$userId", "$$blockedUserIds"] }] },
                   ],
                 },
@@ -1990,7 +1990,7 @@ exports.exploreFunlinks = (page, userId, profileId) => {
             $match: {
               $expr: {
                 $and: [
-                  { $in: ["$$challengeId", Array.isArray("$challengeId") ? "$challengeId" : []] },
+                  { $in: ["$$challengeId", "$challengeId"] },
                   {
                     $not: [
                       { $in: ["$userId", "$$blockedUserIds.profileFunlinks"] },
@@ -2110,7 +2110,7 @@ exports.getFameLinksChallengesBySearch = (searchData, linkType) => {
 //         from: "famelinks",
 //         let: { challengeId: "$_id" },
 //         pipeline: [
-//           { $match: { $expr: { $in: ["$$challengeId", Array.isArray("$challengeId") ? "$challengeId" : []] } } },
+//           { $match: { $expr: { $in: ["$$challengeId", "$challengeId"] } } },
 //           { $project: { _id: 1, userId: 1, likesCount: { $add: ["$likes1Count", "$likes2Count"] } } },
 //           { $sort: { likesCount: -1 } },
 //         ],
@@ -2309,7 +2309,7 @@ exports.getChallengeWinners = (userId) => {
                   $switch: {
                     branches: [
                       { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-                      { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+                      { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
                       { case: { $eq: ["$followStatus", 2] }, then: "Following" },
                     ],
                     default: "Follow",
@@ -2330,7 +2330,7 @@ exports.getChallengeWinners = (userId) => {
               $match: {
                 $expr: {
                   $and: [
-                    { $in: ["$$challengeId", Array.isArray("$challengeId") ? "$challengeId" : []] },
+                    { $in: ["$$challengeId", "$challengeId"] },
                   ],
                 },
               },
@@ -2360,7 +2360,7 @@ exports.getChallengeWinners = (userId) => {
               $match: {
                 $expr: {
                   $and: [
-                    { $in: ["$$challengeId", Array.isArray("$challengeId") ? "$challengeId" : []] },
+                    { $in: ["$$challengeId", "$challengeId"] },
                   ],
                 },
               },
@@ -2683,7 +2683,7 @@ exports.getSavedFametrendzs = (page, userId) => {
                 $switch: {
                   branches: [
                     { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-                    { case: { $eq: ["$followStatus", 1] }, then: "Request Sent" },
+                    { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
                     { case: { $eq: ["$followStatus", 2] }, then: "Following" },
                   ],
                   default: "Follow",
