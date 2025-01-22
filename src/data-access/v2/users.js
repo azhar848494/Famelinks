@@ -211,7 +211,7 @@ exports.getUserByTag = (tag) => {
 exports.getUserProfileImages = (userId) => {
   return UserDB.aggregate([
     { $match: { _id: userId } },
-    
+
     {
       $set: {
         avatarImage: {
@@ -539,7 +539,7 @@ exports.getFollowers = (userId, page, selfUserId) => {
 
 exports.getFollowees = (userId, page, selfUserId) => {
   return FollowerDB.aggregate([
-    { $match: { followerId: ObjectId(userId), type: 'user' } },
+    { $match: { followerId: ObjectId(userId), acceptedDate: { $ne: null }, type: 'user' } },
     { $addFields: { followStatus: 0 } },
     {
       $lookup: {
@@ -2138,7 +2138,7 @@ exports.createProfileFamelinks = async (data) => {
   return await UserDB.create(data);
 };
 
-exports.updateProfileFamelinks = (profileId, obj) => {  
+exports.updateProfileFamelinks = (profileId, obj) => {
   obj = Object.fromEntries(
     Object.entries(obj).map(([key, value]) => [`profileFamelinks.${key}`, value])
   );
@@ -2151,7 +2151,6 @@ exports.getProfileFollowlinks = async (profileId, followerId, page) => {
   let pagination = page ? page : 1;
   return await UserDB.aggregate([
     { $match: { _id: profileId } },
-    
     //MasterIdMigration
     {
       $lookup: {
@@ -2375,6 +2374,7 @@ exports.getProfileFollowlinks = async (profileId, followerId, page) => {
           {
             $match: {
               $expr: { $eq: ["$followeeId", "$$followeeId"] },
+              acceptedDate: { $ne: null },
               type: "user",
             },
           },
@@ -2397,6 +2397,7 @@ exports.getProfileFollowlinks = async (profileId, followerId, page) => {
           {
             $match: {
               $expr: { $eq: ["$followerId", "$$followerId"] },
+              acceptedDate: { $ne: null },
               type: "user",
             },
           },
@@ -2596,7 +2597,7 @@ exports.getProfileFunlinks = async (profileId, followerId, page) => {
   let pagination = page ? page : 1;
   return await UserDB.aggregate([
     { $match: { _id: profileId } },
-    
+
     {
       $lookup: {
         from: "musics",
@@ -2799,7 +2800,7 @@ exports.getOtherProfileFunlinks = async (profileId, followerId, page) => {
   let pagination = page ? page : 1;
   return await UserDB.aggregate([
     { $match: { _id: profileId } },
-    
+
     {
       $lookup: {
         from: "musics",
@@ -3043,7 +3044,7 @@ exports.getProfileJoblinks = (profileId, page) => {
   console.log('profileId :: ', profileId)
   return UserDB.aggregate([
     { $match: { _id: profileId } },
-    
+
     {
       $lookup: {
         from: "hiringprofiles",
@@ -3541,7 +3542,6 @@ exports.getOtherProfileJoblinks = (
   if (profileType == "individual" || profileType == "agency") {
     return UserDB.aggregate([
       { $match: { _id: userId } },
-      
       {
         $lookup: {
           from: "ambassadors",
@@ -4204,6 +4204,32 @@ exports.getOtherProfileJoblinks = (
             { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
             { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
             {
+              $lookup: {
+                from: "jobapplications",
+                let: { jobId: "$_id" },
+                pipeline: [
+                  {
+                    $match: {
+                      $and: [
+                        { $expr: { $eq: ["$jobId", "$$jobId"] } },
+                        { status: "applied" },
+                        { userId: followerId },
+                      ],
+                    },
+                  },
+                  { $project: { _id: 1 } },
+                ],
+                as: "isApplied",
+              },
+            },
+            {
+              $set: {
+                isApplied: {
+                  $cond: [{ $eq: [0, { $size: "$isApplied" }] }, false, true],
+                },
+              },
+            },
+            {
               $project: {
                 jobIds: 0,
                 jobsApplied: 0,
@@ -4316,6 +4342,33 @@ exports.getOtherProfileJoblinks = (
             },
             { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
             { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
+
+            {
+              $lookup: {
+                from: "jobapplications",
+                let: { jobId: "$_id" },
+                pipeline: [
+                  {
+                    $match: {
+                      $and: [
+                        { $expr: { $eq: ["$jobId", "$$jobId"] } },
+                        { status: "applied" },
+                        { userId: followerId },
+                      ],
+                    },
+                  },
+                  { $project: { _id: 1 } },
+                ],
+                as: "isApplied",
+              },
+            },
+            {
+              $set: {
+                isApplied: {
+                  $cond: [{ $eq: [0, { $size: "$isApplied" }] }, false, true],
+                },
+              },
+            },
             {
               $project: {
                 jobIds: 0,
@@ -4701,7 +4754,7 @@ exports.getOtherProfileJoblinks = (
   if (profileType == "brand") {
     return UserDB.aggregate([
       { $match: { _id: userId } },
-      
+
       {
         $lookup: {
           from: "jobs",
@@ -4968,6 +5021,32 @@ exports.getOtherProfileJoblinks = (
             { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
             { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
             {
+              $lookup: {
+                from: "jobapplications",
+                let: { jobId: "$_id" },
+                pipeline: [
+                  {
+                    $match: {
+                      $and: [
+                        { $expr: { $eq: ["$jobId", "$$jobId"] } },
+                        { status: "applied" },
+                        { userId: followerId },
+                      ],
+                    },
+                  },
+                  { $project: { _id: 1 } },
+                ],
+                as: "isApplied",
+              },
+            },
+            {
+              $set: {
+                isApplied: {
+                  $cond: [{ $eq: [0, { $size: "$isApplied" }] }, false, true],
+                },
+              },
+            },
+            {
               $project: {
                 jobIds: 0,
                 jobsApplied: 0,
@@ -5173,7 +5252,7 @@ exports.getStorelinks = (profileId, followerId, page) => {
   let pagination = page ? page : 1;
   return UserDB.aggregate([
     { $match: { _id: profileId } },
-    
+
     {
       $lookup: {
         from: "visits",
@@ -5491,7 +5570,7 @@ exports.getSelfCollablinks = (profileId, followerId, page, masterId) => {
   let pagination = page ? page : 1;
   return UserDB.aggregate([
     { $match: { _id: profileId } },
-    
+
     {
       $set: {
         "profile.profileImage": {
@@ -5977,7 +6056,7 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
   let pagination = page ? page : 1;
   return UserDB.aggregate([
     { $match: { _id: profileId } },
-    
+
     {
       $lookup: {
         from: "agencytags",
@@ -6452,7 +6531,7 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
   ]);
 };
 
-exports.updateCollablinks = (profileId, data) => {  
+exports.updateCollablinks = (profileId, data) => {
   data = Object.fromEntries(
     Object.entries(data).map(([key, value]) => [`profileCollablinks.${key}`, value])
   );
@@ -6543,7 +6622,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
   let pagination = page ? page : 1;
   return UserDB.aggregate([
     { $match: { _id: userId } },
-    
+
     {
       $lookup: {
         from: "jobs",
@@ -6641,6 +6720,32 @@ exports.getBrandProfileJoblinks = (userId, page) => {
             },
           },
           {
+            $lookup: {
+              from: "jobapplications",
+              let: { jobId: "$_id" },
+              pipeline: [
+                {
+                  $match: {
+                    $and: [
+                      { $expr: { $eq: ["$jobId", "$$jobId"] } },
+                      { $expr: { $eq: ["$userId", userId] } },
+                      { status: "applied" },
+                    ],
+                  },
+                },
+                { $project: { _id: 1 } },
+              ],
+              as: "isApplied",
+            },
+          },
+          {
+            $set: {
+              isApplied: {
+                $cond: [{ $eq: [0, { $size: "$isApplied" }] }, false, true],
+              },
+            },
+          },
+          {
             $project: {
               applicants: 1,
               jobType: 1,
@@ -6657,6 +6762,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
               jobDetails: 1,
               experienceLevel: 1,
               height: 1,
+              isApplied: 1,
             },
           },
         ],
@@ -7029,7 +7135,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
 exports.getAgencyProfileJoblinks = (userId) => {
   return UserDB.aggregate([
     { $match: { _id: userId } },
-    
+
     {
       $lookup: {
         from: "hiringprofiles",
@@ -7368,7 +7474,7 @@ exports.getAgencyProfileJoblinks = (userId) => {
   ]);
 };
 
-exports.updateProfileJoblinks = (userId, data) => {  
+exports.updateProfileJoblinks = (userId, data) => {
   data = Object.fromEntries(
     Object.entries(data).map(([key, value]) => [`profileJoblinks.${key}`, value])
   );
@@ -7462,7 +7568,7 @@ exports.getInviteSuggestions = (selfMasterId, page) => {
       },
     },
     { $match: { $expr: { $eq: [0, { $size: "$followStatus" }] } } },
-    
+
     { $sort: { updatedAt: -1 } },
     { $project: { _id: 1, profileImage: 1, profileImageType: 1 } },
     { $skip: (pagination - 1) * 10 },
@@ -7557,7 +7663,7 @@ exports.getUsers = (selfMasterId, search, page) => {
         },
       },
     },
-    
+
     { $sort: { updatedAt: -1 } },
     { $skip: (pagination - 1) * 10 },
     { $limit: 10 },

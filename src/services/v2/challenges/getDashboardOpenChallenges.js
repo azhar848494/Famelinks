@@ -12,6 +12,8 @@ module.exports = async (profileId, userId, sponsorId, page) => {
   let filterObj = {};
   if (sponsorId != "*") {
     filterObj.$expr = { $eq: ["$sponsor", ObjectId(sponsorId)] };
+  } else {
+    filterObj.$expr = { $and: [{ $lt: ["$startDate", new Date()] }] }
   }
 
   const result = await getDashboardOpenChallenges(userId, filterObj, page);

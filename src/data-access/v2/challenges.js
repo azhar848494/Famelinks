@@ -1471,7 +1471,6 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
     .aggregate([
       {
         $match: {
-          $expr: { $and: [{ $lt: ["$startDate", currentDate] }] },
           isWelcomeVideo: { $exists: false },
           isDeleted: false,
           isCompleted: false,
