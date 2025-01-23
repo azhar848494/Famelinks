@@ -89,6 +89,7 @@ module.exports = async (request) => {
     }
 
     return serializeHttpResponse(200, {
+        result: {},
         message: `Follower ${action} successful`
     });
 

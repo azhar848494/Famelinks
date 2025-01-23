@@ -650,6 +650,12 @@ module.exports = {
     }),
   },
 
+  getBrandProduct: {
+    params: joi.object({
+      productId: joi.string().trim(),
+    }),
+  },
+
   removeProfileImage: {
     query: joi.object({
       masterId: joi.string().trim(),

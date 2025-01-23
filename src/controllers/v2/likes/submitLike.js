@@ -129,10 +129,10 @@ module.exports = async (request, postType) => {
         await sendNotificationsService(
           "likeComment",
           {
-            sourceName: childProfile[0].name,
+            sourceName: user.name,
             sourceId: request.user._id,
-            sourceMedia: childProfile[0].profileImage,
-            sourceMediaType: childProfile[0].profileImageType,
+            sourceMedia: user.profileImage,
+            sourceMediaType: user.profileImageType,
             sourceType: request.user.type,
           },
           null,

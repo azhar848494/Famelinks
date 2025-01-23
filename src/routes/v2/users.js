@@ -83,6 +83,7 @@ const accountSettings = require('../../controllers/v2/users/accountSettings')
 const inviteToFollowController = require('../../controllers/v2/users/inviteToFollow')
 const searchAgencyController = require('../../controllers/v2/users/searchAgency')
 const getBrandProductController = require('../../controllers/v2/users/getBrandProductsBySearch')
+const getBrandProduct = require('../../controllers/v2/users/getBrandProduct')
 const removeProfileImageController = require('../../controllers/v2/users/removeProfileImage')
 const updatePrivacyController = require('../../controllers/v2/users/updatePrivacy')
 const deleteProductcontroller = require('../../controllers/v2/users/deleteBrandProduct')
@@ -378,6 +379,12 @@ router.get(
   "/search/brand/Products",
   requestValidatorCallback(validator.getBrandProductsBySearch),
   expressCallback(getBrandProductController)
+);
+
+router.get(
+  "/brand/product/:productId",
+  requestValidatorCallback(validator.getBrandProduct),
+  expressCallback(getBrandProduct)
 );
 
 router.put(

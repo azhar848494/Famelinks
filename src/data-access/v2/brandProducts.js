@@ -151,7 +151,7 @@ exports.getBrandProducts = (brandId, page) => {
               type: 1,
               _id: 0,
               dob: 1,
-              profile:{
+              profile: {
                 name: "$profileStorelinks.name",
                 bio: "$profileStorelinks.bio",
                 profession: "$profileStorelinks.profession",
@@ -298,7 +298,7 @@ exports.getMyBrandProducts = (userId, page, filterObj) => {
               type: 1,
               _id: 0,
               dob: 1,
-              profile:{
+              profile: {
                 name: "$profileStorelinks.name",
                 bio: "$profileStorelinks.bio",
                 profession: "$profileStorelinks.profession",
@@ -309,7 +309,7 @@ exports.getMyBrandProducts = (userId, page, filterObj) => {
         ],
         as: "user",
       },
-    },  
+    },
     {
       $lookup: {
         from: "locatns",
@@ -425,7 +425,7 @@ exports.getBrandPosts = (userId, page) => {
               type: 1,
               _id: 0,
               dob: 1,
-              profile:{
+              profile: {
                 name: "$profileStorelinks.name",
                 bio: "$profileStorelinks.bio",
                 profession: "$profileStorelinks.profession",
@@ -593,7 +593,7 @@ exports.getBrandPosts = (userId, page) => {
         createdAt: 1,
         updatedAt: 1,
         name: 1,
-        profession: 1,        
+        profession: 1,
         location: { $first: "$location" },
         hashTag: 1,
         price: 1,
@@ -1199,5 +1199,77 @@ exports.getBrandProduct = (page, selfId) => {
     { $skip: (page - 1) * 10 },
     { $limit: 10 },
     { $sort: { createdAt: -1 } },
+  ]);
+};
+
+exports.getProductDetails = (data) => {
+  return BrandProductsDB.aggregate([
+    {
+      $match: {
+        $and: [
+          { _id: ObjectId(data.productId) },
+          { isDeleted: false },
+          { isSafe: true },
+          { isBlocked: false },
+        ],
+      },
+    },
+    // {
+    //   $lookup: {
+    //     from: "brandproductcoins",
+    //     let: { productId: "$_id" },
+    //     pipeline: [
+    //       { $match: { $expr: { $eq: ["$productId", "$$productId"] } } },
+    //       {
+    //         $project: {
+    //           _id: 0,
+    //           balance: 1,
+    //           perTagCoins: 1,
+    //         },
+    //       },
+    //     ],
+    //     as: "coins",
+    //   },
+    // },
+    // //MasterIdMigration
+    // {
+    //   $lookup: {
+    //     from: "users",
+    //     let: { userId: "$userId" },
+    //     pipeline: [
+    //       { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+    //       {
+    //         $project: {
+    //           _id: 0,
+    //           name: "$profileStorelinks.name",
+    //         },
+    //       },
+    //     ],
+    //     as: "createdBy",
+    //   },
+    // },
+    // { $addFields: { createdBy: { $first: "$createdBy.name" } } },
+    // { $addFields: { balance: { $first: "$coins.balance" } } },
+    // { $addFields: { perTagCoins: { $first: "$coins.perTagCoins" } } },
+    // {
+    //   $match: {
+    //     $expr: { $gte: ["$balance", "$perTagCoins"] },
+    //   },
+    // },
+    {
+      $project: {
+        media: 1,
+        description: 1,
+        purchaseUrl: 1,
+        buttonName: 1,
+        name: 1,
+        hashTag: 1,
+        price: 1,
+        tags: 1,
+      },
+    },
+    // { $skip: (page - 1) * 10 },
+    // { $limit: 10 },
+    // { $sort: { createdAt: -1 } },
   ]);
 };
