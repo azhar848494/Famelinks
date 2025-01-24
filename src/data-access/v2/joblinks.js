@@ -148,6 +148,8 @@ exports.getUserJobs = (joblinksId, page) => {
                 name: "$profileJoblinks.name",
                 profileImageType: "$profileJoblinks.profileImageType",
                 profileImage: "$profileJoblinks.profileImage",
+                profession: "$profileJoblinks.profession",
+                bio: "$profileJoblinks.bio",
               },
             },
           },
