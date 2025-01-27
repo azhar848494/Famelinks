@@ -327,77 +327,34 @@ const getMyCollabLinks = (
         isBlocked: false,
       },
     },
-    { $match: filterObj },
+    { $match: filterObj },    
+    //MasterIdMigration
     {
       $lookup: {
-        from: "profilecollablinks",
+        from: "users",
         let: { userId: "$userId" },
         pipeline: [
-          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+          {
+            $match: {
+              $expr: { $eq: ["$_id", "$$userId"] },
+              isDeleted: false,
+              isSuspended: false,
+            },
+          },
           {
             $project: {
-              name: 1,
-              // dob: 1,
-              bio: 1,
-              profession: 1,
-              profileImage: 1,
-              profileImageType: 1,
-              // username: 1, //this is present master user table
-              _id: 1,
-              // type: 1, //this is present master user table
+              username: 1,
+              type: 1,
+              dob: 1,
+              profile: {
+                name: "$profileCollablinks.name",
+                bio: "$profileCollablinks.bio",
+                profession: "$profileCollablinks.profession",
+                profileImage: "$profileCollablinks.profileImage",
+                profileImageType: "$profileCollablinks.profileImageType",
+              }
             },
           },
-          {
-            $lookup: {
-              from: "users",
-              let: { userId: "$_id" },
-              pipeline: [
-                {
-                  $match: {
-                    $expr: { $eq: ["$profileCollablinks", "$$userId"] },
-                    isDeleted: false,
-                    isSuspended: false,
-                  },
-                },
-                {
-                  $project: {
-                    username: 1, //this is present master user table
-                    type: 1, //this is present master user table
-                    _id: 1,
-                    dob: 1,
-                    profileCollablinks: 1,
-                    // profileImageType: 1,
-                    name: 1,
-                  },
-                },
-              ],
-              as: "masterUser",
-            },
-          },
-          {
-            $addFields: {
-              username: { $first: "$masterUser.username" },
-              type: { $first: "$masterUser.type" },
-              dob: { $first: "$masterUser.dob" },
-              _id: { $first: "$masterUser._id" },
-              // name: { $first: "$masterUser.name" },
-              // profileImageType: { $first: "$masterUser.profileImageType" },
-            },
-          },
-          {
-            $group: {
-              _id: "$_id",
-              name: { $first: "$name" },
-              type: { $first: "$type" },
-              username: { $first: "$username" },
-              dob: { $first: "$dob" },
-              bio: { $first: "$bio" },
-              profession: { $first: "$profession" },
-              profileImage: { $first: "$profileImage" },
-              profileImageType: { $first: "$profileImageType" },
-            },
-          },
-          
         ],
         as: "users",
       },
@@ -434,6 +391,7 @@ const getMyCollabLinks = (
                 {
                   $project: {
                     _id: 1,
+                    type: 1,
                     username: 1,
                     name: 1,
                   },

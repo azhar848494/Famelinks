@@ -26,11 +26,8 @@ module.exports = async (request) => {
     });
   }
   
-  let profileId = await getFollowlinksProfile(request.params.userId, 'collablinks')
-  
-  //request.params.userId => Followlinks Profile Id
   const result = await getMyCollablinksService(
-    profileId[0]._id,
+    request.params.userId,
     request.query.page,
     followLinksProfile[0]._id,
     request.user._id,

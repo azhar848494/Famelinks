@@ -1308,17 +1308,6 @@ exports.getTalents = (page, masterId, joblinksId) => {
           },
           {
             $set: {
-              profileImage: {
-                $cond: [
-                  { $eq: [null, "$profileImage"] },
-                  null,
-                  { $concat: ["$profileImage", "-", "xs"] },
-                ],
-              },
-            },
-          },
-          {
-            $set: {
               age: {
                 $dateDiff: {
                   startDate: "$dob",
@@ -1422,17 +1411,6 @@ exports.getTalents = (page, masterId, joblinksId) => {
               greetText: "$profileJoblinks.",
               profileImage: "$profileJoblinks.",
               profileImageType: "$profileJoblinks.",
-            },
-          },
-          {
-            $set: {
-              profileImage: {
-                $cond: [
-                  { $eq: [null, "$profileImage"] },
-                  null,
-                  { $concat: ["$profileImage", "-", "xs"] },
-                ],
-              },
             },
           },
           {
@@ -1982,17 +1960,6 @@ exports.getApplicantsFaces = (selfMasterId, jobId, page) => {
                 },
                 {
                   $set: {
-                    profileImage: {
-                      $cond: [
-                        { $eq: [null, "$profileImage"] },
-                        null,
-                        { $concat: ["$profileImage", "-", "xs"] },
-                      ],
-                    },
-                  },
-                },
-                {
-                  $set: {
                     age: {
                       $dateDiff: {
                         startDate: "$dob",
@@ -2261,17 +2228,6 @@ exports.getApplicantsCrew = (selfMasterId, jobId, page) => {
                     dob: 1,
                     type: 1,
                     profileFamelinks: 1,
-                  },
-                },
-                {
-                  $set: {
-                    profileImage: {
-                      $cond: [
-                        { $eq: [null, "$profileImage"] },
-                        null,
-                        { $concat: ["$profileImage", "-", "xs"] },
-                      ],
-                    },
                   },
                 },
                 {
@@ -2958,17 +2914,6 @@ exports.getFacesShortlistedApplicant = (selfMasterId, jobId, page) => {
                 },
                 {
                   $set: {
-                    profileImage: {
-                      $cond: [
-                        { $eq: [null, "$profileImage"] },
-                        null,
-                        { $concat: ["$profileImage", "-", "xs"] },
-                      ],
-                    },
-                  },
-                },
-                {
-                  $set: {
                     age: {
                       $dateDiff: {
                         startDate: "$dob",
@@ -3207,17 +3152,6 @@ exports.getCrewShortlistedApplicant = (selfMasterId, jobId, page) => {
                     followersCount: 1,
                     dob: 1,
                     profileFamelinks: 1,
-                  },
-                },
-                {
-                  $set: {
-                    profileImage: {
-                      $cond: [
-                        { $eq: [null, "$profileImage"] },
-                        null,
-                        { $concat: ["$profileImage", "-", "xs"] },
-                      ],
-                    },
                   },
                 },
                 {
@@ -3531,17 +3465,6 @@ exports.getSotedApplicantsFaces = (selfMasterId, jobId, page, sort) => {
                 },
                 {
                   $set: {
-                    profileImage: {
-                      $cond: [
-                        { $eq: [null, "$profileImage"] },
-                        null,
-                        { $concat: ["$profileImage", "-", "xs"] },
-                      ],
-                    },
-                  },
-                },
-                {
-                  $set: {
                     age: {
                       $dateDiff: {
                         startDate: "$dob",
@@ -3781,17 +3704,6 @@ exports.getSortedApplicantsCrew = (selfMasterId, jobId, page, sort) => {
                     followersCount: 1,
                     dob: 1,
                     profileFamelinks: 1,
-                  },
-                },
-                {
-                  $set: {
-                    profileImage: {
-                      $cond: [
-                        { $eq: [null, "$profileImage"] },
-                        null,
-                        { $concat: ["$profileImage", "-", "xs"] },
-                      ],
-                    },
                   },
                 },
                 {
@@ -4122,17 +4034,6 @@ exports.getApplicantsFacesBySearch = (
                 },
                 {
                   $set: {
-                    profileImage: {
-                      $cond: [
-                        { $eq: [null, "$profileImage"] },
-                        null,
-                        { $concat: ["$profileImage", "-", "xs"] },
-                      ],
-                    },
-                  },
-                },
-                {
-                  $set: {
                     age: {
                       $dateDiff: {
                         startDate: "$dob",
@@ -4442,17 +4343,6 @@ exports.getApplicantsCrewBySearch = (
                 },
                 {
                   $set: {
-                    profileImage: {
-                      $cond: [
-                        { $eq: [null, "$profileImage"] },
-                        null,
-                        { $concat: ["$profileImage", "-", "xs"] },
-                      ],
-                    },
-                  },
-                },
-                {
-                  $set: {
                     age: {
                       $dateDiff: {
                         startDate: "$dob",
@@ -4628,7 +4518,7 @@ exports.getAppliedJobs = (page, joblinksId, masterId) => {
           },
           { $set: { appliedOn: "$createdAt" } },
           { $set: { applicationId: "$_id" } },
-          { $project: { _id: 0, jobId: 1, appliedOn: 1, applicationId: 1, } },
+          { $project: { _id: 0, jobStatus: '$status', jobId: 1, appliedOn: 1, applicationId: 1, } },
           {
             $lookup: {
               from: "jobs",
@@ -4636,11 +4526,13 @@ exports.getAppliedJobs = (page, joblinksId, masterId) => {
                 jobId: "$jobId",
                 appliedOn: "$appliedOn",
                 applicationId: "$applicationId",
+                jobStatus: "$jobStatus",
               },
               pipeline: [
                 { $match: { $expr: { $eq: ["$_id", "$$jobId"] } } },
                 { $set: { appliedOn: "$$appliedOn" } },
                 { $set: { applicationId: "$$applicationId" } },
+                { $set: { jobStatus: "$$jobStatus" } },
                 {
                   $lookup: {
                     from: "locatns",
@@ -4670,6 +4562,7 @@ exports.getAppliedJobs = (page, joblinksId, masterId) => {
                     createdBy: 1,
                     appliedOn: 1,
                     applicationId: 1,
+                    jobStatus: 1,
                   },
                 },
                 {
@@ -4807,7 +4700,7 @@ exports.getHiredJobs = (page, joblinksId, masterId) => {
           },
           { $set: { appliedOn: "$createdAt" } },
           { $set: { applicationId: "$_id" } },
-          { $project: { _id: 0, jobId: 1, appliedOn: 1, applicationId: 1 } },
+          { $project: { _id: 0, jobStatus: '$status', jobId: 1, appliedOn: 1, applicationId: 1 } },
           {
             $lookup: {
               from: "jobs",
@@ -4815,11 +4708,13 @@ exports.getHiredJobs = (page, joblinksId, masterId) => {
                 jobId: "$jobId",
                 appliedOn: "$appliedOn",
                 applicationId: "$applicationId",
+                jobStatus: "$jobStatus",
               },
               pipeline: [
                 { $match: { $expr: { $eq: ["$_id", "$$jobId"] } } },
                 { $set: { appliedOn: "$$appliedOn" } },
                 { $set: { applicationId: "$$applicationId" } },
+                { $set: { jobStatus: "$$jobStatus" } },
                 {
                   $lookup: {
                     from: "locatns",
@@ -4849,6 +4744,7 @@ exports.getHiredJobs = (page, joblinksId, masterId) => {
                     createdAt: 1,
                     appliedOn: 1,
                     applicationId: 1,
+                    jobStatus: 1,
                   },
                 },
                 {
@@ -4998,7 +4894,7 @@ exports.getShortlistedJobs = (page, joblinksId, masterId) => {
           },
           { $set: { appliedOn: "$createdAt" } },
           { $set: { applicationId: "$_id" } },
-          { $project: { _id: 0, jobId: 1, appliedOn: 1, applicationId: 1 } },
+          { $project: { _id: 0, jobStatus: '$status', jobId: 1, appliedOn: 1, applicationId: 1 } },
           {
             $lookup: {
               from: "jobs",
@@ -5006,11 +4902,13 @@ exports.getShortlistedJobs = (page, joblinksId, masterId) => {
                 jobId: "$jobId",
                 appliedOn: "$appliedOn",
                 applicationId: "$applicationId",
+                jobStatus: "$jobStatus",
               },
               pipeline: [
                 { $match: { $expr: { $eq: ["$_id", "$$jobId"] } } },
                 { $set: { appliedOn: "$$appliedOn" } },
                 { $set: { applicationId: "$$applicationId" } },
+                { $set: { jobStatus: "$$jobStatus" } },
                 {
                   $lookup: {
                     from: "locatns",
@@ -5040,6 +4938,7 @@ exports.getShortlistedJobs = (page, joblinksId, masterId) => {
                     createdAt: 1,
                     appliedOn: 1,
                     applicationId: 1,
+                    jobStatus: 1,
                   },
                 },
                 {
@@ -5152,6 +5051,27 @@ exports.getSavedJobs = (page, joblinksId, masterId) => {
               ],
               as: "jobDetails",
             },
+          },
+          {
+            $lookup: {
+              from: "jobapplications",
+              let: { jobId: "$_id" },
+              pipeline: [
+                {
+                  $match: {
+                    $and: [
+                      { $expr: { $eq: ["$jobId", "$$jobId"] } },
+                      { userId: joblinksId },
+                    ],
+                  },
+                },
+                { $project: { status: 1 } },
+              ],
+              as: "jobStatus",
+            },
+          },
+          {
+            $addFields: { jobStatus: { $first: "$jobStatus.status" } }
           },
           //MasterIdMigration
           {
@@ -5281,7 +5201,7 @@ exports.acceptRejectJobInvite = (jobId, selfId, userId, action, jobType) => {
       jobId: jobId,
       jobType: jobType,
       userId: selfId,
-      status: "applied",
+      status: "hired",
     });
   }
 
@@ -5693,17 +5613,6 @@ exports.getNewTalents = (data) => {
               gender: 1,
               type: 1,
               ageGroup: 1,
-            },
-          },
-          {
-            $set: {
-              profileImage: {
-                $cond: [
-                  { $eq: [null, "$profileImage"] },
-                  null,
-                  { $concat: ["$profileImage", "-", "xs"] },
-                ],
-              },
             },
           },
           {

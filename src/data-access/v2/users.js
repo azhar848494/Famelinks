@@ -186,12 +186,36 @@ exports.getOneUser = (userId) => {
       thanksGifted: { $add: [23000, 0] },
       thanksBalance: { $add: [3000, 0] },
       isFirstLogin: 1,
-      profileFamelinks: 1,
-      profileFunlinks: 1,
-      profileFollowlinks: 1,
-      profileJoblinks: 1,
-      profileStorelinks: 1,
-      profileCollablinks: 1,
+      profileFamelinks: {
+        name: '$profileFamelinks.name',
+        profileImage: '$profileFamelinks.profileImage',
+        profileImageType: '$profileFamelinks.profileImageType',
+      },
+      profileFunlinks: {
+        name: '$profileFunlinks.name',
+        profileImage: '$profileFunlinks.profileImage',
+        profileImageType: '$profileFunlinks.profileImageType',
+      },
+      profileFollowlinks: {
+        name: '$profileFollowlinks.name',
+        profileImage: '$profileFollowlinks.profileImage',
+        profileImageType: '$profileFollowlinks.profileImageType',
+      },
+      profileJoblinks: {
+        name: '$profileJoblinks.name',
+        profileImage: '$profileJoblinks.profileImage',
+        profileImageType: '$profileJoblinks.profileImageType',
+      },
+      profileStorelinks: {
+        name: '$profileStorelinks.name',
+        profileImage: '$profileStorelinks.profileImage',
+        profileImageType: '$profileStorelinks.profileImageType',
+      },
+      profileCollablinks: {
+        name: '$profileCollablinks.name',
+        profileImage: '$profileCollablinks.profileImage',
+        profileImageType: '$profileCollablinks.profileImageType',
+      },
       profileImageType: 1,
       deleteDate: 1,
       isSuspended: 1,
@@ -2100,13 +2124,7 @@ exports.getProfileFamelinks = (profileId, followerId, page) => {
         isBlocked: "$profileFamelinks.isBlocked",
         isDeleted: "$profileFamelinks.isDeleted",
         createdAt: "$profileFamelinks.createdAt",
-        profileImage: {
-          $cond: {
-            if: { $eq: [null, "$profileFamelinks.profileImage"] },
-            then: null,
-            else: { $concat: ["$profileFamelinks.profileImage", "-", "xs"] },
-          },
-        },
+        profileImage: "$profileFamelinks.profileImage",
         masterUser: {
           _id: "$_id",
           name: "$name",
@@ -3401,17 +3419,6 @@ exports.getProfileJoblinks = (profileId, page) => {
                     pipeline: [
                       { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
                       { $project: { profileImage: 1, profileImageType: 1 } },
-                      {
-                        $set: {
-                          profileImage: {
-                            $cond: [
-                              { $eq: [null, "$profileImage"] },
-                              null,
-                              { $concat: ["$profileImage", "-", "xs"] },
-                            ],
-                          },
-                        },
-                      },
                     ],
                     as: "user",
                   },
@@ -3959,17 +3966,6 @@ exports.getOtherProfileJoblinks = (
                       pipeline: [
                         { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
                         { $project: { profileImage: "$profileJoblinks.profileImage", profileImageType: "$profileJoblinks.profileImageType" } },
-                        {
-                          $set: {
-                            profileImage: {
-                              $cond: [
-                                { $eq: [null, "$profileImage"] },
-                                null,
-                                { $concat: ["$profileImage", "-", "xs"] },
-                              ],
-                            },
-                          },
-                        },
                       ],
                       as: "user",
                     },
@@ -4119,19 +4115,6 @@ exports.getOtherProfileJoblinks = (
             },
             {
               $lookup: {
-                from: "jobapplications",
-                let: { joblinksId: userId },
-                pipeline: [
-                  { $match: { $expr: { $eq: ["$userId", "$$joblinksId"] } } },
-                  { $project: { jobId: 1, _id: 0 } },
-                ],
-                as: "jobsApplied",
-              },
-            },
-            { $addFields: { jobIds: "$jobsApplied.jobId" } },
-            { $match: { $expr: { $not: [{ $in: ["$_id", "$jobIds"] }] } } },
-            {
-              $lookup: {
                 from: "jobcategories",
                 let: { jobCategory: "$jobCategory" },
                 pipeline: [
@@ -4258,19 +4241,6 @@ exports.getOtherProfileJoblinks = (
             { $match: { isClosed: false, jobType: "crew", createdBy: userId } },
             {
               $lookup: {
-                from: "jobapplications",
-                let: { joblinksId: userId },
-                pipeline: [
-                  { $match: { $expr: { $eq: ["$userId", "$$joblinksId"] } } },
-                  { $project: { jobId: 1, _id: 0 } },
-                ],
-                as: "jobsApplied",
-              },
-            },
-            { $addFields: { jobIds: "$jobsApplied.jobId" } },
-            { $match: { $expr: { $not: [{ $in: ["$_id", "$jobIds"] }] } } },
-            {
-              $lookup: {
                 from: "jobcategories",
                 let: { jobCategory: "$jobCategory" },
                 pipeline: [
@@ -4332,7 +4302,7 @@ exports.getOtherProfileJoblinks = (
             {
               $lookup: {
                 from: "users",
-                let: { userId: userId },
+                let: { userId: followerId },
                 pipeline: [
                   { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
                   { $project: { _id: 0, savedJobs: "$profileJoblinks.savedJobs" } },
@@ -4754,7 +4724,6 @@ exports.getOtherProfileJoblinks = (
   if (profileType == "brand") {
     return UserDB.aggregate([
       { $match: { _id: userId } },
-
       {
         $lookup: {
           from: "jobs",
@@ -5010,7 +4979,7 @@ exports.getOtherProfileJoblinks = (
             {
               $lookup: {
                 from: "users",
-                let: { userId: userId },
+                let: { userId: followerId },
                 pipeline: [
                   { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
                   { $project: { _id: 0, savedJobs: "$profileJoblinks.savedJobs" } },
@@ -5570,18 +5539,6 @@ exports.getSelfCollablinks = (profileId, followerId, page, masterId) => {
   let pagination = page ? page : 1;
   return UserDB.aggregate([
     { $match: { _id: profileId } },
-
-    {
-      $set: {
-        "profile.profileImage": {
-          $cond: {
-            if: { $eq: [null, "$profileCollablinks.profileImage"] },
-            then: null,
-            else: { $concat: ["$profileCollablinks.profileImage", "-", "xs"] },
-          },
-        },
-      },
-    },
     {
       $lookup: {
         from: "agencytags",
@@ -6675,17 +6632,6 @@ exports.getBrandProfileJoblinks = (userId, page) => {
                     pipeline: [
                       { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
                       { $project: { profileImage: "$profileJoblinks.profileImage", profileImageType: "$profileJoblinks.profileImageType" } },
-                      {
-                        $set: {
-                          profileImage: {
-                            $cond: [
-                              { $eq: [null, "$profileImage"] },
-                              null,
-                              { $concat: ["$profileImage", "-", "xs"] },
-                            ],
-                          },
-                        },
-                      },
                     ],
                     as: "user",
                   },
@@ -7271,17 +7217,6 @@ exports.getAgencyProfileJoblinks = (userId) => {
                     pipeline: [
                       { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
                       { $project: { profileImage: "$profileJoblinks.profileImage", profileImageType: "$profileJoblinks.profileImageType" } },
-                      {
-                        $set: {
-                          profileImage: {
-                            $cond: [
-                              { $eq: [null, "$profileImage"] },
-                              null,
-                              { $concat: ["$profileImage", "-", "xs"] },
-                            ],
-                          },
-                        },
-                      },
                     ],
                     as: "user",
                   },
