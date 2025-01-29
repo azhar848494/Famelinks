@@ -174,7 +174,7 @@ exports.getUpcomingFametrendzs = (page, type, filterObj, userId) => {
         pipeline: [
 
           { $project: { _id: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-          
+
           {
             $set: {
               profileImageType: {
@@ -296,10 +296,146 @@ exports.getUpcomingChallenges = (page, type) => {
   ]);
 };
 
-exports.getOneFunlinksChallenge = (challengeId) => {
+exports.getFameChallengeDetails = (data) => {
+  return fameTrendzDB.aggregate([
+    {
+      $match: {
+        _id: ObjectId(data.challengeId),
+        isDeleted: false,
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "sponsor",
+        pipeline: [
+          { $project: { type: 1, username: 1, name: 1, profileImageType: 1, profileImage: 1 } },
+        ],
+        as: "sponsor",
+      },
+    },
+    {
+      $addFields: { sponsor: { $first: '$sponsor' } },
+    },
+    {
+      $lookup: {
+        from: "ratings",
+        let: { value: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $and: [
+                { $expr: { $eq: ["$trendId", "$$value"] } },
+                { userId: data.userId },
+              ],
+            },
+          },
+        ],
+        as: "rating",
+      },
+    },
+    {
+      $set: {
+        rating: {
+          $cond: [
+            { $eq: [0, { $size: "$rating" }] },
+            null,
+            { $first: "$rating.rating" },
+          ],
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "famelinks",
+        let: { value: "$_id" },
+        pipeline: [
+          {
+            $lookup: {
+              from: "users",
+              let: { userId: "$userId" },
+              pipeline: [
+                { $match: { _id: ObjectId(data.userId) } },
+                { $project: { blockList: 1 } },
+              ],
+              as: "selfUser",
+            },
+          },
+          { $addFields: { blockedUserIds: { $first: "$selfUser.blockList" } } },
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $in: [ObjectId(data.challengeId), "$challengeId"] },
+                  { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
+                ],
+              },
+            },
+          },
+          {
+            $project: {
+              type: { $cond: [{ $ne: ["$video", null] }, 'video', 'image'] },
+              path: {
+                $switch: {
+                  branches: [
+                    { case: { $ne: ["$video", null] }, then: "$video" },
+                    { case: { $ne: ["$closeUp", null] }, then: "$closeUp" },
+                    { case: { $ne: ["$medium", null] }, then: "$medium" },
+                    { case: { $ne: ["$long", null] }, then: "$long" },
+                    { case: { $ne: ["$pose1", null] }, then: "$pose1" },
+                    { case: { $ne: ["$pose2", null] }, then: "$pose2" },
+                  ],
+                  default: "$additional"
+                },
+              },
+              userId: 1,
+            },
+          },
+          {
+            $facet: {
+              data: [
+                { $sort: { createdAt: -1 } },
+                { $skip: (data.page - 1) * 15 },
+                { $limit: 15 },
+              ],
+              count: [
+                { $count: "total" },
+              ],
+            }
+          },
+          {
+            $project: { data: 1, count: { $ifNull: [{ $first: '$count.total' }, 0] } },
+          },
+        ],
+        as: "posts",
+      },
+    },
+    {
+      $project: {
+        hashTag: 1,
+        category: 1,
+        totalParticipants: 1,
+        totalImpressions: 1,
+        totalPost: 1,
+        milestoneValue: '$milestoneAggrement.milestoneValue',
+        rewardWinner: 1,
+        rewardRunnerUp: 1,
+        sponsor: 1,
+        rating: 1,
+        posts: { $first: '$posts' },
+      },
+    },
+  ]);
+};
+
+exports.getFunChallengeDetails = (data) => {
   return ChallengeDB.aggregate([
     {
-      $match: { _id: ObjectId(challengeId), isDeleted: false },
+      $match: {
+        _id: ObjectId(data.challengeId),
+        isDeleted: false,
+      },
     },
     {
       $lookup: {
@@ -307,34 +443,100 @@ exports.getOneFunlinksChallenge = (challengeId) => {
         foreignField: "_id",
         localField: "createdBy",
         pipeline: [
-          { $project: { _id: 0, name: 1, profileImage: 1 } },
+          { $project: { type: 1, username: 1, name: 1, profileImageType: 1, profileImage: 1 } },
         ],
         as: "sponsor",
       },
     },
     {
+      $addFields: { sponsor: { $first: '$sponsor' } },
+    },
+    {
+      $lookup: {
+        from: "ratings",
+        let: { value: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $and: [
+                { $expr: { $eq: ["$trendId", "$$value"] } },
+                { userId: data.userId },
+              ],
+            },
+          },
+        ],
+        as: "rating",
+      },
+    },
+    {
+      $set: {
+        rating: {
+          $cond: [
+            { $eq: [0, { $size: "$rating" }] },
+            null,
+            { $first: "$rating.rating" },
+          ],
+        },
+      },
+    },
+    {
       $lookup: {
         from: "funlinks",
-        foreignField: "challengeId",
-        localField: "_id",
+        let: { value: "$_id" },
         pipeline: [
-          { $project: { video: 1 } },
           {
-            $set: {
-              video: {
-                $cond: {
-                  if: { $eq: [null, "$video"] },
-                  then: null,
-                  else: { $concat: ["$video", "-", "xs"] },
-                },
+            $lookup: {
+              from: "users",
+              let: { userId: "$userId" },
+              pipeline: [
+                { $match: { _id: ObjectId(data.userId) } },
+                { $project: { blockList: 1 } },
+              ],
+              as: "selfUser",
+            },
+          },
+          { $addFields: { blockedUserIds: { $first: "$selfUser.blockList" } } },
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $in: [ObjectId(data.challengeId), "$challengeId"] },
+                  { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
+                ],
               },
             },
+          },
+          {
+            $project: { video: 1, userId: 1, musicName: 1 },
+          },
+          {
+            $facet: {
+              data: [
+                { $sort: { createdAt: -1 } },
+                { $skip: (data.page - 1) * 15 },
+                { $limit: 15 },
+              ],
+              count: [
+                { $count: "total" },
+              ],
+            }
+          },
+          {
+            $project: { data: 1, count: { $ifNull: [{ $first: '$count.total' }, 0] } },
           },
         ],
         as: "posts",
       },
     },
-    { $sort: { updatedAt: -1 } },
+    {
+      $project: {
+        hashTag: 1,
+        giftCoins: 1,
+        sponsor: 1,
+        rating: 1,
+        posts: { $first: '$posts' },
+      },
+    },
   ]);
 };
 
@@ -352,7 +554,7 @@ exports.getOneFamelinksChallenge = (challengeId, userId) => {
           {
             $project: { _id: 0, name: 1, profileImage: 1, profileImageType: 1 },
           },
-          
+
           {
             $set: {
               profileImageType: {
@@ -942,8 +1144,8 @@ exports.getChallengeFunlinks = (challengeId, page, userId) => {
               type: 1,
               dob: 1,
               name: 1,
-              profileImage:1,
-              profileImageType:1,
+              profileImage: 1,
+              profileImageType: 1,
               profile: {
                 name: "$profileFamelinks.name",
                 bio: "$profileFamelinks.bio",
@@ -1225,7 +1427,7 @@ exports.getChallengeFollowlinks = (challengeId, page, userId) => {
           ],
         },
       },
-    },    
+    },
     //MasterIdMigration
     {
       $lookup: {
@@ -1474,6 +1676,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
           isDeleted: false,
           isCompleted: false,
           type: "famelinks",
+          status: "paid",
         },
       },
       { $match: filterObj },
@@ -1499,7 +1702,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
           localField: "sponsor",
           pipeline: [
             { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-            
+
             {
               $set: {
                 profileImageType: {
@@ -2224,330 +2427,330 @@ exports.getFameLinksChallengesBySearch = (searchData, linkType) => {
 
 exports.getChallengeWinners = (userId) => {
   return fameTrendzDB.aggregate([
-      {
-        $match: {
-          type: "famelinks",
-          isDeleted: false,
-          isCompleted: true,
-        },
+    {
+      $match: {
+        type: "famelinks",
+        isDeleted: false,
+        isCompleted: true,
       },
-      {
-        $lookup: {
-          from: "users",
-          localField: "sponsor",
-          foreignField: "_id",
-          pipeline: [
-            { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-            
-            {
-              $set: {
-                profileImageType: {
-                  $cond: [
-                    { $ifNull: ["$profileImageType", false] },
-                    "$profileImageType",
-                    "",
-                  ],
-                },
-              },
-            },
-            { $addFields: { followStatus: 0 } },
-            {
-              $lookup: {
-                from: "followers",
-                let: { followeeId: "$_id" }, //master user Id
-                pipeline: [
-                  {
-                    $match: {
-                      followerId: ObjectId(userId),
-                      $expr: { $eq: ["$followeeId", "$$followeeId"] },
-                      acceptedDate: { $eq: null },
-                      type: "user",
-                    },
-                  },
-                  { $project: { _id: 1 } },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "sponsor",
+        foreignField: "_id",
+        pipeline: [
+          { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+
+          {
+            $set: {
+              profileImageType: {
+                $cond: [
+                  { $ifNull: ["$profileImageType", false] },
+                  "$profileImageType",
+                  "",
                 ],
-                as: "requested",
               },
             },
-            {
-              $addFields: {
-                followStatus: {
-                  $cond: [{ $eq: [{ $size: "$requested" }, 1] }, 1, "$followStatus"],
-                },
-              },
-            },
-            {
-              $lookup: {
-                from: "followers",
-                let: { followeeId: "$_id" }, //master user Id
-                pipeline: [
-                  {
-                    $match: {
-                      followerId: ObjectId(userId),
-                      $expr: { $eq: ["$followeeId", "$$followeeId"] },
-                      acceptedDate: { $ne: null },
-                      type: "user",
-                    },
-                  },
-                  { $project: { _id: 1 } },
-                ],
-                as: "following",
-              },
-            },
-            {
-              $addFields: {
-                followStatus: {
-                  $cond: [{ $eq: [{ $size: "$following" }, 1] }, 2, "$followStatus"],
-                },
-              },
-            },
-            {
-              $addFields: {
-                followStatus: {
-                  $switch: {
-                    branches: [
-                      { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-                      { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
-                      { case: { $eq: ["$followStatus", 2] }, then: "Following" },
-                    ],
-                    default: "Follow",
-                  },
-                },
-              },
-            },
-          ],
-          as: "sponsor",
-        },
-      },
-      {
-        $lookup: {
-          from: "famelinks",
-          let: { challengeId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $in: ["$$challengeId", "$challengeId"] },
-                  ],
-                },
-              },
-            },
-            {
-              $group: {
-                _id: '$userId',
-              }
-            },
-          ],
-          as: "participantsCount",
-        },
-      },
-      {
-        $set: {
-          participantsCount: {
-            $size: "$participantsCount"
           },
-        },
-      },
-      {
-        $lookup: {
-          from: "famelinks",
-          let: { challengeId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $in: ["$$challengeId", "$challengeId"] },
+          { $addFields: { followStatus: 0 } },
+          {
+            $lookup: {
+              from: "followers",
+              let: { followeeId: "$_id" }, //master user Id
+              pipeline: [
+                {
+                  $match: {
+                    followerId: ObjectId(userId),
+                    $expr: { $eq: ["$followeeId", "$$followeeId"] },
+                    acceptedDate: { $eq: null },
+                    type: "user",
+                  },
+                },
+                { $project: { _id: 1 } },
+              ],
+              as: "requested",
+            },
+          },
+          {
+            $addFields: {
+              followStatus: {
+                $cond: [{ $eq: [{ $size: "$requested" }, 1] }, 1, "$followStatus"],
+              },
+            },
+          },
+          {
+            $lookup: {
+              from: "followers",
+              let: { followeeId: "$_id" }, //master user Id
+              pipeline: [
+                {
+                  $match: {
+                    followerId: ObjectId(userId),
+                    $expr: { $eq: ["$followeeId", "$$followeeId"] },
+                    acceptedDate: { $ne: null },
+                    type: "user",
+                  },
+                },
+                { $project: { _id: 1 } },
+              ],
+              as: "following",
+            },
+          },
+          {
+            $addFields: {
+              followStatus: {
+                $cond: [{ $eq: [{ $size: "$following" }, 1] }, 2, "$followStatus"],
+              },
+            },
+          },
+          {
+            $addFields: {
+              followStatus: {
+                $switch: {
+                  branches: [
+                    { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
+                    { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
+                    { case: { $eq: ["$followStatus", 2] }, then: "Following" },
                   ],
+                  default: "Follow",
                 },
               },
             },
-            {
-              $addFields: {
-                likesCount: { $add: ["$likes1Count", "$likes2Count"] },
-              },
-            },
-            {
-              $set: {
-                closeUp: {
-                  $cond: {
-                    if: { $eq: [null, "$closeUp"] },
-                    then: null,
-                    else: { $concat: ["$closeUp", "-", "xs"] },
-                  },
-                },
-              },
-            },
-            {
-              $set: {
-                medium: {
-                  $cond: {
-                    if: { $eq: [null, "$medium"] },
-                    then: null,
-                    else: { $concat: ["$medium", "-", "xs"] },
-                  },
-                },
-              },
-            },
-            {
-              $set: {
-                long: {
-                  $cond: {
-                    if: { $eq: [null, "$long"] },
-                    then: null,
-                    else: { $concat: ["$long", "-", "xs"] },
-                  },
-                },
-              },
-            },
-            {
-              $set: {
-                pose1: {
-                  $cond: {
-                    if: { $eq: [null, "$pose1"] },
-                    then: null,
-                    else: { $concat: ["$pose1", "-", "xs"] },
-                  },
-                },
-              },
-            },
-            {
-              $set: {
-                pose2: {
-                  $cond: {
-                    if: { $eq: [null, "$pose2"] },
-                    then: null,
-                    else: { $concat: ["$pose2", "-", "xs"] },
-                  },
-                },
-              },
-            },
-            {
-              $set: {
-                additional: {
-                  $cond: {
-                    if: { $eq: [null, "$additional"] },
-                    then: null,
-                    else: { $concat: ["$additional", "-", "xs"] },
-                  },
-                },
-              },
-            },
-            {
-              $set: {
-                video: {
-                  $cond: {
-                    if: { $eq: [null, "$video"] },
-                    then: null,
-                    else: { $concat: ["$video", "-", "xs"] },
-                  },
-                },
-              },
-            },
-            { $project: { _id: 1, likesCount: 1 } },
-            { $sort: { likesCount: -1 } },
-            { $limit: 10 },
-          ],
-          as: "posts",
-        },
+          },
+        ],
+        as: "sponsor",
       },
-      { $addFields: { winnerIds: "$posts._id" } },
-      {
-        $lookup: {
-          from: "famelinks",
-          let: { winnerIds: "$winnerIds" },
-          pipeline: [
-            { $match: { $expr: { $in: ["$_id", "$$winnerIds"] } } },
-            {
-              $project: {
-                _id: 1,
-                userId: 1,
-                country: 1,
-                likes1Count: 1,
-                likes2Count: 1,
-                likesCount: {
-                  $add: ["$likes1Count", "$likes2Count"],
-                },
-              },
-            },
-            { $sort: { likesCount: -1 } },
-            {
-              $lookup: {
-                from: "users",
-                foreignField: "_id",
-                localField: "userId",
-                pipeline: [
-                  {
-                    $project: {
-                      _id: 1,
-                      name: 1,
-                      username: 1,
-                      type: 1,
-                      profileImage: 1,
-                      profileImageType: 1,
-                    },
-                  },
-                  
+    },
+    {
+      $lookup: {
+        from: "famelinks",
+        let: { challengeId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $in: ["$$challengeId", "$challengeId"] },
                 ],
-                as: "users",
               },
             },
-            {
-              $addFields: {
-                masterId: { $first: "$users._id" },
-                name: { $first: "$users.name" },
-                username: { $first: "$users.username" },
-                type: { $first: "$users.type" },
-                profileImage: { $first: "$users.profileImage" },
-                profileImageType: { $first: "$users.profileImageType" },
-              },
-            },
-            
-            {
-              $group: {
-                _id: "$masterId",
-                name: { $first: "$name" },
-                username: { $first: "$username" },
-                type: { $first: "$type" },
-                country: { $first: "$country" },
-                profileImage: { $first: "$profileImage" },
-                profileImageType: { $first: "$profileImageType" },
-                likes1Count: { $first: "$likes1Count" },
-                likes2Count: { $first: "$likes2Count" },
-                likesCount: { $first: "$likesCount" },
-                postId: { $first: "$_id" },
-              },
-            },
-            { $sort: { likesCount: -1 } },
-            { $limit: 5 },
-          ],
-          as: "winner",
+          },
+          {
+            $group: {
+              _id: '$userId',
+            }
+          },
+        ],
+        as: "participantsCount",
+      },
+    },
+    {
+      $set: {
+        participantsCount: {
+          $size: "$participantsCount"
         },
       },
-      {
-        $project: {
-          _id: 1,
-          hashTag: 1,
-          images: 1,
-          description: 1,
-          for: 1,
-          requiredImpressions: 1,
-          totalImpressions: 1,
-          totalPost: 1,
-          requiredPost: 1,
-          totalParticipants: 1,
-          requiredParticipants: 1,
-          rewardWinner: 1,
-          rewardRunnerUp: 1,
-          posts: 1,
-          participantsCount: 1,
-          sponsor: 1,
-          winner: 1,
-          endDate: '$updatedAt',
-        },
+    },
+    {
+      $lookup: {
+        from: "famelinks",
+        let: { challengeId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $in: ["$$challengeId", "$challengeId"] },
+                ],
+              },
+            },
+          },
+          {
+            $addFields: {
+              likesCount: { $add: ["$likes1Count", "$likes2Count"] },
+            },
+          },
+          {
+            $set: {
+              closeUp: {
+                $cond: {
+                  if: { $eq: [null, "$closeUp"] },
+                  then: null,
+                  else: { $concat: ["$closeUp", "-", "xs"] },
+                },
+              },
+            },
+          },
+          {
+            $set: {
+              medium: {
+                $cond: {
+                  if: { $eq: [null, "$medium"] },
+                  then: null,
+                  else: { $concat: ["$medium", "-", "xs"] },
+                },
+              },
+            },
+          },
+          {
+            $set: {
+              long: {
+                $cond: {
+                  if: { $eq: [null, "$long"] },
+                  then: null,
+                  else: { $concat: ["$long", "-", "xs"] },
+                },
+              },
+            },
+          },
+          {
+            $set: {
+              pose1: {
+                $cond: {
+                  if: { $eq: [null, "$pose1"] },
+                  then: null,
+                  else: { $concat: ["$pose1", "-", "xs"] },
+                },
+              },
+            },
+          },
+          {
+            $set: {
+              pose2: {
+                $cond: {
+                  if: { $eq: [null, "$pose2"] },
+                  then: null,
+                  else: { $concat: ["$pose2", "-", "xs"] },
+                },
+              },
+            },
+          },
+          {
+            $set: {
+              additional: {
+                $cond: {
+                  if: { $eq: [null, "$additional"] },
+                  then: null,
+                  else: { $concat: ["$additional", "-", "xs"] },
+                },
+              },
+            },
+          },
+          {
+            $set: {
+              video: {
+                $cond: {
+                  if: { $eq: [null, "$video"] },
+                  then: null,
+                  else: { $concat: ["$video", "-", "xs"] },
+                },
+              },
+            },
+          },
+          { $project: { _id: 1, likesCount: 1 } },
+          { $sort: { likesCount: -1 } },
+          { $limit: 10 },
+        ],
+        as: "posts",
       },
-    ])
+    },
+    { $addFields: { winnerIds: "$posts._id" } },
+    {
+      $lookup: {
+        from: "famelinks",
+        let: { winnerIds: "$winnerIds" },
+        pipeline: [
+          { $match: { $expr: { $in: ["$_id", "$$winnerIds"] } } },
+          {
+            $project: {
+              _id: 1,
+              userId: 1,
+              country: 1,
+              likes1Count: 1,
+              likes2Count: 1,
+              likesCount: {
+                $add: ["$likes1Count", "$likes2Count"],
+              },
+            },
+          },
+          { $sort: { likesCount: -1 } },
+          {
+            $lookup: {
+              from: "users",
+              foreignField: "_id",
+              localField: "userId",
+              pipeline: [
+                {
+                  $project: {
+                    _id: 1,
+                    name: 1,
+                    username: 1,
+                    type: 1,
+                    profileImage: 1,
+                    profileImageType: 1,
+                  },
+                },
+
+              ],
+              as: "users",
+            },
+          },
+          {
+            $addFields: {
+              masterId: { $first: "$users._id" },
+              name: { $first: "$users.name" },
+              username: { $first: "$users.username" },
+              type: { $first: "$users.type" },
+              profileImage: { $first: "$users.profileImage" },
+              profileImageType: { $first: "$users.profileImageType" },
+            },
+          },
+
+          {
+            $group: {
+              _id: "$masterId",
+              name: { $first: "$name" },
+              username: { $first: "$username" },
+              type: { $first: "$type" },
+              country: { $first: "$country" },
+              profileImage: { $first: "$profileImage" },
+              profileImageType: { $first: "$profileImageType" },
+              likes1Count: { $first: "$likes1Count" },
+              likes2Count: { $first: "$likes2Count" },
+              likesCount: { $first: "$likesCount" },
+              postId: { $first: "$_id" },
+            },
+          },
+          { $sort: { likesCount: -1 } },
+          { $limit: 5 },
+        ],
+        as: "winner",
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        hashTag: 1,
+        images: 1,
+        description: 1,
+        for: 1,
+        requiredImpressions: 1,
+        totalImpressions: 1,
+        totalPost: 1,
+        requiredPost: 1,
+        totalParticipants: 1,
+        requiredParticipants: 1,
+        rewardWinner: 1,
+        rewardRunnerUp: 1,
+        posts: 1,
+        participantsCount: 1,
+        sponsor: 1,
+        winner: 1,
+        endDate: '$updatedAt',
+      },
+    },
+  ])
     .sort({ updatedAt: "desc" })
     .limit(10);
 };
@@ -2612,7 +2815,7 @@ exports.getSavedFametrendzs = (page, userId) => {
         foreignField: "_id",
         pipeline: [
           { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
-          
+
           {
             $set: {
               profileImageType: {
@@ -2727,7 +2930,7 @@ exports.getUpcomingFamecontest = (
           {
             $project: { _id: 0, name: 1, profileImage: 1, profileImageType: 1 },
           },
-          
+
           {
             $set: {
               profileImageType: {

@@ -100,6 +100,7 @@ module.exports = {
       time: joi.string().optional(),
       status: joi.string().optional(),
       images: joi.string().optional(),
+      paymentId: joi.string().trim(),
     }),
   },
 

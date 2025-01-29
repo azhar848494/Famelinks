@@ -10,47 +10,25 @@ const getFollowLinksWelcomeVideo = (childProfileId, userId, page) => {
     { $sort: { createdAt: -1 } },
     {
       $lookup: {
-        from: "profilefollowlinks",
+        from: "users",
         let: { userId: "$userId" },
         pipeline: [
-          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+          {
+            $match: {
+              $expr: { $eq: ["$_id", "$$userId"] },
+              isDeleted: false,
+              isSuspended: false,
+            },
+          },
           {
             $project: {
               _id: 1,
+              type: 1,
               name: 1,
-            },
-          },
-          {
-            $lookup: {
-              from: "users",
-              let: { userId: "$_id" },
-              pipeline: [
-                {
-                  $match: {
-                    $expr: { $eq: ["$profileFollowlinks", "$$userId"] },
-                    isDeleted: false,
-                    isSuspended: false,
-                  },
-                },
-                {
-                  $project: {
-                    _id: 1,
-                  },
-                },
-              ],
-              as: "masterUser",
-            },
-          },
-          {
-            $addFields: {
-              _id: { $first: "$masterUser._id" },
-              // name: { $first: "$masterUser.name" },
-            },
-          },
-          {
-            $group: {
-              _id: "$_id",
-              name: { $first: "$name" },
+              username: 1,
+              profile: {
+                name: '$profileFollowlinks.name',
+              },
             },
           },
         ],
@@ -59,7 +37,6 @@ const getFollowLinksWelcomeVideo = (childProfileId, userId, page) => {
     },
     { $addFields: { user: { $first: "$user" } } },
     { $match: { $expr: { $ne: ["$user._id", null] } } },
-
     {
       $lookup: {
         from: "followers",

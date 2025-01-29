@@ -8,6 +8,7 @@ const {
 const {
   getTodaysPosts,
   getUnseenCount,
+  getUnseenMessageCount,
   getTodaysfamelinksContestPost,
   getTodaysambassadorTrendzPost,
 } = require("../../../data-access/v2/famelinks");
@@ -119,6 +120,7 @@ module.exports = async (userId, selfUserId, swapId) => {
       ).length;
     }
     user.unseenCount = await getUnseenCount(userId);
+    user.unseenMessageCount = await getUnseenMessageCount(userId);
   }
   return user;
 };

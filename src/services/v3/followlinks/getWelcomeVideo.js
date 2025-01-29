@@ -41,7 +41,6 @@ exports = async (childProfileId, userId, page) => {
       name: item.user.name,
       type: "followlinks",
     };
-    return item.media[0];
   });
     return _.orderBy(result3, "updatedAt", "desc");
 };

@@ -16,7 +16,6 @@ module.exports = async (request) => {
         splitTemp[1] = splitTemp[1].toUpperCase();
     } else {
         splitTemp[0] = splitTemp[0].toUpperCase();
-        splitTemp = ['#'].concat(splitTemp)
     }
     temp = splitTemp.join("");
 

@@ -1977,28 +1977,28 @@ exports.getProfileFamelinks = (profileId, followerId, page) => {
         localField: "_id",
         foreignField: "userId",
         let: {
-          followStatus: "$followStatus",
-          profile_type: "$profile_type",
+          // followStatus: "$followStatus",
+          // profile_type: "$profile_type",
           masterId: "$_id",
         },
         pipeline: [
-          {
-            $match: {
-              $expr: {
-                $cond: [
-                  { $eq: ["$$masterId", followerId] },
-                  true,
-                  {
-                    $cond: [
-                      { $eq: ["$$followStatus", "Following"] },
-                      true,
-                      { $eq: ["$$profile_type", "public"] },
-                    ],
-                  },
-                ],
-              },
-            },
-          },
+          // {
+          //   $match: {
+          //     $expr: {
+          //       $cond: [
+          //         { $eq: ["$$masterId", followerId] },
+          //         true,
+          //         {
+          //           $cond: [
+          //             { $eq: ["$$followStatus", "Following"] },
+          //             true,
+          //             { $eq: ["$$profile_type", "public"] },
+          //           ],
+          //         },
+          //       ],
+          //     },
+          //   },
+          // },
           { $sort: { isWelcomeVideo: -1, createdAt: -1 } },
           {
             $set: {
@@ -2713,28 +2713,28 @@ exports.getProfileFunlinks = async (profileId, followerId, page) => {
         localField: "_id",
         foreignField: "userId",
         let: {
-          followStatus: "$followStatus",
-          profile_type: "$profile_type",
+          // followStatus: "$followStatus",
+          // profile_type: "$profile_type",
           masterId: "$_id",
         },
         pipeline: [
-          {
-            $match: {
-              $expr: {
-                $cond: [
-                  { $eq: ["$$masterId", followerId] },
-                  true,
-                  {
-                    $cond: [
-                      { $eq: ["$$followStatus", "Following"] },
-                      true,
-                      { $eq: ["$$profile_type", "public"] },
-                    ],
-                  },
-                ],
-              },
-            },
-          },
+          // {
+          //   $match: {
+          //     $expr: {
+          //       $cond: [
+          //         { $eq: ["$$masterId", followerId] },
+          //         true,
+          //         {
+          //           $cond: [
+          //             { $eq: ["$$followStatus", "Following"] },
+          //             true,
+          //             { $eq: ["$$profile_type", "public"] },
+          //           ],
+          //         },
+          //       ],
+          //     },
+          //   },
+          // },
           { $sort: { isWelcomeVideo: -1, createdAt: -1 } },
           {
             $set: {
@@ -2949,22 +2949,22 @@ exports.getOtherProfileFunlinks = async (profileId, followerId, page) => {
         from: "funlinks",
         localField: "_id",
         foreignField: "userId",
-        let: {
-          followStatus: "$followStatus",
-          profile_type: "$profile_type",
-        },
+        // let: {
+        //   followStatus: "$followStatus",
+        //   profile_type: "$profile_type",
+        // },
         pipeline: [
-          {
-            $match: {
-              $expr: {
-                $cond: [
-                  { $eq: ["$$followStatus", "Following"] },
-                  true,
-                  { $eq: ["$$profile_type", "public"] },
-                ],
-              },
-            },
-          },
+          // {
+          //   $match: {
+          //     $expr: {
+          //       $cond: [
+          //         { $eq: ["$$followStatus", "Following"] },
+          //         true,
+          //         { $eq: ["$$profile_type", "public"] },
+          //       ],
+          //     },
+          //   },
+          // },
           { $sort: { isWelcomeVideo: -1, createdAt: -1 } },
           {
             $set: {
@@ -5427,26 +5427,26 @@ exports.getStorelinks = (profileId, followerId, page) => {
         from: "brandproducts",
         let: {
           userId: "$_id",
-          followStatus: "$followStatus",
-          profile_type: "$profile_type",
+          // followStatus: "$followStatus",
+          // profile_type: "$profile_type",
         },
         pipeline: [
-          {
-            $match: {
-              $expr: {
-                $cond: [
-                  { $eq: ["$$followStatus", "Following"] },
-                  { $eq: ["$userId", "$$userId"] },
-                  {
-                    $and: [
-                      { $eq: ["$userId", "$$userId"] },
-                      { $eq: ["$$profile_type", "public"] },
-                    ],
-                  },
-                ],
-              },
-            },
-          },
+          // {
+          //   $match: {
+          //     $expr: {
+          //       $cond: [
+          //         { $eq: ["$$followStatus", "Following"] },
+          //         { $eq: ["$userId", "$$userId"] },
+          //         {
+          //           $and: [
+          //             { $eq: ["$userId", "$$userId"] },
+          //             { $eq: ["$$profile_type", "public"] },
+          //           ],
+          //         },
+          //       ],
+          //     },
+          //   },
+          // },
           { $match: { $expr: { $eq: ["$userId", "$$userId"] } } },
           { $sort: { createdAt: -1 } },
           { $project: { media: 1 } },
@@ -5855,22 +5855,22 @@ exports.getSelfCollablinks = (profileId, followerId, page, masterId) => {
         from: "collablinks",
         localField: "_id",
         foreignField: "userId",
-        let: {
-          followStatus: "$followStatus",
-          profile_type: "$profile_type",
-        },
+        // let: {
+        //   followStatus: "$followStatus",
+        //   profile_type: "$profile_type",
+        // },
         pipeline: [
-          {
-            $match: {
-              $expr: {
-                $cond: [
-                  { $eq: ["$$followStatus", "Follow"] },
-                  true,
-                  { $eq: ["$$profile_type", "public"] },
-                ],
-              },
-            },
-          },
+          // {
+          //   $match: {
+          //     $expr: {
+          //       $cond: [
+          //         { $eq: ["$$followStatus", "Follow"] },
+          //         true,
+          //         { $eq: ["$$profile_type", "public"] },
+          //       ],
+          //     },
+          //   },
+          // },
           { $sort: { createdAt: -1 } },
           {
             $project: {
@@ -6388,22 +6388,22 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
         from: "collablinks",
         localField: "_id",
         foreignField: "userId",
-        let: {
-          followStatus: "$followStatus",
-          profile_type: "$profile_type",
-        },
+        // let: {
+        //   followStatus: "$followStatus",
+        //   profile_type: "$profile_type",
+        // },
         pipeline: [
-          {
-            $match: {
-              $expr: {
-                $cond: [
-                  { $eq: ["$$followStatus", "Following"] },
-                  true,
-                  { $eq: ["$$profile_type", "public"] },
-                ],
-              },
-            },
-          },
+          // {
+          //   $match: {
+          //     $expr: {
+          //       $cond: [
+          //         { $eq: ["$$followStatus", "Following"] },
+          //         true,
+          //         { $eq: ["$$profile_type", "public"] },
+          //       ],
+          //     },
+          //   },
+          // },
           { $sort: { createdAt: -1 } },
           {
             $project: {

@@ -8,6 +8,7 @@ const likesDB = require("../../models/v2/likes");
 const commentsDB = require("../../models/v2/comments");
 const UsersDB = require("../../models/v2/users");
 const NotificationDB = require("../../models/v2/notifications");
+const MessageDB = require("../../models/v2/messages2");
 const FametrendzDB = require("../../models/v2/fametrendzs");
 
 exports.addPost = (data) => {
@@ -2288,6 +2289,11 @@ exports.getTodaysPosts = (userId) => {
 
 exports.getUnseenCount = (userId) => {
   return NotificationDB.find({ userId, isSeen: false }).count();
+};
+
+exports.getUnseenMessageCount = (userId) => {
+  console.log('Data ::: ', userId)
+  return MessageDB.find({ toId: userId, readAt: null }).count();
 };
 
 exports.getFameLinksByUserId = (userId, challengeId) => {

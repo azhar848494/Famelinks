@@ -1,35 +1,31 @@
-const serializeHttpResponse = require("../../../helpers/serialize-http-response");
-const getChallengePostsService = require('../../../services/v2/challenges/getChallengePosts');
-const getOneChallengeService = require('../../../services/v2/challenges/getOneChallenge');
-const { isValidObjectId } = require("../../../utils/db");
+const serializeHttpResponse = require("../../../helpers/serialize-http-response")
+const getChallengeDetails = require('../../../services/v2/challenges/getChallengeDetails')
+const { isValidObjectId } = require("../../../utils/db")
 
 module.exports = async (request) => {
-    if (!isValidObjectId(request.params.challengeId)) {
-        return serializeHttpResponse(400, {
-            message: 'Invalid Object Id'
-        });
-    }
+    const userId = request.user._id
 
-    const challenge = await getOneChallengeService(request.params.challengeId);
-    if (!challenge) {
-        return serializeHttpResponse(404, {
-            message: 'Challenge not found',
-        });
-    }
+    const challengeId = request.params.challengeId
+    const type = request.params.type
 
-    const result = await getChallengePostsService(request.params.challengeId, request.params.type, request.query.page, request.user._id, request.user.type);
+    const page = request.query.page
 
-    if (!result) {
-        return serializeHttpResponse(500, {
-            message: 'Failed to fetch Challenge posts',
-        });
-    }
-
-    return serializeHttpResponse(200, {
-        message: 'Challenge Posts Fetched',
-        result: {
-            "content": challenge[0],
-            "data": result
+    try {
+        if (!isValidObjectId(challengeId)) {
+            return serializeHttpResponse(400, {
+                message: 'Invalid ChallengeId'
+            });
         }
-    });
+
+        const result = await getChallengeDetails({ userId, type, challengeId, page })
+
+        return serializeHttpResponse(200, {
+            result: result[0],
+            message: 'Challenge Posts Fetched',
+        });
+    } catch (error) {
+        return serializeHttpResponse(500, {
+            message: error.message,
+        });
+    }
 };
