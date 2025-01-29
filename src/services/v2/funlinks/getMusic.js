@@ -4,7 +4,7 @@ const { getSavedMusicIds, getOneUser } = require("../../../data-access/v2/users"
 module.exports = async (page, search, type = 'trending', userId) => {
     let result;
     let user = await getOneUser(userId);
-    const music = await getSavedMusicIds(user.profileFunlinks);
+    const music = await getSavedMusicIds(userId);
     switch (type) {
         case 'trending':
             result = await getMusic(page, search);

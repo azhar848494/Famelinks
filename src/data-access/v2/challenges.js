@@ -305,10 +305,9 @@ exports.getOneFunlinksChallenge = (challengeId) => {
       $lookup: {
         from: "users",
         foreignField: "_id",
-        localField: "sponsor",
+        localField: "createdBy",
         pipeline: [
           { $project: { _id: 0, name: 1, profileImage: 1 } },
-          
         ],
         as: "sponsor",
       },

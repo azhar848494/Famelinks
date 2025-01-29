@@ -8,6 +8,12 @@ module.exports = {
     }),
   },
 
+  deleteRating: {
+    params: joi.object({
+      trendId: joi.string().trim().required(),
+    }),
+  },
+
   removeRating: {
     params: joi.object({
       _id: joi.string().trim().required(),

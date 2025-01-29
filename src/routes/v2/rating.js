@@ -8,11 +8,18 @@ const validator = require("../../validator/v2/rating");
 
 const addRatingController = require("../../controllers/v3/rating/addRating");
 const removeRatingController = require("../../controllers/v3/rating/removeRating")
+const deleteRatingController = require("../../controllers/v3/rating/deleteRating")
 
 router.post(
   "/addRating",
   requestValidatorCallback(validator.addRating),
   expressCallback(addRatingController)
+);
+
+router.delete(
+  "/deleteRating/:trendId",
+  requestValidatorCallback(validator.deleteRating),
+  expressCallback(deleteRatingController)
 );
 
 router.delete(
