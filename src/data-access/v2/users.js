@@ -1499,7 +1499,7 @@ exports.recieveFameCoin = (type, toUserId, fameCoins) => {
 
 exports.updateUserCoin = (userId, fameCoins) => {
   return UserDB.updateOne(
-    { _id: userId, fameCoins: { $gte: 0 } },
+    { _id: userId },
     { $inc: { fameCoins } }
   );
 };
@@ -3059,7 +3059,6 @@ exports.updateProfileFunlinks = (profileId, obj) => {
 };
 
 exports.getProfileJoblinks = (profileId, page) => {
-  console.log('profileId :: ', profileId)
   return UserDB.aggregate([
     { $match: { _id: profileId } },
 
@@ -6579,7 +6578,38 @@ exports.getBrandProfileJoblinks = (userId, page) => {
   let pagination = page ? page : 1;
   return UserDB.aggregate([
     { $match: { _id: userId } },
-
+    {
+      $lookup: {
+        from: "jobs",
+        let: { createdBy: userId },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$createdBy", "$$createdBy"] },
+            },
+          },
+          {
+            $project: {
+              itemsCount: {$sum: { $size: "$hiredApplicants" }},
+            },
+          },
+          {
+            $group: {
+              _id: "$userId",
+              totalItemsCount: { $sum: "$itemsCount" }
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              totalItemsCount: 1
+            }
+          }
+        ],
+        as: "hired",
+      },
+    },
+    { $set: { hired: { $first: "$hired.totalItemsCount" } } },
     {
       $lookup: {
         from: "jobs",
@@ -6591,6 +6621,22 @@ exports.getBrandProfileJoblinks = (userId, page) => {
       },
     },
     { $set: { totalJobs: { $size: "$totalJobs" } } },
+    {
+      $lookup: {
+        from: "jobs",
+        let: { createdBy: userId },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$createdBy", "$$createdBy"] },
+              isClosed: false,
+            },
+          },
+        ],
+        as: "openJobsCount",
+      },
+    },
+    { $set: { openJobsCount: { $size: "$openJobsCount" } } },
     {
       $lookup: {
         from: "jobs",
@@ -7068,6 +7114,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
         unreadChats: 1,
         totalJobs: 1,
         openJobsCount: 1,
+        hired: {$ifNull: ['$hired', 0]},
         openJobs: 1,
         jobsFaces: 1,
         jobsCrew: 1,

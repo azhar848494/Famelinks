@@ -1214,48 +1214,35 @@ exports.getProductDetails = (data) => {
         ],
       },
     },
-    // {
-    //   $lookup: {
-    //     from: "brandproductcoins",
-    //     let: { productId: "$_id" },
-    //     pipeline: [
-    //       { $match: { $expr: { $eq: ["$productId", "$$productId"] } } },
-    //       {
-    //         $project: {
-    //           _id: 0,
-    //           balance: 1,
-    //           perTagCoins: 1,
-    //         },
-    //       },
-    //     ],
-    //     as: "coins",
-    //   },
-    // },
-    // //MasterIdMigration
-    // {
-    //   $lookup: {
-    //     from: "users",
-    //     let: { userId: "$userId" },
-    //     pipeline: [
-    //       { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
-    //       {
-    //         $project: {
-    //           _id: 0,
-    //           name: "$profileStorelinks.name",
-    //         },
-    //       },
-    //     ],
-    //     as: "createdBy",
-    //   },
-    // },
-    // { $addFields: { createdBy: { $first: "$createdBy.name" } } },
-    // { $addFields: { balance: { $first: "$coins.balance" } } },
-    // { $addFields: { perTagCoins: { $first: "$coins.perTagCoins" } } },
-    // {
-    //   $match: {
-    //     $expr: { $gte: ["$balance", "$perTagCoins"] },
-    //   },
-    // },
+    {
+      $lookup: {
+        from: "followlinks",
+        let: { userId: "$userId" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+          {
+            $project: {
+              _id: 0,
+              name: "$profileStorelinks.name",
+            },
+          },
+        ],
+        as: "createdBy",
+      },
+    },
+    {
+      $lookup: {
+        from: "challenges",
+        let: { userId: "$userId" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$createdBy", "$$userId"] } } },
+          {
+            $project: { _id: 1 },
+          },
+        ],
+        as: "tags",
+      },
+    },
     {
       $project: {
         media: 1,
@@ -1268,8 +1255,5 @@ exports.getProductDetails = (data) => {
         tags: 1,
       },
     },
-    // { $skip: (page - 1) * 10 },
-    // { $limit: 10 },
-    // { $sort: { createdAt: -1 } },
   ]);
 };

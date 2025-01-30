@@ -15,20 +15,20 @@ module.exports = async (childProfileId, postOwnerId, mediaId, status, postType) 
     switch (postType) {
       case "famelinks":
         updatePostLikeCounter = famelinks.updatePostLikeCounter;
-        property = `profileFamelinks.likes${status}Count`;
+        property = `likes${status}Count`;
         if (result) {
-          resultProperty = `profileFamelinks.likes${result.status}Count`;
+          resultProperty = `likes${result.status}Count`;
         }
         break;
       case "funlinks":
         updatePostLikeCounter = funlinks.updatePostLikeCounter;
-        property = `profileFunlinks.likesCount`;
-        resultProperty = `profileFunlinks.likesCount`;
+        property = `likesCount`;
+        resultProperty = `likesCount`;
         break;
       case "followlinks":
         updatePostLikeCounter = followlinks.updatePostLikeCounter;
-        property = `profileFollowlinks.likesCount`;
-        resultProperty = `profileFollowlinks.likesCount`;
+        property = `likesCount`;
+        resultProperty = `likesCount`;
         break;
       case "collablinks":
         return collablinks.updatePostLikeCounter(mediaId, 1);

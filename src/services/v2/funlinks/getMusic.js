@@ -1,4 +1,4 @@
-const { getMusic } = require("../../../data-access/v2/funlinks");
+const { getMusic, getMusic2 } = require("../../../data-access/v2/funlinks");
 const { getSavedMusicIds, getOneUser } = require("../../../data-access/v2/users");
 
 module.exports = async (page, search, type = 'trending', userId) => {
@@ -7,17 +7,17 @@ module.exports = async (page, search, type = 'trending', userId) => {
     const music = await getSavedMusicIds(userId);
     switch (type) {
         case 'trending':
-            result = await getMusic(page, search);
+            result = await getMusic2(page, search);
             break;
         case 'voice':
-            result = await getMusic(page, search, 'user');
+            result = await getMusic2(page, search, 'user');
             break;
         case 'songs':
-            result = await getMusic(page, search, 'admin');
+            result = await getMusic2(page, search, 'admin');
             break;
         case 'saved': {
             if (music) {
-                result = (music.savedMusic && music.savedMusic.length) ? (await getMusic(page, search, null, music.savedMusic)) : [];
+                result = (music.savedMusic && music.savedMusic.length) ? (await getMusic2(page, search, null, music.savedMusic)) : [];
             }
             break;
         }

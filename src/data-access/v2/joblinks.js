@@ -1798,7 +1798,7 @@ exports.getApplicantsFaces = (selfMasterId, jobId, page) => {
 
   return jobs.aggregate([
     { $match: { _id: ObjectId(jobId) } },
-    { $project: { _id: 1, lastVisited: 1 } },
+    { $project: { _id: 1, lastVisited: 1, hiredApplicants: 1 } },
     {
       $lookup: {
         from: "jobapplications",
@@ -2104,13 +2104,7 @@ exports.getApplicantsFaces = (selfMasterId, jobId, page) => {
     },
     {
       $addFields: {
-        Hired: {
-          $cond: [
-            { $isArray: "$hiredApplicants" },
-            { $size: "$hiredApplicants" },
-            0,
-          ],
-        },
+        hired: { $size: "$hiredApplicants" },
       },
     },
     {
@@ -2139,7 +2133,7 @@ exports.getApplicantsFaces = (selfMasterId, jobId, page) => {
       },
     },
     { $addFields: { newApplicants: { $size: "$newApplicants" } } },
-    { $project: { lastVisited: 0 } },
+    { $project: { lastVisited: 0, hiredApplicants: 0 } },
   ]);
 };
 

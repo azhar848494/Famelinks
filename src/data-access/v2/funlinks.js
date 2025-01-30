@@ -37,7 +37,7 @@ exports.getFunLinks = (masterUserId, page, profileId, filterObj) => {
         userId: { $ne: ObjectId(appConfig.famelinks.officialId) },
         $expr: { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
       },
-    },    
+    },
     //MasterIdMigration
     {
       $lookup: {
@@ -206,7 +206,7 @@ exports.getFunLinks = (masterUserId, page, profileId, filterObj) => {
         pipeline: [
           {
             $match: {
-              $expr: { $in: ["$_id", "$$userId"] } ,
+              $expr: { $in: ["$_id", "$$userId"] },
             },
           },
           { $project: { username: 1 } },
@@ -1120,6 +1120,43 @@ exports.updatePostCommentCounter = (postId, incBy) => {
     { _id: postId },
     { $inc: { commentsCount: incBy } }
   );
+};
+
+exports.getMusic2 = (page, search, type, savedMusic) => {
+  const obj = {};
+  if (savedMusic && savedMusic.length) {
+    obj._id = { $in: savedMusic };
+  }
+  if (search) {
+    obj.name = { $regex: `^.*?${search}.*?$`, $options: "gi" };
+  }
+  if (type) {
+    obj.addedBy = type;
+  }
+  return MusicDB.aggregate([
+    {
+      $match: {
+        ...obj,
+      },
+    },
+    {
+      $lookup: {
+        from: "funlinks",
+        let: { value: "$_id" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$musicId", "$$value"] } } },
+          {
+            $count: "total",
+          },
+        ],
+        as: "count",
+      },
+    },
+    { $addFields: { count: { $ifNull: [{$first: '$count.total'}, 0] } } },
+    { $sort: { updatedAt: -1 } },
+    { $skip: (page - 1) * 25 },
+    { $limit: 25 },
+  ]);
 };
 
 exports.getMusic = (page, search, type, savedMusic) => {
