@@ -74,7 +74,7 @@ module.exports = async (request, postType) => {
         postType
       );
       const user = await getOneUserService(onePost.userId);
-      if (user.pushToken && request.body.status !== 0) {
+      if (onePost.userId.toString() != request.user._id.toString() && user.pushToken && request.body.status !== 0) {
         await sendNotificationsService(
           "likePost",
           {
@@ -125,7 +125,7 @@ module.exports = async (request, postType) => {
       );
       const onePost = await getOnePostService(oneComment.mediaId);
       const user = await getOneUserService(oneComment.userId);
-      if (user.pushToken) {
+      if (oneComment.userId.toString() != request.user._id.toString() && user.pushToken) {
         await sendNotificationsService(
           "likeComment",
           {
