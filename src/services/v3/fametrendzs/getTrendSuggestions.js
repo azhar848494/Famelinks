@@ -1,5 +1,9 @@
-const { getTrendzSuggestions } = require("../../../data-access/v3/fametrendzs");
+const { getTrendzSuggestions, getMyTrendzSuggestions } = require("../../../data-access/v3/fametrendzs");
 
-module.exports = async (page, userId) => {
-  return await getTrendzSuggestions(page, userId);
+module.exports = async (page, userId, type) => {
+  if (type == 'individual') {
+    return await getMyTrendzSuggestions(page, userId);
+  } else {
+    return await getTrendzSuggestions(page, userId);
+  }
 };

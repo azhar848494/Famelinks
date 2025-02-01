@@ -22,7 +22,8 @@ module.exports = mongoose.model(
         type: [String],
         default: null,
       },
-      type : { type: [String], required: false}
+      type : { type: [String], required: false},
+      pickerId: { type: ObjectId },
     },
     {
       versionKey: false,

@@ -20,6 +20,7 @@ const clubOffersRouter = require('./clubOffers')
 const fametrendzsRouter = require("./fametrendzs");
 const ratingsRouter = require("./rating");
 const settingRouter = require("./settings");
+const reminderRouter = require("./reminders");
 
 router.use('/users', userRouter);
 router.use('/challenges', challengeRouter);
@@ -39,5 +40,6 @@ router.use('/clubOffers', clubOffersRouter)
 router.use("/media", fametrendzsRouter);
 router.use("/rating", ratingsRouter);
 router.use("/settings", settingRouter);
+router.use("/reminders", reminderRouter);
 
 module.exports = router;

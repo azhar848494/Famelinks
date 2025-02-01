@@ -28,7 +28,7 @@ module.exports = mongoose.model(
       rewardRunnerUp: {
         type: [String],
         default: ['1K'],
-      }, 
+      },
       startDate: {
         type: Date,
         required: true,
@@ -132,6 +132,7 @@ module.exports = mongoose.model(
         type: [String],
         default: null,
       },
+      suggestedBy: { type: ObjectId },
     },
     {
       versionKey: false,

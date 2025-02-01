@@ -2292,7 +2292,6 @@ exports.getUnseenCount = (userId) => {
 };
 
 exports.getUnseenMessageCount = (userId) => {
-  console.log('Data ::: ', userId)
   return MessageDB.find({ toId: userId, readAt: null }).count();
 };
 

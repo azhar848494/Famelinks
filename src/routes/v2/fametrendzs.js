@@ -13,6 +13,7 @@ const {
 
 const createFametrendzController = require('../../controllers/v3/fametrendzs/createfametrendz');
 const addTrendzSuggestionsController = require('../../controllers/v3/fametrendzs/addSuggestions');
+const updateSuggestionTrendzController = require('../../controllers/v3/fametrendzs/updateSuggestionTrendz');
 const uploadTrendBanner = require('../../controllers/v3/fametrendzs/uploadFametrendsBanner');
 const getTrendSettingController = require('../../controllers/v3/fametrendzs/getTrendSetting')
 const getSavedFametrendzsController = require('../../controllers/v3/fametrendzs/getSavedFametrendzs')
@@ -20,6 +21,7 @@ const getEditFametrendzController = require('../../controllers/v3/fametrendzs/ge
 const getTrendSuggestions = require('../../controllers/v3/fametrendzs/getTrendSuggestions');
 const updateFametrendz = require('../../controllers/v3/fametrendzs/updateFametrendz')
 const deleteFametrendz = require('../../controllers/v3/fametrendzs/deleteFametrendz')
+const deleteSuggestionTrendz = require('../../controllers/v3/fametrendzs/deleteSuggestionTrendz')
 const validator = require('../../validator/v3/fametrendz');
 
 router.post('/createFametrendz',
@@ -27,6 +29,13 @@ router.post('/createFametrendz',
   requestValidatorCallback(validator.createFametrendz),
   expressCallback(createFametrendzController)
 );
+
+router.put('/updateFametrendz/:trendzId',
+  uploadChannelBanner,
+  requestValidatorCallback(validator.updateFametrendz),
+  expressCallback(updateFametrendz)
+);
+
 router.post('/addTrendSuggestion',
   uploadTrendzSuggestionMedia,
   requestValidatorCallback(validator.addTrendzSuggestions),
@@ -50,13 +59,19 @@ router.get('/editFametrendz/:id',
   expressCallback(getEditFametrendzController)
 );
 
-router.put('/updateFametrendz',
-  requestValidatorCallback(validator.updateFametrendz),
-  expressCallback(updateFametrendz)
+router.put('/updateSuggestionTrendz/:trendzId',
+  uploadTrendzSuggestionMedia,
+  requestValidatorCallback(validator.updateSuggestionTrendz),
+  expressCallback(updateSuggestionTrendzController)
 );
 
 router.delete('/deleteFametrendz/:trendzId',
   requestValidatorCallback(validator.deleteFametrendz),
   expressCallback(deleteFametrendz)
+);
+
+router.delete('/deleteSuggestionTrendz/:trendzId',
+  requestValidatorCallback(validator.deletetrendzSuggestion),
+  expressCallback(deleteSuggestionTrendz)
 );
 module.exports = router;

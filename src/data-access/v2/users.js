@@ -957,15 +957,6 @@ exports.updateUserLikesCount = (userId, obj) => {
 
 exports.getContestants = (search, page) => {
   return UserDB.aggregate([
-    // {
-    //   $match:
-    //   {
-    //     $or: [
-    //       { name: { $regex: `^.*?${search}.*?$` } },
-    //       { username: { $regex: `^.*?${search}.*?$` } },
-    //     ]
-    //   },
-    // },
     {
       $lookup: {
         from: "famelinks",
@@ -1017,7 +1008,88 @@ exports.getContestants = (search, page) => {
     { $skip: (page - 1) * 10 },
     { $limit: 10 },
   ]);
-  // return UserDB.find(condition, {
+  //   name: 1,
+  //   district: 1,
+  //   state: 1,
+  //   country: 1,
+  //   continent: 1,
+  //   gender: 1,
+  //   ageGroup: 1,
+  //   profileImage: 1,
+  //   profileImageType: 1,
+  //   type: 1,
+  //   profileFamelinks: 1,
+  //   profileStorelinks: 1,
+  //   profileCollablinks: 1,
+  // })
+  //   .sort({ createdAt: "desc" })
+  //   .lean()
+  //   .skip((page - 1) * 10)
+  //   .limit(10);
+};
+
+exports.getSearchContestants = (search, page) => {
+  return UserDB.aggregate([
+    {
+      $match:
+      {
+        $or: [
+          { name: { $regex: `^.*?${search}.*?$` } },
+          { username: { $regex: `^.*?${search}.*?$` } },
+        ]
+      },
+    },
+    {
+      $lookup: {
+        from: "famelinks",
+        let: { userId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$userId", "$$userId"] },
+              isDeleted: false,
+              isSafe: true,
+              isBlocked: false,
+            },
+          },
+          { $sort: { createdAt: -1 } },
+          { $limit: 1 },
+        ],
+        as: "famelinksPost",
+      },
+    },
+    { $match: { $expr: { $ne: [0, { $size: "$famelinksPost" }] } } },
+    { $sort: { createdAt: -1 } },
+    {
+      $lookup: {
+        from: "locatns",
+        let: { value: "$location" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$value"] } } },
+          { $project: { type: 1, value: 1 } },
+        ],
+        as: "location",
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        location: { $first: "$location" },
+        gender: 1,
+        ageGroup: 1,
+        profileImage: 1,
+        profileImageType: 1,
+        type: 1,
+        profile: {
+          name: "$profileFamelinks.name",
+          profileImage: "$profileFamelinks.profileImage",
+          profileImageType: "$profileFamelinks.profileImageType",
+        }
+      },
+    },
+    { $skip: (page - 1) * 10 },
+    { $limit: 10 },
+  ]);
   //   name: 1,
   //   district: 1,
   //   state: 1,

@@ -162,7 +162,8 @@ exports.getUpcomingFametrendzs = (page, type, filterObj, userId) => {
         },
         isDeleted: false,
         isCompleted: false,
-        type: "famelinks" || "funlinks",
+        type: "famelinks",
+        // status: 'paid',
       },
     },
     { $match: filterObj },
@@ -2795,7 +2796,20 @@ exports.getbrandHashTagBySearch = (searchData) => {
 };
 
 exports.getEditFametrendz = (id) => {
-  return fameTrendzDB.aggregate([{ $match: { _id: ObjectId(id) }, },]);
+  return fameTrendzDB.aggregate([
+    { $match: { _id: ObjectId(id) }, },
+    {
+      $lookup: {
+        from: "locatns",
+        let: { value: "$location" },
+        pipeline: [
+          { $match: { $expr: { $in: ["$_id", "$$value"] } } },
+          { $project: { type: 1, value: 1, } },
+        ],
+        as: "location",
+      },
+    },
+  ]);
 }
 
 exports.getSavedFametrendzs = (page, userId) => {

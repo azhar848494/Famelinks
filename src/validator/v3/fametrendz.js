@@ -13,11 +13,28 @@ module.exports = {
     }),
   },
 
+  updateSuggestionTrendz: {
+    params: joi.object({
+      trendzId: joi.string().trim().required(),
+    }),
+    payload: joi.object({
+      name: joi.string().trim().required(),
+      description: joi.string().trim().required(),
+      userId: joi.string().trim(),
+      gender: joi.string().trim(),
+      age: joi.string().trim(),
+      images: joi.array().label("images").max(5),
+      type: joi.string().trim(),
+    }),
+  },
+
   createFametrendz: {
     files: joi.object({
       challenge_banner: joi.string().trim(),
     }),
     payload: joi.object({
+      suggestionId: joi.string().trim(),
+      suggestedBy: joi.string().trim(),
       milestoneAggrement: joi
         .object()
         .keys({
@@ -73,34 +90,32 @@ module.exports = {
   },
 
   updateFametrendz: {
+    params: joi.object({
+      trendzId: joi.string().trim().required(),
+    }),
     files: joi.object({
       challenge_banner: joi.string().trim(),
     }),
-    payload: joi.object({
-      milestoneAggrement: joi
-        .object()
-        .keys({
-          budget: joi.number().optional(),
-          minCost: joi.number().optional(),
-          constant: joi.number().optional(),
-          reachMultiplier: joi.number().optional(),
-          perImpressionCost: joi.number().optional(),
-          milestoneValue: joi.number().optional(),
-        })
-        .optional(),
-      hashTag: joi.string().optional(),
-      id: joi.string().required(),
+    payload: joi.object({      
+      hashTag: joi.string(),
       description: joi.string().optional(),
       category: joi.string().optional(),
       type: joi.string().optional(),
-      for: joi.string().trim().valid("male", "female", "all").optional(),
-      location: joi.array().items(joi.string().trim()).optional(),
+      for: joi.string().trim(),
+      location: joi.string().trim(),
       startDate: joi.date().format("DD-MM-YYYY").utc().optional(),
       ageGroup: joi.array().items(joi.string().trim()),
       time: joi.string().optional(),
-      status: joi.string().optional(),
       images: joi.string().optional(),
       paymentId: joi.string().trim(),
+      trendzCategory: joi.array().items(joi.string().trim()),
+      userId: joi.string().trim(),
+    }),
+  },
+
+  deletetrendzSuggestion: {
+    params: joi.object({
+      trendzId: joi.string().trim().required(),
     }),
   },
 

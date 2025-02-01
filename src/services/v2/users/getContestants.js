@@ -1,6 +1,6 @@
 const { getOpenChallenges, getOpenChallengesHashTag, getOpenFametrendzs, getOpenFametrendzsHashTag } = require("../../../data-access/v2/challenges");
 const { getUserMostLikedPost, getFameLinks } = require("../../../data-access/v2/famelinks");
-const { getContestants, getRecommendedContestants, getTrendingContestants, getUserFollowStatus, getUsers } = require("../../../data-access/v2/users");
+const { getContestants,getSearchContestants, getRecommendedContestants, getTrendingContestants, getUserFollowStatus, getUsers } = require("../../../data-access/v2/users");
 const { searchChannel } = require('../../../data-access/v2/channels')
 const { searchClubOffersByName } = require('../../../data-access/v2/clubOffers')
 
@@ -30,7 +30,7 @@ module.exports = async (userId, { type, ageGroup, gender, district, state, count
             result.challenges = await getOpenChallenges(search, page, [postType]);
             result.hashTags = await getOpenChallengesHashTag(search, page, [postType]);
         }
-        result.users = await getContestants(search, page);
+        result.users = await getSearchContestants(search, page);
         const statusList = await Promise.all(result.users.map(fetchedUser => {
             return getUserFollowStatus(userId, fetchedUser._id);
         }));

@@ -21,12 +21,23 @@ const getOneFametrendz = (trendId) => {
     .lean();
 };
 
+const getOneSuggestionTrendz = (trendId) => {
+  return trendzSuggestionsDB
+    .findOne({ _id: ObjectId(trendId), isDeleted: false })
+    .lean();
+};
+
 const updateFametrendz = (trendzId, data) => {
+  console.log('Data :: ', data)
   return fameTrendzDB.updateOne({ _id: trendzId }, { $set: data });
 };
 
 const addTrendzSuggestion = (payload) => {
   return trendzSuggestionsDB.create(payload);
+};
+
+const updateSuggestiontrendz = (trendzId, data) => {
+  return trendzSuggestionsDB.updateOne({ _id: trendzId }, { $set: data });
 };
 
 const uploadFametrendzBanner = async (files, image_name) => {
@@ -48,12 +59,43 @@ const getTrendSettingData = () => {
   );
 };
 
+const getMyTrendzSuggestions = (page, userId) => {
+  return trendzSuggestionsDB
+    .aggregate([
+      {
+        $match: {
+          userId: { $eq: userId },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "userId",
+          pipeline: [
+            {
+              $project: {
+                _id: 0,
+                name: 1,
+              },
+            },
+          ],
+          as: "suggestedBy",
+        },
+      },
+    ])
+    .sort({ createdAt: "desc" })
+    .skip((page - 1) * 10)
+    .limit(10);
+};
+
 const getTrendzSuggestions = (page, userId) => {
   return trendzSuggestionsDB
     .aggregate([
       {
         $match: {
           userId: { $ne: userId },
+          pickerId: { $exists: false }
         },
       },
       {
@@ -80,6 +122,10 @@ const getTrendzSuggestions = (page, userId) => {
 
 const deleteFametrendz = (trendId) => {
   return fameTrendzDB.deleteOne({ _id: ObjectId(trendId) });
+};
+
+const deleteSuggestionTrendz = (trendId) => {
+  return trendzSuggestionsDB.deleteOne({ _id: ObjectId(trendId) });
 };
 
 const addPaymentId = (trendId, paymentId) => {
@@ -118,12 +164,16 @@ module.exports = {
   createfametrendz,
   createFunChallenge,
   getOneFametrendz,
+  getOneSuggestionTrendz,
   addTrendzSuggestion,
+  updateSuggestiontrendz,
   uploadFametrendzBanner,
   getTrendSettingData,
   getTrendzSuggestions,
+  getMyTrendzSuggestions,
   updateFametrendz,
   deleteFametrendz,
+  deleteSuggestionTrendz,
   addPayments,
   addPaymentId,
   addFameContest,

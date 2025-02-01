@@ -2045,7 +2045,7 @@ exports.uploadChannelBanner = (req, res, next) => {
     if (req.body.trendzCategory) {
       req.body.trendzCategory = JSON.parse(req.body.trendzCategory);
     }
-
+    
     try {
       if (req.files) {
         req.files.challenge_banner = req.files.challenge_banner[0].filename;

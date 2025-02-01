@@ -5,8 +5,9 @@ const { isValidObjectId } = require("../../../utils/db");
 module.exports = async (request) => {
   let page = request.query.page;
   let userId = request.user._id;
+  let type = request.user.type;
 
-  const result = await getTrendzSuggestions(page, userId);
+  const result = await getTrendzSuggestions(page, userId, type);
 
   if (!result) {
     return serializeHttpResponse(404, {
