@@ -3133,7 +3133,6 @@ exports.updateProfileFunlinks = (profileId, obj) => {
 exports.getProfileJoblinks = (profileId, page) => {
   return UserDB.aggregate([
     { $match: { _id: profileId } },
-
     {
       $lookup: {
         from: "hiringprofiles",
@@ -4282,6 +4281,29 @@ exports.getOtherProfileJoblinks = (
                   $cond: [{ $eq: [0, { $size: "$isApplied" }] }, false, true],
                 },
               },
+            },            
+            {
+              $lookup: {
+                from: "jobapplications",
+                let: { jobId: "$_id" },
+                pipeline: [
+                  {
+                    $match: {
+                      $and: [
+                        { $expr: { $eq: ["$jobId", "$$jobId"] } },
+                        { userId: followerId },
+                      ],
+                    },
+                  },
+                  { $project: { _id: 0, status: 1 } },
+                ],
+                as: "applicationStatus",
+              },
+            },
+            {
+              $addFields: {
+                applicationStatus: {$first: '$applicationStatus.status'},
+              },
             },
             {
               $project: {
@@ -4408,6 +4430,29 @@ exports.getOtherProfileJoblinks = (
                 isApplied: {
                   $cond: [{ $eq: [0, { $size: "$isApplied" }] }, false, true],
                 },
+              },
+            },                        
+            {
+              $lookup: {
+                from: "jobapplications",
+                let: { jobId: "$_id" },
+                pipeline: [
+                  {
+                    $match: {
+                      $and: [
+                        { $expr: { $eq: ["$jobId", "$$jobId"] } },
+                        { userId: followerId },
+                      ],
+                    },
+                  },
+                  { $project: { _id: 0, status: 1 } },
+                ],
+                as: "applicationStatus",
+              },
+            },
+            {
+              $addFields: {
+                applicationStatus: {$first: '$applicationStatus.status'},
               },
             },
             {
@@ -5085,6 +5130,29 @@ exports.getOtherProfileJoblinks = (
                   $cond: [{ $eq: [0, { $size: "$isApplied" }] }, false, true],
                 },
               },
+            },            
+            {
+              $lookup: {
+                from: "jobapplications",
+                let: { jobId: "$_id" },
+                pipeline: [
+                  {
+                    $match: {
+                      $and: [
+                        { $expr: { $eq: ["$jobId", "$$jobId"] } },
+                        { userId: followerId },
+                      ],
+                    },
+                  },
+                  { $project: { _id: 0, status: 1 } },
+                ],
+                as: "applicationStatus",
+              },
+            },
+            {
+              $addFields: {
+                applicationStatus: {$first: '$applicationStatus.status'},
+              },
             },
             {
               $project: {
@@ -5198,7 +5266,30 @@ exports.getOtherProfileJoblinks = (
               },
             },
             { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
-            { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
+            { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },                        
+            {
+              $lookup: {
+                from: "jobapplications",
+                let: { jobId: "$_id" },
+                pipeline: [
+                  {
+                    $match: {
+                      $and: [
+                        { $expr: { $eq: ["$jobId", "$$jobId"] } },
+                        { userId: followerId },
+                      ],
+                    },
+                  },
+                  { $project: { _id: 0, status: 1 } },
+                ],
+                as: "applicationStatus",
+              },
+            },
+            {
+              $addFields: {
+                applicationStatus: {$first: '$applicationStatus.status'},
+              },
+            },
             {
               $project: {
                 jobIds: 0,

@@ -242,11 +242,6 @@ router.patch('/profile/faces',
   requestValidatorCallback(validator.updateProfileFaces),
   expressCallback(updateProfileFaces)
 );
-router.patch('/profile/faces',
-  profileFaces,
-  requestValidatorCallback(validator.updateProfileFaces),
-  expressCallback(updateProfileFaces)
-);
 router.patch('/profile/crew',
   profileCrew,
   requestValidatorCallback(validator.updateProfileCrew),

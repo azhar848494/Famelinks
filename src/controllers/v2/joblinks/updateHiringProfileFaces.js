@@ -21,7 +21,7 @@ module.exports = async (request) => {
         });
     }
 
-    let result = await updateHiringProfile(childProfileId, payload)
+    let result = await updateHiringProfile(request.user._id, 'faces', payload)
 
     if (!result) {
         return serializeHttpResponse(500, {

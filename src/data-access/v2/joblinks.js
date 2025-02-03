@@ -1090,21 +1090,31 @@ exports.userExplore = (page, joblinksId, masterId) => {
 };
 
 exports.brandAgencyExplore = (data) => {
-  return UsersDB.aggregate([
+  return hiringprofile.aggregate([
     {
-      $match: {
-        _id: { $ne: data.userId },
-        isDeleted: false,
-        isRegistered: true,
+      $match: { _id: { $ne: data.userId } },
+    },
+    {
+      $project: { type: 1, userId: 1 },
+    },
+    {
+      $lookup: {
+        from: "users",
+        let: { value: '$userId' },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$value"] } } },
+          { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+        ],
+        as: "user",
       },
     },
     {
-      $project: { type: 1, name: 1, profileImage: 1, profileImageType: 1 },
+      $addFields: {user: {$first: '$user'}}
     },
     {
       $lookup: {
         from: "invitations",
-        let: { to: "$_id", from: data.userId, type: "$type" },
+        let: { to: "$userId", from: data.userId, type: "$type" },
         pipeline: [
           {
             $match: {
@@ -1132,7 +1142,7 @@ exports.brandAgencyExplore = (data) => {
     {
       $lookup: {
         from: "users",
-        let: { joblinksId: data.userId, profileJoblinks: "$_id" },
+        let: { joblinksId: data.userId, profileJoblinks: "$userId" },
         pipeline: [
           { $match: { $expr: { $eq: ["$_id", "$$joblinksId"] } } },
           { $project: { _id: 0, savedTalents: "$profileJoblinks.savedTalents" } },
@@ -1789,8 +1799,8 @@ exports.getHiringProfile = (profileId, profileType) => {
   }
 };
 
-exports.updateHiringProfile = (Id, data) => {
-  return hiringprofile.updateOne({ _id: Id }, { $set: data });
+exports.updateHiringProfile = (profileId, profileType, data) => {
+  return hiringprofile.updateOne({ userId: profileId, type: profileType }, { $set: data });
 };
 
 exports.getApplicantsFaces = (selfMasterId, jobId, page) => {
@@ -2404,7 +2414,7 @@ exports.searchJobs = (selfJoblinksId, title, page) => {
         $and: [
           { isClosed: false },
           // { startDate: { $lt: currentDate } },
-          { title: { $regex: `^.*?${title}.*?$`, $options: "gi" } },
+          { title: { $regex: `^.*?${title}.*?$`, $options: "i" } },
         ],
       },
     },
@@ -4147,19 +4157,19 @@ exports.getApplicantsFacesBySearch = (
           {
             $match: {
               $or: [
-                { name: { $regex: `^.*?${name}.*?$`, $options: "gi" } },
+                { name: { $regex: `^.*?${name}.*?$`, $options: "i" } },
                 { age: age },
-                { gender: { $regex: `^.*?${gender}.*?$`, $options: "gi" } },
+                { gender: { $regex: `^.*?${gender}.*?$`, $options: "i" } },
                 {
                   complexion: {
                     $regex: `^.*?${complexion}.*?$`,
-                    $options: "gi",
+                    $options: "i",
                   },
                 },
                 {
                   eyeColor: {
                     $regex: `^.*?${eyeColor}.*?$`,
-                    $options: "gi",
+                    $options: "i",
                   },
                 },
                 {
@@ -4168,7 +4178,7 @@ exports.getApplicantsFacesBySearch = (
                 {
                   height: {
                     $regex: `^.*?${height}.*?$`,
-                    $options: "gi",
+                    $options: "i",
                   },
                 },
                 {
@@ -4439,7 +4449,7 @@ exports.getApplicantsCrewBySearch = (
                 {
                   experienceLevel: {
                     $regex: `^.*?${experienceLevel}.*?$`,
-                    $options: "gi",
+                    $options: "i",
                   },
                 },
               ],

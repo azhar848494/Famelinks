@@ -1128,7 +1128,7 @@ exports.getMusic2 = (page, search, type, savedMusic) => {
     obj._id = { $in: savedMusic };
   }
   if (search) {
-    obj.name = { $regex: `^.*?${search}.*?$`, $options: "gi" };
+    obj.name = { $regex: `^.*?${search}.*?$`, $options: "i" };
   }
   if (type) {
     obj.addedBy = type;
@@ -1165,7 +1165,7 @@ exports.getMusic = (page, search, type, savedMusic) => {
     obj._id = { $in: savedMusic };
   }
   if (search) {
-    obj.name = { $regex: `^.*?${search}.*?$`, $options: "gi" };
+    obj.name = { $regex: `^.*?${search}.*?$`, $options: "i" };
   }
   if (type) {
     obj.addedBy = type;
