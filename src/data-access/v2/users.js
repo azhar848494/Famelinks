@@ -3566,6 +3566,37 @@ exports.getProfileJoblinks = (profileId, page) => {
       },
     },
     {
+      $lookup: {
+        from: "jobs",
+        let: { value: profileId },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$createdBy", "$$value"] },
+            },
+          },
+          {
+            $project: {
+              itemsCount: { $sum: { $size: "$hiredApplicants" } },
+            },
+          },
+          {
+            $group: {
+              _id: "$userId",
+              totalItemsCount: { $sum: "$itemsCount" }
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              totalItemsCount: 1
+            }
+          }
+        ],
+        as: "hiredByMe",
+      },
+    },
+    {
       $project: {
         _id: 1,
         name: "$profileJoblinks.name",
@@ -3592,6 +3623,7 @@ exports.getProfileJoblinks = (profileId, page) => {
         chats: 1,
         unreadChats: 1,
         hired: 1,
+        hiredByMe: 1,
         applied: 1,
         shortlisted: 1,
         Invites: 1,
@@ -4281,7 +4313,7 @@ exports.getOtherProfileJoblinks = (
                   $cond: [{ $eq: [0, { $size: "$isApplied" }] }, false, true],
                 },
               },
-            },            
+            },
             {
               $lookup: {
                 from: "jobapplications",
@@ -4302,7 +4334,7 @@ exports.getOtherProfileJoblinks = (
             },
             {
               $addFields: {
-                applicationStatus: {$first: '$applicationStatus.status'},
+                applicationStatus: { $first: '$applicationStatus.status' },
               },
             },
             {
@@ -4431,7 +4463,7 @@ exports.getOtherProfileJoblinks = (
                   $cond: [{ $eq: [0, { $size: "$isApplied" }] }, false, true],
                 },
               },
-            },                        
+            },
             {
               $lookup: {
                 from: "jobapplications",
@@ -4452,7 +4484,7 @@ exports.getOtherProfileJoblinks = (
             },
             {
               $addFields: {
-                applicationStatus: {$first: '$applicationStatus.status'},
+                applicationStatus: { $first: '$applicationStatus.status' },
               },
             },
             {
@@ -4790,6 +4822,40 @@ exports.getOtherProfileJoblinks = (
         },
       },
       {
+        $lookup: {
+          from: "jobs",
+          let: { value: userId },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$createdBy", "$$value"] },
+              },
+            },
+            {
+              $project: {
+                itemsCount: { $sum: { $size: "$hiredApplicants" } },
+              },
+            },
+            {
+              $group: {
+                _id: "$userId",
+                totalItemsCount: { $sum: "$itemsCount" }
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                totalItemsCount: 1
+              }
+            }
+          ],
+          as: "hiredByMe",
+        },
+      },
+      {
+        $addFields: { hiredByMe: { $first: '$hiredByMe.totalItemsCount' } }
+      },
+      {
         $project: {
           _id: 1,
           name: "$profileJoblinks.name",
@@ -4817,6 +4883,7 @@ exports.getOtherProfileJoblinks = (
           totalJobs: 1,
           followers: 1,
           Invites: 1,
+          hiredByMe: 1,
           hired: 1,
           invitationStatus: 1,
           profileFaces: 1,
@@ -5130,7 +5197,7 @@ exports.getOtherProfileJoblinks = (
                   $cond: [{ $eq: [0, { $size: "$isApplied" }] }, false, true],
                 },
               },
-            },            
+            },
             {
               $lookup: {
                 from: "jobapplications",
@@ -5151,7 +5218,7 @@ exports.getOtherProfileJoblinks = (
             },
             {
               $addFields: {
-                applicationStatus: {$first: '$applicationStatus.status'},
+                applicationStatus: { $first: '$applicationStatus.status' },
               },
             },
             {
@@ -5266,7 +5333,7 @@ exports.getOtherProfileJoblinks = (
               },
             },
             { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
-            { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },                        
+            { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
             {
               $lookup: {
                 from: "jobapplications",
@@ -5287,7 +5354,7 @@ exports.getOtherProfileJoblinks = (
             },
             {
               $addFields: {
-                applicationStatus: {$first: '$applicationStatus.status'},
+                applicationStatus: { $first: '$applicationStatus.status' },
               },
             },
             {
@@ -6753,7 +6820,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
           },
           {
             $project: {
-              itemsCount: {$sum: { $size: "$hiredApplicants" }},
+              itemsCount: { $sum: { $size: "$hiredApplicants" } },
             },
           },
           {
@@ -7277,7 +7344,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
         unreadChats: 1,
         totalJobs: 1,
         openJobsCount: 1,
-        hired: {$ifNull: ['$hired', 0]},
+        hired: { $ifNull: ['$hired', 0] },
         openJobs: 1,
         jobsFaces: 1,
         jobsCrew: 1,

@@ -523,17 +523,7 @@ module.exports = {
 
   getProfile: {
     params: joi.object({
-      linkType: joi
-        .string()
-        .valid(
-          "famelinks",
-          "funlinks",
-          "followlinks",
-          "joblinks",
-          "storelinks",
-          "collablinks"
-        )
-        .required(),
+      linkType: joi.string().valid("famelinks", "funlinks", "followlinks", "joblinks", "storelinks", "collablinks").required(),
       masterUserId: joi.string().trim().required(),
     }),
     query: joi.object({

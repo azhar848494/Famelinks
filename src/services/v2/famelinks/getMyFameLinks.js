@@ -13,51 +13,51 @@ var ObjectId = require("mongoose").Types.ObjectId;
 
 //-----------------------v2------------------------//
 module.exports = async (profileId, page, childProfileId, selfMasterId, hashTagId) => {
-    let filterObj = {};
-    let sorted = {};
- 
-    if (hashTagId != null) {
-      {}
-      filterObj = {
-        challengeId: {$in:[ObjectId(hashTagId)]},
-        isDeleted: false,
-        isSafe: true,
-        isBlocked: false,
-      };
-    } else {
-      filterObj = {
-        userId: ObjectId(profileId),
-        isDeleted: false,
-        isSafe: true,
-        isBlocked: false,
-      };
-    }
-    sorted = { createdAt: -1 };
+  let filterObj = {};
+  let sorted = {};
 
-    // if (postId != "*") {
-    //   filterObj = {
-    //     $or: [
-    //       { $expr: { $eq: ["$_id", ObjectId(postId)] } },
-    //       { $expr: { $lt: ["$_id", ObjectId(postId)] } },
-    //     ],
-    //   };
-    //   sorted = { createdAt: -1 };
-    // } else{
-    //   sorted = { isWelcomeVideo: -1, createdAt: -1 };
-    // }
-    const result = await getMyFameLinks(
-      profileId,
-      page,
-      childProfileId,
-      selfMasterId,
-      filterObj,
-      sorted
-    );
-    return result.map(item => {
-        item.media = item.media.filter(oneImage => {
-            return oneImage.path;
-        });
-        return item;
+  if (hashTagId != null) {
+    { }
+    filterObj = {
+      challengeId: { $in: [ObjectId(hashTagId)] },
+      isDeleted: false,
+      isSafe: true,
+      isBlocked: false,
+    };
+  } else {
+    filterObj = {
+      userId: ObjectId(profileId),
+      isDeleted: false,
+      isSafe: true,
+      isBlocked: false,
+    };
+  }
+  sorted = { createdAt: -1 };
+
+  // if (postId != "*") {
+  //   filterObj = {
+  //     $or: [
+  //       { $expr: { $eq: ["$_id", ObjectId(postId)] } },
+  //       { $expr: { $lt: ["$_id", ObjectId(postId)] } },
+  //     ],
+  //   };
+  //   sorted = { createdAt: -1 };
+  // } else{
+  //   sorted = { isWelcomeVideo: -1, createdAt: -1 };
+  // }
+  const result = await getMyFameLinks(
+    profileId,
+    page,
+    childProfileId,
+    selfMasterId,
+    filterObj,
+    sorted
+  );
+  return result.map(item => {
+    item.media = item.media.filter(oneImage => {
+      return oneImage.path;
     });
+    return item;
+  });
 };
 //-----------------------v2------------------------//

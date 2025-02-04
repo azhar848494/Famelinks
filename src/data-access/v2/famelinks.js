@@ -402,7 +402,7 @@ exports.getMyFameLinks = (
 ) => {
   return (
     FamelinksDB.aggregate([
-      { $match: filterObj },
+      { $match: { ...filterObj, isWelcomeVideo: { $exists: false } } },
       { $sort: sorted },
       //MasterIdMigration
       {
@@ -423,8 +423,8 @@ exports.getMyFameLinks = (
                 type: 1,
                 dob: 1,
                 name: 1,
-                profileImage:1,
-                profileImageType:1,
+                profileImage: 1,
+                profileImageType: 1,
                 profile: {
                   name: "$profileFamelinks.name",
                   bio: "$profileFamelinks.bio",
@@ -826,8 +826,8 @@ exports.getFameLinks = (profileId, masterUserId, page, filterObj, limit) => {
               type: 1,
               dob: 1,
               name: 1,
-              profileImage:1,
-              profileImageType:1,
+              profileImage: 1,
+              profileImageType: 1,
               profile: {
                 name: "$profileFamelinks.name",
                 bio: "$profileFamelinks.bio",
@@ -1194,7 +1194,7 @@ exports.getAdFameLinks = (userId, page) => {
     .limit(6);
 };
 
-exports.getFameLinksFollowlinks = (fameLinksId, userId, page, filterObj ) => {
+exports.getFameLinksFollowlinks = (fameLinksId, userId, page, filterObj) => {
   return FamelinksDB.aggregate([
     { $sort: { createdAt: -1 } },
     { $match: filterObj },
@@ -1238,8 +1238,8 @@ exports.getFameLinksFollowlinks = (fameLinksId, userId, page, filterObj ) => {
               type: 1,
               dob: 1,
               name: 1,
-              profileImage:1,
-              profileImageType:1,
+              profileImage: 1,
+              profileImageType: 1,
               profile: {
                 name: "$profileFamelinks.name",
                 bio: "$profileFamelinks.bio",
@@ -1754,8 +1754,8 @@ exports.getFameLinksById = (profileId, userId, postId) => {
               type: 1,
               dob: 1,
               name: 1,
-              profileImage:1,
-              profileImageType:1,
+              profileImage: 1,
+              profileImageType: 1,
               profile: {
                 name: "$profileFamelinks.name",
                 bio: "$profileFamelinks.bio",
