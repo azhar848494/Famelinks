@@ -87,6 +87,7 @@ const getBrandProduct = require('../../controllers/v2/users/getBrandProduct')
 const removeProfileImageController = require('../../controllers/v2/users/removeProfileImage')
 const updatePrivacyController = require('../../controllers/v2/users/updatePrivacy')
 const deleteProductcontroller = require('../../controllers/v2/users/deleteBrandProduct')
+const getParticipatedTrendzController = require('../../controllers/v2/users/getParticipatedTrendz')
 
 router.post(
   "/login",
@@ -284,6 +285,11 @@ router.get(
 );
 
 router.get(
+  "/participatedTrendz",
+  expressCallback(getParticipatedTrendzController)
+);
+
+router.get(
   "/followRequest",
   requestValidatorCallback(validator.getFollowRequest),
   expressCallback(getFollowRequestController)
@@ -299,6 +305,7 @@ router.get(
   requestValidatorCallback(validator.checkUsername),
   expressCallback(checkUsernameController)
 );
+
 router.get(
   "/notifications",
   requestValidatorCallback(validator.getNotifications),

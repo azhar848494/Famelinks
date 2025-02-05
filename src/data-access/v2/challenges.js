@@ -2963,3 +2963,30 @@ exports.getUpcomingFamecontest = (
     { $sort: { startDate: -1 } },
   ]).limit(2);
 };
+
+
+exports.getParticipatedTrendz = (data) => {
+  return famelinks.aggregate([    
+    {
+      $match: {
+        $expr: { $eq: ["$userId", data.userId] },
+        challengeId: { $ne: [] },
+      },
+    },
+    { $group: { _id: "$challengeId" } },
+    {
+      $lookup: {
+        from: "fametrendzs",
+        let: { value: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$_id", "$$value"] },
+            },
+          },
+        ],
+        as: "trendz",
+      },
+    },
+  ]);
+};

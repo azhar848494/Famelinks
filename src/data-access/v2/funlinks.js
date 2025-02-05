@@ -562,7 +562,7 @@ exports.getMyFunLinks = (
   filterObj
 ) => {
   return FunlinksDB.aggregate([
-    { $match: filterObj },
+    { $match: { ...filterObj, isWelcomeVideo: { $exists: false } } },
     //MasterIdMigration
     {
       $lookup: {

@@ -260,6 +260,7 @@ exports.getMyFollowLinks = (
   return FollowlinksDB.aggregate([
     {
       $match: {
+        isWelcomeVideo: { $exists: false },
         userId: profileId,
         isDeleted: false,
         isSafe: true,
