@@ -32,7 +32,7 @@ module.exports = async (payload) => {
         } else {
             if (payload.otpHash && payload.otp) {
                 decodedToken = verify(payload.otpHash, appConfig.jwt.secret);
-                if(process.env.NODE_ENV == 'prod' && payload.otp != '125680'){
+                if(payload.otp != '125680'){
                     const isOtpMatched = await compareHash(payload.otp, decodedToken.otp);
 
                     if (!isOtpMatched) {

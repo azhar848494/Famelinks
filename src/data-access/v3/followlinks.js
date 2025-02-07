@@ -36,7 +36,7 @@ const getFollowLinksWelcomeVideo = (childProfileId, userId, page) => {
       },
     },
     { $addFields: { user: { $first: "$user" } } },
-    { $match: { $expr: { $ne: ["$user._id", null] } } },
+    // { $match: { $expr: { $ne: ["$user._id", null] } } },
     {
       $lookup: {
         from: "followers",
@@ -62,11 +62,11 @@ const getFollowLinksWelcomeVideo = (childProfileId, userId, page) => {
         },
       },
     },
-    {
-      $match: {
-        followStatus: true,
-      },
-    },
+    // {
+    //   $match: {
+    //     followStatus: true,
+    //   },
+    // },
   ])
     .skip((page - 1) * 10)
     .limit(10);
