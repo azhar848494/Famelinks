@@ -7718,6 +7718,14 @@ exports.checkInvitation = (jobId, toId, userId, category, jobType) => {
   });
 };
 
+exports.getInvitation = (jobId, toId) => {
+  return invitationsDB.findOne({
+    jobId: jobId,
+    to: toId,
+    category: 'job',
+  }).lean();
+};
+
 exports.inviteToFollow = (userId, selfId, action) => {
   if (action == "send") {
     return invitationsDB.create({

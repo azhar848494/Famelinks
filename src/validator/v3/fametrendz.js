@@ -110,6 +110,7 @@ module.exports = {
       paymentId: joi.string().trim(),
       trendzCategory: joi.array().items(joi.string().trim()),
       userId: joi.string().trim(),
+      status: joi.string().trim(),
     }),
   },
 

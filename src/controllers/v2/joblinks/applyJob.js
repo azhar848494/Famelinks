@@ -5,7 +5,8 @@ const checkApplication = require("../../../services/v2/joblinks/checkApplication
 const sendNotificationsService = require("../../../services/v2/users/sendNotifications");
 const { isValidObjectId } = require("../../../utils/db");
 const getMasterProfile = require("../../../services/v2/users/getMasterProfile");
-const { getOneUser,getHiringProfile } = require("../../../data-access/v2/users");
+const { getOneUser, getHiringProfile } = require("../../../data-access/v2/users");
+const { getInvitation } = require("../../../data-access/v2/users");
 
 
 module.exports = async (request) => {
@@ -86,6 +87,19 @@ module.exports = async (request) => {
         result,
       });
     }
+  }
+
+
+
+  let invitation = await getInvitation(
+    jobId,
+    request.user._id,
+  );
+
+  if (invitation) {
+    return serializeHttpResponse(500, {
+      message: "You have already recived job invitation for this job.",
+    });
   }
 
   result = await applyJob(childProfileId, jobId, jobType);
