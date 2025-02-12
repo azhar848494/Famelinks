@@ -10,6 +10,7 @@ module.exports = {
       agencyTags: joi.array().items(joi.string().trim()),
       isWelcomeVideo: joi.boolean(),
       offerCode: joi.string().trim(),
+      productId: joi.string().trim(),
     }),
     files: joi
       .object()

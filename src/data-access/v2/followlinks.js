@@ -411,7 +411,43 @@ exports.getMyFollowLinks = (
       },
     },
     {
+      $lookup: {
+        from: "channels",
+        let: { channelId: "$channelId" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$_id", "$$channelId"] },
+              isDeleted: false,
+            },
+          },
+          { $project: { name: 1 } },
+        ],
+        as: "channels",
+      },
+    },
+    { $addFields: { channels: { $first:  "$channels" } } },
+    {
+      $lookup: {
+        from: "brandproducts",
+        let: { value: "$productId" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$_id", "$$value"] },
+              isDeleted: false,
+            },
+          },
+          { $project: { hashTag: 1 } },
+        ],
+        as: "product",
+      },
+    },
+    { $addFields: { product: { $first:  "$product" } } },
+    {
       $project: {
+        channels: 1,
+        product: 1,
         followStatus: 1,
         users: 1,
         createdAt: 1,
@@ -728,6 +764,23 @@ exports.getFollowLinks = (followLinksId, userId, page, filterObj) => {
         },
       },
       {
+        $lookup: {
+          from: "brandproducts",
+          let: { value: "$productId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$value"] },
+                isDeleted: false,
+              },
+            },
+            { $project: { hashTag: 1 } },
+          ],
+          as: "product",
+        },
+      },
+      { $addFields: { product: { $first:  "$product" } } },
+      {
         $project: {
           createdAt: 1,
           updatedAt: 1,
@@ -737,6 +790,7 @@ exports.getFollowLinks = (followLinksId, userId, page, filterObj) => {
           gender: 1,
           challenges: 1,
           channels: 1,
+          product: 1,
           user: 1,
           description: 1,
           profileImage: 1,

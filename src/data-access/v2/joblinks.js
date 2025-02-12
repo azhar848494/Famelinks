@@ -30,6 +30,10 @@ exports.updateJob = (jobId, data) => {
   return jobs.updateOne({ _id: jobId }, { $set: data });
 };
 
+exports.updateHiredJob = (jobId, data) => {
+  return jobs.updateOne({ _id: jobId }, { $push: data });
+};
+
 exports.updateJobApplication = (userId, jobId, status) => {
   if (status == "withdraw") {
     return jobApplications.deleteOne({ userId: userId, jobId: jobId });
@@ -1615,10 +1619,22 @@ exports.getOpenJobs = (joblinksId, page, jobType) => {
           {
             $match: {
               $expr: { $eq: ["$jobId", "$$jobId"] },
-              $or: [{ status: "applied" }, { status: "shortlisted" }],
+              // $or: [{ status: "applied" }, { status: "shortlisted" }],
             },
           },
-          { $project: { _id: 0, userId: 1 } },
+          { $project: { _id: 0, userId: 1, status: 1 } },
+          {
+            $addFields: {
+              statusOrder: {
+                $switch: {
+                  branches: [
+                    { case: { $eq: ["$status", "hired"] }, then: 1 },
+                  ],
+                  default: 0
+                }
+              }
+            }
+          },
           {
             $lookup: {
               from: "users",
@@ -1652,6 +1668,7 @@ exports.getOpenJobs = (joblinksId, page, jobType) => {
               profile: { $first: "$user.profile" }
             },
           },
+          { $sort: { statusOrder: 1 } },
         ],
         as: "applicants",
       },

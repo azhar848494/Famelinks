@@ -1,10 +1,10 @@
-const { updateJob, updateJobApplication } = require('../../../data-access/v2/joblinks')
+const { updateJob,updateHiredJob, updateJobApplication } = require('../../../data-access/v2/joblinks')
 
 module.exports = async (jobId, userId, closeJob) => {
     let updateObj = {}
-    updateObj.hiredApplicants = userId
     updateObj.isClosed = closeJob
 
+    await updateHiredJob(jobId, { hiredApplicants: userId })
     let result = await updateJob(jobId, updateObj)
 
     if (!result) { return }

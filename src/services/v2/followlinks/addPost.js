@@ -23,6 +23,7 @@ module.exports = async (profileId, user, files, payload, token, isWelcomeVideo) 
       description: payload.description,
       location: user.location,
       channelId: payload.channelId,
+      productId: payload.productId,
       offerId: payload.offerId || null,
       //userId: user._id, //=>v1
       userId: profileId, //=>v2

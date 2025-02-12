@@ -40,6 +40,7 @@ const followlinksSchema = new Schema(
     // tags: { type: [tagSchema], default: [] }, //field added=>v2,
     channelId: { type: ObjectId, default: null },
     offerId: { type: ObjectId, default: null },
+    productId: { type: ObjectId },
     reachIds: { type: [ObjectId], default: [] },
   },
   {
