@@ -41,11 +41,13 @@ const searchJobs = require('../../controllers/v2/joblinks/searchJobs');
 const inviteForJob = require('../../controllers/v2/joblinks/inviteForJob');
 const getJobDetails = require('../../controllers/v2/joblinks/getJobDetails');
 const closeJob = require('../../controllers/v2/joblinks/closeJob');
+const deleteJob = require('../../controllers/v2/joblinks/deleteJob');
 const getShortlistedApplicant = require('../../controllers/v2/joblinks/getShortlistedApplicant');
 const getSortedApplicants = require('../../controllers/v2/joblinks/getSortedApplicant');
 const getApplicantBySearch = require('../../controllers/v2/joblinks/getApplicantBySearch');
 const createHiringProfileCrew = require('../../controllers/v2/joblinks/createHiringProfileCrew');
 const createHiringProfileFaces = require('../../controllers/v2/joblinks/createHiringProfileFaces');
+const getAllJobs = require('../../controllers/v2/joblinks/getAllJobs');
 const getAppliedJobs = require('../../controllers/v2/joblinks/getAppliedJobs');
 const getShortlistedJobs = require('../../controllers/v2/joblinks/getShortlistedJobs');
 const getHiredJobs = require('../../controllers/v2/joblinks/getHiredJobs');
@@ -58,6 +60,7 @@ const addcategorySuggestion = require('../../controllers/v2/joblinks/addcategory
 const getExploreTalents = require('../../controllers/v2/joblinks/getExploreTalents');
 const getPastJobs = require('../../controllers/v2/joblinks/getPastJobs');
 const getYourJobs = require('../../controllers/v2/joblinks/getYourJobs');
+const createdJobs = require('../../controllers/v2/joblinks/getJobs');
 const getExploreJobs = require('../../controllers/v2/joblinks/getExploreJobs')
 
 router.post('/addJobCategory',
@@ -122,6 +125,12 @@ router.post('/invitation/:action/:userId',
   requestValidatorCallback(validator.invitation),
   expressCallback(inviteForJob)
 );
+
+router.delete('/:jobId',
+  requestValidatorCallback(validator.deleteJob),
+  expressCallback(deleteJob)
+);
+
 router.post('/closeJob/:jobId',
   requestValidatorCallback(validator.closeJob),
   expressCallback(closeJob)
@@ -186,6 +195,17 @@ router.get('/getApplicantBySearch/:jobId',
   requestValidatorCallback(validator.getApplicantsBySearch),
   expressCallback(getApplicantBySearch)
 );
+
+router.get('/jobs/:type',
+  requestValidatorCallback(validator.getJobs),
+  expressCallback(createdJobs)
+);
+
+router.get('/allJobs',
+  requestValidatorCallback(validator.getAllJobs),
+  expressCallback(getAllJobs)
+);
+
 router.get('/appliedJobs',
   requestValidatorCallback(validator.getAppliedJobs),
   expressCallback(getAppliedJobs)

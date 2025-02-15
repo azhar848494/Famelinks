@@ -40,6 +40,7 @@ module.exports = {
       }),
       gender: joi.string().trim().valid("male", "female", "all").optional(),
       jobCategory: joi.array().items(joi.string().trim()).required(),
+      status: joi.string().trim(),
     }),
   },
 
@@ -296,6 +297,12 @@ module.exports = {
     }),
   },
 
+  deleteJob: {
+    params: joi.object({
+      jobId: joi.string().trim().required(),
+    }),
+  },
+
   shortlist: {
     payload: joi.object({
       jobId: joi.string().trim().required(),
@@ -380,6 +387,12 @@ module.exports = {
     }),
   },
 
+  getAllJobs: {
+    query: joi.object({
+      page: joi.number().min(1).required(),
+    }),
+  },
+
   getAppliedJobs: {
     query: joi.object({
       page: joi.number().min(1).required(),
@@ -447,6 +460,15 @@ module.exports = {
   },
 
   getYourJobs: {
+    query: joi.object({
+      page: joi.number().min(1).required(),
+    }),
+  },
+  
+  getJobs: {
+    params: joi.object({
+      type: joi.string().trim().valid("open", "closed", "draft").required(),
+    }),
     query: joi.object({
       page: joi.number().min(1).required(),
     }),

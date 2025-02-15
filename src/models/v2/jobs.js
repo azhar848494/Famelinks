@@ -40,7 +40,8 @@ module.exports = mongoose.model('jobs', new Schema({
     isClosed: { type: Boolean, default: false },
     shortlistedApplicants: { type: [ObjectId], default: [] },
     hiredApplicants: { type: [ObjectId], default: [] },
-    lastVisited: { type: Date, default: null }
+    lastVisited: { type: Date, default: null },
+    status: { type: String, default: 'draft' },
 }, {
     versionKey: false,
     timestamps: true

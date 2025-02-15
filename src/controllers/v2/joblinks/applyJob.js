@@ -7,6 +7,7 @@ const { isValidObjectId } = require("../../../utils/db");
 const getMasterProfile = require("../../../services/v2/users/getMasterProfile");
 const { getOneUser, getHiringProfile } = require("../../../data-access/v2/users");
 const { getInvitation } = require("../../../data-access/v2/users");
+const { deleteInvite } = require("../../../data-access/v2/joblinks");
 
 
 module.exports = async (request) => {
@@ -97,9 +98,7 @@ module.exports = async (request) => {
   );
 
   if (invitation) {
-    return serializeHttpResponse(500, {
-      message: "You have already recived job invitation for this job.",
-    });
+    await deleteInvite(jobId, childProfileId, masterId, jobType);
   }
 
   result = await applyJob(childProfileId, jobId, jobType);

@@ -205,6 +205,8 @@ exports.getOneUser = (userId) => {
         name: '$profileJoblinks.name',
         profileImage: '$profileJoblinks.profileImage',
         profileImageType: '$profileJoblinks.profileImageType',
+        savedJobs: 1,
+        savedTalents: 1,
       },
       profileStorelinks: {
         name: '$profileStorelinks.name',
@@ -3456,6 +3458,7 @@ exports.getProfileJoblinks = (profileId, page) => {
           {
             $match: {
               $expr: { $eq: ["$createdBy", "$$createdBy"] },
+              status: 'open',
               isClosed: false,
             },
           },
@@ -4034,6 +4037,7 @@ exports.getOtherProfileJoblinks = (
             {
               $match: {
                 $expr: { $eq: ["$createdBy", "$$createdBy"] },
+                status: 'open',
                 isClosed: false,
               },
             },
@@ -4213,7 +4217,7 @@ exports.getOtherProfileJoblinks = (
           from: "jobs",
           pipeline: [
             {
-              $match: { isClosed: false, jobType: "faces", createdBy: userId },
+              $match: {  status: 'open',isClosed: false, jobType: "faces", createdBy: userId },
             },
             {
               $lookup: {
@@ -4363,7 +4367,7 @@ exports.getOtherProfileJoblinks = (
         $lookup: {
           from: "jobs",
           pipeline: [
-            { $match: { isClosed: false, jobType: "crew", createdBy: userId } },
+            { $match: {  status: 'open',isClosed: false, jobType: "crew", createdBy: userId } },
             {
               $lookup: {
                 from: "jobcategories",
@@ -5006,6 +5010,7 @@ exports.getOtherProfileJoblinks = (
             {
               $match: {
                 $expr: { $eq: ["$createdBy", "$$createdBy"] },
+                status: 'open',
                 isClosed: false,
               },
             },
@@ -5084,7 +5089,8 @@ exports.getOtherProfileJoblinks = (
           from: "jobs",
           pipeline: [
             {
-              $match: { isClosed: false, jobType: "faces", createdBy: userId },
+              $match: { 
+                status: 'open', isClosed: false, jobType: "faces", createdBy: userId },
             },
             {
               $lookup: {
@@ -5247,7 +5253,8 @@ exports.getOtherProfileJoblinks = (
         $lookup: {
           from: "jobs",
           pipeline: [
-            { $match: { isClosed: false, jobType: "crew", createdBy: userId } },
+            { $match: {
+              status: 'open', isClosed: false, jobType: "crew", createdBy: userId } },
             {
               $lookup: {
                 from: "jobapplications",
@@ -6859,6 +6866,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
           {
             $match: {
               $expr: { $eq: ["$createdBy", "$$createdBy"] },
+              status: 'open',
               isClosed: false,
             },
           },
@@ -6875,6 +6883,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
           {
             $match: {
               $expr: { $eq: ["$createdBy", "$$createdBy"] },
+              status: 'open',
               isClosed: false,
             },
           },
@@ -6996,7 +7005,8 @@ exports.getBrandProfileJoblinks = (userId, page) => {
         from: "jobs",
         pipeline: [
           {
-            $match: { isClosed: false, jobType: "faces", createdBy: userId },
+            $match: { 
+              status: 'open',isClosed: false, jobType: "faces", createdBy: userId },
           },
           {
             $lookup: {
@@ -7123,7 +7133,8 @@ exports.getBrandProfileJoblinks = (userId, page) => {
       $lookup: {
         from: "jobs",
         pipeline: [
-          { $match: { isClosed: false, jobType: "crew", createdBy: userId } },
+          { $match: {
+            status: 'open', isClosed: false, jobType: "crew", createdBy: userId } },
           {
             $lookup: {
               from: "jobapplications",
@@ -7461,6 +7472,7 @@ exports.getAgencyProfileJoblinks = (userId) => {
           {
             $match: {
               $expr: { $eq: ["$createdBy", "$$createdBy"] },
+              status: 'open',
               isClosed: false,
             },
           },

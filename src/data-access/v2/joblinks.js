@@ -105,7 +105,7 @@ exports.getUserJobs = (joblinksId, page) => {
   let pagination = page ? page : 1;
   return jobs.aggregate([
     {
-      $match: { isClosed: false, createdBy: { $ne: joblinksId } },
+      $match: { status: 'open', isClosed: false, createdBy: { $ne: joblinksId } },
     },
     {
       $lookup: {
@@ -213,6 +213,7 @@ exports.getAgentJobs = (joblinksId, page) => {
   return jobs.aggregate([
     {
       $match: {
+        status: 'open',
         isClosed: false,
         jobType: "crew",
         createdBy: { $ne: joblinksId },
@@ -1113,7 +1114,7 @@ exports.brandAgencyExplore = (data) => {
       },
     },
     {
-      $addFields: {user: {$first: '$user'}}
+      $addFields: { user: { $first: '$user' } }
     },
     {
       $lookup: {
@@ -1599,7 +1600,7 @@ exports.getTalents = (page, masterId, joblinksId) => {
 exports.getOpenJobs = (joblinksId, page, jobType) => {
   let pagination = page ? page : 1;
   return jobs.aggregate([
-    { $match: { isClosed: false, jobType: jobType, createdBy: joblinksId } },
+    { $match: {  status: 'open',isClosed: false, jobType: jobType, createdBy: joblinksId } },
     {
       $lookup: {
         from: "jobcategories",
@@ -1704,6 +1705,122 @@ exports.getOpenJobs = (joblinksId, page, jobType) => {
     },
     { $sort: { createdAt: -1 } },
     { $skip: (pagination - 1) * 10 },
+    { $limit: 10 },
+  ]);
+};
+
+exports.createdJobs = (data) => {
+  return jobs.aggregate([
+    {
+      $match: {
+        status: data.type,
+        createdBy: data.userId,
+      },
+    },
+    {
+      $lookup: {
+        from: "jobcategories",
+        let: { jobCategory: "$jobCategory" },
+        pipeline: [
+          { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+          { $project: { jobName: 1, jobCategory: 1 } },
+        ],
+        as: "jobDetails",
+      },
+    },
+    {
+      $lookup: {
+        from: "locatns",
+        let: { value: "$jobLocation" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$value"] } } },
+          { $project: { type: 1, value: 1, } },
+        ],
+        as: "jobLocation",
+      },
+    },
+    {
+      $lookup: {
+        from: "jobapplications",
+        let: { jobId: "$_id" },
+        pipeline: [
+          {
+            $match: { $expr: { $eq: ["$jobId", "$$jobId"] } },
+          },
+          { $project: { _id: 0, userId: 1, status: 1 } },
+          {
+            $addFields: {
+              statusOrder: {
+                $switch: {
+                  branches: [
+                    { case: { $eq: ["$status", "hired"] }, then: 1 },
+                  ],
+                  default: 0
+                }
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: "users",
+              let: { userId: "$userId" },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                {
+                  $project: {
+                    type: 1,
+                    name: 1,
+                    username: 1,
+                    profileImage: 1,
+                    profileImageType: 1,
+                    profile: {
+                      name: "$profileJoblinks.name",
+                      profileImage: "$profileJoblinks.profileImage",
+                      profileImageType: "$profileJoblinks.profileImageType",
+                    },
+                  },
+                },
+              ],
+              as: "user",
+            },
+          },
+          { $addFields: { user: { $first: "$user" } } },
+          { $sort: { statusOrder: 1 } },
+          {
+            $project: {
+              type: "$user.type",
+              name: "$user.name",
+              username: "$user.username",
+              profileImage: "$user.profileImage",
+              profileImageType: "$user.profileImageType",
+              profile: "$user.profile",
+            },
+          },
+        ],
+        as: "applicants",
+      },
+    },
+    {
+      $project: {
+        jobType: 1,
+        title: 1,
+        status: 1,
+        jobLocation: { $first: "$jobLocation" },
+        description: 1,
+        experienceLevel: 1,
+        startDate: 1,
+        endDate: 1,
+        deadline: 1,
+        jobDetails: 1,
+        ageGroup: 1,
+        gender: 1,
+        height: 1,
+        createdAt: 1,
+        applicants: 1,
+      },
+    },
+    { $sort: { createdAt: -1 } },
+    { $skip: (data.page - 1) * 10 },
     { $limit: 10 },
   ]);
 };
@@ -2603,19 +2720,201 @@ exports.getSavedTalents = (data) => {
         let: { userId: "$profileJoblinks.savedTalents" },
         pipeline: [
           { $match: { $expr: { $in: ["$_id", "$$userId"] } } },
-          { $project: { userId: 1, type: 1 } },
           {
             $lookup: {
-              from: "users",
-              let: { profileJoblinks: "$userId" },
+              from: "jobcategories",
+              let: { interestCat: "$interestCat" },
               pipeline: [
                 {
                   $match: {
-                    $expr: {
-                      $eq: ["$_id", "$$profileJoblinks"],
-                    },
+                    $expr: { $in: ["$_id", "$$interestCat"] },
+                  },
+                },
+                { $project: { jobName: 1, jobCategory: 1 } },
+              ],
+              as: "interestCat",
+            },
+          },
+          {
+            $lookup: {
+              from: "locatns",
+              let: { value: "$interestedLoc" },
+              pipeline: [
+                { $match: { $expr: { $in: ["$_id", "$$value"] } } },
+                {
+                  $lookup: {
+                    from: "locatns",
+                    let: { value: "$scopes" },
+                    pipeline: [
+                      { $match: { $expr: { $in: ["$_id", "$$value"] } } },
+                      { $project: { type: 1, value: 1, } },
+                      { $sort: { _id: -1 } },
+                    ],
+                    as: "scopes",
+                  },
+                },
+                {
+                  $project: {
+                    type: 1,
+                    value: 1,
+                  }
+                },
+              ],
+              as: "interestedLoc",
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              let: { value: data.userId, userId: "$_id" },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$value"] } } },
+                { $project: { _id: 0, savedTalents: "$profileJoblinks.savedTalents" } },
+                {
+                  $match: { $expr: { $in: ["$$userId", "$savedTalents"] } },
+                },
+              ],
+              as: "saved",
+            },
+          },
+          {
+            $set: {
+              saved: {
+                $cond: [{ $ne: [0, { $size: "$saved" }] }, true, false],
+              },
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              let: { userId: "$userId" },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                { $project: { _id: 0, greetVideo: "$profileJoblinks.greetVideo" } },
+              ],
+              as: "greetVideo",
+            },
+          },
+          { $set: { greetVideo: { $first: "$greetVideo.greetVideo" } } },
+          {
+            $lookup: {
+              from: "invitations",
+              let: { to: "$userId", from: data.userId, type: "$type" },
+              pipeline: [
+                {
+                  $match: {
+                    $and: [
+                      { $expr: { $eq: ["$to", "$$to"] } },
+                      { $expr: { $eq: ["$from", "$$from"] } },
+                      { $expr: { $eq: ["$jobType", "$$type"] } },
+                      { status: "invited" },
+                      { category: "job" },
+                    ],
+                  },
+                },
+              ],
+              as: "invitationStatus",
+            },
+          },
+          {
+            $set: {
+              invitationStatus: {
+                $cond: [{ $ne: [0, { $size: "$invitationStatus" }] }, true, false],
+              },
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              let: { userId: "$userId" },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: { $eq: ["$_id", "$$userId"] },
                     isDeleted: false,
                     isSuspended: false,
+                    isRegistered: true,
+                  },
+                },
+                {
+                  $project: {
+                    type: 1,
+                    name: 1,
+                    username: 1,
+                    profileImage: 1,
+                    profileImageType: 1,
+                    gender: 1,
+                    dob: 1,
+                    followersCount: 1,
+                    profile: {
+                      name: "$profileJoblinks.name",
+                      profileImage: "$profileJoblinks.profileImage",
+                      profileImageType: "$profileJoblinks.profileImageType",
+                    }
+                  },
+                },
+                {
+                  $set: {
+                    age: {
+                      $dateDiff: {
+                        startDate: "$dob",
+                        endDate: "$$NOW",
+                        unit: "year",
+                      },
+                    },
+                  },
+                },
+              ],
+              as: "userDetail",
+            },
+          },
+          { $addFields: { userDetail: { $first: "$userDetail" } } },
+          {
+            $lookup: {
+              from: "users",
+              let: {
+                userId: "$userId",
+              },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: { $eq: ["$_id", "$$userId"] },
+                    isDeleted: false,
+                    isSuspended: false,
+                    isRegistered: true,
+                  },
+                },
+                {
+                  $match: {
+                    $or: [{ type: "individual" }],
+                  },
+                },
+                { $project: { _id: 1, profileFamelinks: 1 } },
+              ],
+              as: "user",
+            },
+          },
+          { $match: { $expr: { ne: [0, { $size: "$user" }] } } },
+          { $set: { profileFamelinks: { $first: "$user._id" } } },
+          {
+            $lookup: {
+              from: "users",
+              let: {
+                profileJoblinks: "$userId",
+                profileFamelinks: "$profileFamelinks",
+              },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: { $eq: ["$_id", "$$profileJoblinks"] },
+                    isDeleted: false,
+                    isSuspended: false,
+                    isRegistered: true,
+                  },
+                },
+                {
+                  $match: {
+                    $or: [{ type: "individual" }],
                   },
                 },
                 {
@@ -2637,17 +2936,39 @@ exports.getSavedTalents = (data) => {
                 //MasterIdMigration
                 {
                   $lookup: {
-                    from: "users",
+                    from: "uers",
                     let: { profileFamelinks: "$_id" },
                     pipeline: [
-                      {
-                        $match: {
-                          $expr: { $eq: ["$_id", "$$profileFamelinks"] },
-                        },
-                      },
+                      { $match: { $expr: { $eq: ["$_id", "$$profileFamelinks"] } } },
                       { $project: { _id: 0, trendWinner: "$profileFamelinks.trendWinner" } },
                     ],
                     as: "trendsWon",
+                  },
+                },
+                {
+                  $project: {
+                    name: 1,
+                    trendsWon: 1,
+                    ambassador: 1,
+                    username: 1,
+                    profileImage: 1,
+                    profileImageType: 1,
+                    followersCount: 1,
+                    dob: 1,
+                    gender: 1,
+                    type: 1,
+                    ageGroup: 1,
+                  },
+                },
+                {
+                  $set: {
+                    age: {
+                      $dateDiff: {
+                        startDate: "$dob",
+                        endDate: "$$NOW",
+                        unit: "year",
+                      },
+                    },
                   },
                 },
                 {
@@ -2662,25 +2983,21 @@ exports.getSavedTalents = (data) => {
                   },
                 },
                 { $set: { trendsWon: { $first: "$trendsWon" } } },
-                {
-                  $set: {
-                    trendsWon: {
-                      $cond: [
-                        { $ne: [0, { $size: "$trendsWon.trendWinner" }] },
-                        "Trend Setter",
-                        "",
-                      ],
-                    },
-                  },
-                },
+                // {
+                //   $set: {
+                //     trendsWon: {
+                //       $cond: [
+                //         { $ne: [0, { $size: "$trendsWon.trendWinner" }] },
+                //         "Trend Setter",
+                //         "",
+                //       ],
+                //     },
+                //   },
+                // },
                 {
                   $set: {
                     achievements: {
-                      $cond: [
-                        { $ne: ["", "$ambassador"] },
-                        "$ambassador",
-                        "",
-                      ],
+                      $cond: [{ $ne: ["", "$ambassador"] }, "$ambassador", ""],
                     },
                   },
                 },
@@ -2689,71 +3006,85 @@ exports.getSavedTalents = (data) => {
                     achievements: {
                       $cond: [
                         { $ne: ["", "$achievements"] },
-                        {
-                          $concat: ["$achievements", ", ", "$trendsWon"],
-                        },
+                        { $concat: ["$achievements", ", ", "$trendsWon"] },
                         "$trendsWon",
                       ],
                     },
                   },
                 },
-                {
-                  $project: {
-                    type: 1,
-                    name: 1,
-                    username: 1,
-                    profileImage: 1,
-                    profileImageType: 1,
-                    followersCount: 1,
-                    dob: 1,
-                    achievements: 1,
-                  },
-                },
-                {
-                  $set: {
-                    age: {
-                      $dateDiff: {
-                        startDate: "$dob",
-                        endDate: "$$NOW",
-                        unit: "year",
-                      },
-                    },
-                  },
-                },
+                { $project: { dob: 0, trendsWon: 0, ambassador: 0 } },
               ],
-              as: "user",
+              as: "masterProfile",
             },
           },
-          { $addFields: { user: { $first: "$user" } } },
+          { $match: { $expr: { $ne: [0, { $size: "$masterProfile" }] } } },
+          { $addFields: { masterProfile: { $first: "$masterProfile" } } },
           {
             $lookup: {
-              from: "invitations",
-              let: { to: "$userId", from: data.userId, type: "$type" },
+              from: "chats",
+              let: { member1: "$masterProfile._id", member2: data.userId },
               pipeline: [
                 {
                   $match: {
                     $and: [
-                      { $expr: { $eq: ["$to", "$$to"] } },
-                      { $expr: { $eq: ["$from", "$$from"] } },
-                      { $expr: { $eq: ["$jobType", "$$type"] } },
-                      { category: "job" },
-                      { status: "invited" },
+                      { $expr: { $eq: [2, { $size: "$members" }] } },
+                      { isGroup: false },
+                      { $expr: { $in: ["$$member1", "$members"] } },
+                      { $expr: { $in: ["$$member2", "$members"] } },
+                      { category: "conversation" },
                     ],
                   },
                 },
                 { $project: { _id: 1 } },
               ],
-              as: "invitation",
+              as: "chatId",
             },
           },
+          // { $addFields: { chatId: { $first: "$chatId" } } },
+          // { $addFields: { chatId: "$chatId._id" } },
           {
             $set: {
-              invitation: {
-                $cond: [{ $eq: [0, { $size: "$invitation" }] }, false, true],
+              chatId: {
+                $cond: [
+                  { $eq: [0, { $size: "$chatId" }] },
+                  null,
+                  { $first: "$chatId._id" },
+                ],
               },
             },
           },
-          { $project: { type: 1, user: 1, invitation: 1 } },
+          {
+            $lookup: {
+              from: "famelinks",
+              let: { userId: "$profileFamelinks" },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: { $eq: ["$userId", "$$userId"] },
+                    isSafe: true,
+                    isWelcomeVideo: { $exists: false },
+                  },
+                },
+                { $set: { likes2Count: { $multiply: [2, "$likes2Count"] } } },
+                { $set: { likesCount: { $sum: ["$likes1Count", "$likes2Count"] } } },
+                { $sort: { likesCount: -1 } },
+                {
+                  $project: {
+                    closeUp: 1,
+                    medium: 1,
+                    long: 1,
+                    pose1: 1,
+                    pose2: 1,
+                    additional: 1,
+                    video: 1,
+                  },
+                },
+                // { $skip: ((postsPagination - 1) * 3) },
+                { $limit: 10 },
+              ],
+              as: "posts",
+            },
+          },
           { $sort: { updatedAt: -1 } },
           { $skip: (data.page - 1) * 10 },
           { $limit: 10 },
@@ -2765,7 +3096,11 @@ exports.getSavedTalents = (data) => {
 };
 
 exports.closeJob = (jobId, close) => {
-  return jobs.updateOne({ _id: jobId }, { isClosed: close });
+  return jobs.updateOne({ _id: jobId }, { isClosed: close, status: 'closed' });
+};
+
+exports.deleteJob = (jobId) => {
+  return jobs.deleteOne({ _id: jobId, status: 'draft' });
 };
 
 exports.getFacesShortlistedApplicant = (selfMasterId, jobId, page) => {
@@ -4521,6 +4856,131 @@ exports.getApplicantsCrewBySearch = (
   ]);
 };
 
+exports.getAllJobs = (page, joblinksId, masterId) => {
+  let pagination = page ? page : 1;
+  return UsersDB.aggregate([
+    { $match: { _id: joblinksId } },
+    { $project: { _id: 1 } },
+    {
+      $lookup: {
+        from: "jobapplications",
+        let: { userId: joblinksId },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$userId", "$$userId"] },
+            },
+          },
+          { $set: { appliedOn: "$createdAt" } },
+          { $set: { applicationId: "$_id" } },
+          { $project: { _id: 0, jobStatus: '$status', jobId: 1, appliedOn: 1, applicationId: 1, } },
+          {
+            $lookup: {
+              from: "jobs",
+              let: {
+                jobId: "$jobId",
+                appliedOn: "$appliedOn",
+                applicationId: "$applicationId",
+                jobStatus: "$jobStatus",
+              },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$jobId"] } } },
+                { $set: { appliedOn: "$$appliedOn" } },
+                { $set: { applicationId: "$$applicationId" } },
+                { $set: { jobStatus: "$$jobStatus" } },
+                {
+                  $lookup: {
+                    from: "locatns",
+                    let: { value: "$jobLocation" },
+                    pipeline: [
+                      { $match: { $expr: { $eq: ["$_id", "$$value"] } } },
+                      { $project: { type: 1, value: 1, } },
+                    ],
+                    as: "jobLocation",
+                  },
+                },
+                {
+                  $project: {
+                    createdAt: 1,
+                    jobType: 1,
+                    title: 1,
+                    jobLocation: { $first: "$jobLocation" },
+                    description: 1,
+                    experienceLevel: 1,
+                    startDate: 1,
+                    endDate: 1,
+                    deadline: 1,
+                    ageGroup: 1,
+                    height: 1,
+                    gender: 1,
+                    jobCategory: 1,
+                    createdBy: 1,
+                    appliedOn: 1,
+                    applicationId: 1,
+                    jobStatus: 1,
+                  },
+                },
+                {
+                  $lookup: {
+                    from: "jobcategories",
+                    let: { jobCategory: "$jobCategory" },
+                    pipeline: [
+                      { $match: { $expr: { $in: ["$_id", "$$jobCategory"] } } },
+                      { $project: { jobName: 1, jobCategory: 1 } },
+                    ],
+                    as: "jobDetails",
+                  },
+                },
+                //MasterIdMigration
+                {
+                  $lookup: {
+                    from: "users",
+                    let: { userId: "$createdBy" },
+                    pipeline: [
+                      { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                      {
+                        $project: {
+                          type: 1,
+                          name: 1,
+                          username: 1,
+                          profileImage: 1,
+                          profileImageType: 1,
+                          profile: {
+                            name: "$profileJoblinks.name",
+                            profileImage: "$profileJoblinks.profileImage",
+                            profileImageType: "$profileJoblinks.profileImageType",
+                          },
+                        },
+                      },
+                    ],
+                    as: "user",
+                  },
+                },
+                { $addFields: { user: { $first: "$user" } } },
+                {
+                  $project: {
+                    jobCategory: 0,
+                    createdBy: 0,
+                    chatDetails: 0,
+                  },
+                },
+                { $sort: { createdAt: -1 } },
+                { $skip: (pagination - 1) * 10 },
+                { $limit: 10 },
+              ],
+              as: "job",
+            },
+          },
+          { $project: { jobId: 0, } },
+          { $set: { job: { $first: "$job" } } },
+        ],
+        as: "applied",
+      },
+    },
+    { $set: { applied: "$applied.job" } },
+  ]);
+};
+
 exports.getAppliedJobs = (page, joblinksId, masterId) => {
   let pagination = page ? page : 1;
   return UsersDB.aggregate([
@@ -5044,6 +5504,7 @@ exports.getSavedJobs = (page, joblinksId, masterId) => {
               as: "jobLocation",
             },
           },
+          { $addFields: { savedStatus: true } },
           {
             $project: {
               createdAt: 1,
@@ -5060,6 +5521,7 @@ exports.getSavedJobs = (page, joblinksId, masterId) => {
               gender: 1,
               jobCategory: 1,
               createdBy: 1,
+              savedStatus: 1,
             },
           },
           {
@@ -5197,6 +5659,30 @@ exports.getJobInvites = (page, joblinksId, masterId) => {
             },
           },
           {
+            $lookup: {
+              from: "locatns",
+              let: { value: "$jobLocation" },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$value"] } } },
+                { $project: { type: 1, value: 1, } },
+              ],
+              as: "jobLocation",
+            },
+          },
+          { $addFields: { jobLocation: { $first: "$jobLocation" } } },{
+            $lookup: {
+              from: "users",
+              let: { userId: joblinksId },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                { $project: { _id: 0, savedJobs: "$profileJoblinks.savedJobs" } },
+              ],
+              as: "savedJobs",
+            },
+          },
+          { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
+          { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
+          {
             $project: {
               hiredApplicants: 0,
               shortlistedApplicants: 0,
@@ -5222,7 +5708,7 @@ exports.acceptRejectJobInvite = (jobId, selfId, userId, action, jobType) => {
       jobId: jobId,
       jobType: jobType,
       userId: selfId,
-      status: "hired",
+      status: "applied",
     });
   }
 
@@ -5239,7 +5725,7 @@ exports.getMyOpenJobs = (joblinksId, page, userId, typeObj) => {
   let pagination = page ? page : 1;
   return jobs.aggregate([
     {
-      $match: { isClosed: false, createdBy: joblinksId },
+      $match: {  status: 'open', isClosed: false, createdBy: joblinksId },
     },
     {
       $match: typeObj,
