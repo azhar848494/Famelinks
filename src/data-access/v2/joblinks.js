@@ -35,10 +35,6 @@ exports.updateHiredJob = (jobId, data) => {
 };
 
 exports.updateJobApplication = (userId, jobId, status) => {
-  if (status == "withdraw") {
-    return jobApplications.deleteOne({ userId: userId, jobId: jobId });
-  }
-
   return jobApplications.updateOne(
     { userId: userId, jobId: jobId },
     { $set: { status: status } }
@@ -112,7 +108,7 @@ exports.getUserJobs = (joblinksId, page) => {
         from: "jobapplications",
         let: { joblinksId: joblinksId },
         pipeline: [
-          { $match: { $expr: { $eq: ["$userId", "$$joblinksId"] } } },
+          { $match: { $expr: { $eq: ["$userId", "$$joblinksId"] }, status: { $ne: "withdraw" }, } },
           { $project: { jobId: 1, _id: 0 } },
         ],
         as: "jobsApplied",
@@ -224,7 +220,12 @@ exports.getAgentJobs = (joblinksId, page) => {
         from: "jobapplications",
         let: { userId: joblinksId },
         pipeline: [
-          { $match: { $expr: { $eq: ["$userId", "$$userId"] } } },
+          {
+            $match: {
+              $expr: { $eq: ["$userId", "$$userId"] },
+              status: { $ne: "withdraw" },
+            }
+          },
           { $project: { jobId: 1, _id: 0 } },
         ],
         as: "jobsApplied",
@@ -1600,7 +1601,7 @@ exports.getTalents = (page, masterId, joblinksId) => {
 exports.getOpenJobs = (joblinksId, page, jobType) => {
   let pagination = page ? page : 1;
   return jobs.aggregate([
-    { $match: {  status: 'open',isClosed: false, jobType: jobType, createdBy: joblinksId } },
+    { $match: { status: 'open', isClosed: false, jobType: jobType, createdBy: joblinksId } },
     {
       $lookup: {
         from: "jobcategories",
@@ -1620,7 +1621,7 @@ exports.getOpenJobs = (joblinksId, page, jobType) => {
           {
             $match: {
               $expr: { $eq: ["$jobId", "$$jobId"] },
-              // $or: [{ status: "applied" }, { status: "shortlisted" }],
+              status: { $ne: "withdraw" },
             },
           },
           { $project: { _id: 0, userId: 1, status: 1 } },
@@ -1745,7 +1746,10 @@ exports.createdJobs = (data) => {
         let: { jobId: "$_id" },
         pipeline: [
           {
-            $match: { $expr: { $eq: ["$jobId", "$$jobId"] } },
+            $match: {
+              $expr: { $eq: ["$jobId", "$$jobId"] },
+              status: { $ne: "withdraw" },
+            },
           },
           { $project: { _id: 0, userId: 1, status: 1 } },
           {
@@ -1951,7 +1955,7 @@ exports.getApplicantsFaces = (selfMasterId, jobId, page) => {
           {
             $match: {
               $expr: { $eq: ["$jobId", "$$jobId"] },
-              status: { $ne: "withdrew" },
+              status: { $ne: "withdraw" },
             },
           },
           { $project: { _id: 0, userId: 1, status: 1, updatedAt: 1 } },
@@ -2295,7 +2299,7 @@ exports.getApplicantsCrew = (selfMasterId, jobId, page) => {
           {
             $match: {
               $expr: { $eq: ["$jobId", "$$jobId"] },
-              status: { $ne: "withdrew" },
+              status: { $ne: "withdraw" },
             },
           },
           { $project: { _id: 0, userId: 1, status: 1, updatedAt: 1 } },
@@ -2664,6 +2668,7 @@ exports.searchJobs = (selfJoblinksId, title, page) => {
               $and: [
                 { $expr: { $eq: ["$jobId", "$$jobId"] } },
                 { $expr: { $eq: ["$userId", "$$userId"] } },
+                { status: { $ne: "withdraw" } },
               ],
             },
           },
@@ -3668,7 +3673,7 @@ exports.getSotedApplicantsFaces = (selfMasterId, jobId, page, sort) => {
           {
             $match: {
               $expr: { $eq: ["$jobId", "$$jobId"] },
-              status: { $ne: "withdrew" },
+              status: { $ne: "withdraw" },
             },
           },
           { $project: { _id: 0, userId: 1, status: 1, updatedAt: 1 } },
@@ -3990,7 +3995,7 @@ exports.getSortedApplicantsCrew = (selfMasterId, jobId, page, sort) => {
           {
             $match: {
               $expr: { $eq: ["$jobId", "$$jobId"] },
-              status: { $ne: "withdrew" },
+              status: { $ne: "withdraw" },
             },
           },
           { $project: { _id: 0, userId: 1, status: 1, updatedAt: 1 } },
@@ -4234,7 +4239,7 @@ exports.getApplicantsFacesBySearch = (
             $match: {
               $and: [
                 { $expr: { $eq: ["$jobId", "$$jobId"] } },
-                { status: { $ne: "withdrew" } },
+                { status: { $ne: "withdraw" } },
               ],
             },
           },
@@ -4625,7 +4630,7 @@ exports.getApplicantsCrewBySearch = (
           {
             $match: {
               $expr: { $eq: ["$jobId", "$$jobId"] },
-              status: { $ne: "withdrew" },
+              status: { $ne: "withdraw" },
             },
           },
           { $project: { _id: 0, userId: 1, status: 1, updatedAt: 1 } },
@@ -4869,6 +4874,7 @@ exports.getAllJobs = (page, joblinksId, masterId) => {
           {
             $match: {
               $expr: { $eq: ["$userId", "$$userId"] },
+              status: { $ne: "withdraw" },
             },
           },
           { $set: { appliedOn: "$createdAt" } },
@@ -5545,6 +5551,7 @@ exports.getSavedJobs = (page, joblinksId, masterId) => {
                     $and: [
                       { $expr: { $eq: ["$jobId", "$$jobId"] } },
                       { userId: joblinksId },
+                      { status: { $ne: "withdraw" } },
                     ],
                   },
                 },
@@ -5669,7 +5676,7 @@ exports.getJobInvites = (page, joblinksId, masterId) => {
               as: "jobLocation",
             },
           },
-          { $addFields: { jobLocation: { $first: "$jobLocation" } } },{
+          { $addFields: { jobLocation: { $first: "$jobLocation" } } }, {
             $lookup: {
               from: "users",
               let: { userId: joblinksId },
@@ -5725,7 +5732,7 @@ exports.getMyOpenJobs = (joblinksId, page, userId, typeObj) => {
   let pagination = page ? page : 1;
   return jobs.aggregate([
     {
-      $match: {  status: 'open', isClosed: false, createdBy: joblinksId },
+      $match: { status: 'open', isClosed: false, createdBy: joblinksId },
     },
     {
       $match: typeObj,

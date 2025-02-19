@@ -23,11 +23,11 @@ module.exports = async (request) => {
       message: "Failed to create job",
     });
   }
-  
+
   //Match with users' hiring profile and send notifications to those users
 
   return serializeHttpResponse(200, {
-    message: "Job created successfuly",
+    message: payload.status == 'draft' ? "Job saved successfully" : "Job created successfully",
     result,
   });
 }

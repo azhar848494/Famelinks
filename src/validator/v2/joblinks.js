@@ -90,6 +90,7 @@ module.exports = {
       }),
       gender: joi.string().trim().valid("male", "female", "all").optional(),
       jobCategory: joi.array().items(joi.string().trim()).optional(),
+      status: joi.string().trim(),
     }),
   },
 
@@ -111,6 +112,7 @@ module.exports = {
       endDate: joi.date().format("DD-MM-YYYY").utc().optional(),
       deadline: joi.date().format("DD-MM-YYYY").utc().optional(),
       jobCategory: joi.array().items(joi.string().trim()).optional(),
+      status: joi.string().trim(),
     }),
   },
 

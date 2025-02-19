@@ -69,6 +69,8 @@ module.exports = async (request) => {
 
   let application = await checkApplication(jobId, childProfileId);
 
+  console.log('application ::: ', application)
+  
   if (application) {
     if (application.status == "applied") {
       return serializeHttpResponse(400, {
@@ -86,6 +88,12 @@ module.exports = async (request) => {
       return serializeHttpResponse(200, {
         message: "You have already been hired for this job.",
         result,
+      });
+    }
+
+    if (application.status == "withdraw") {
+      return serializeHttpResponse(400, {
+        message: "Job have withdraw this job. You can't apply again.",
       });
     }
   }
