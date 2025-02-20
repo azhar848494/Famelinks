@@ -412,6 +412,61 @@ exports.getMyFollowLinks = (
     },
     {
       $lookup: {
+        from: "agencytags",
+        let: { postId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$postId", "$$postId"] },
+              status: "accepted"
+            },
+          },
+          {
+            $project: {
+              receiverId: 1,
+              _id: 0,
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              let: { userId: "$receiverId" },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: { $eq: ["$_id", "$$userId"] },
+                    isDeleted: false,
+                    isSuspended: false,
+                  },
+                },
+                {
+                  $project: {
+                    _id: 1,
+                    username: 1,
+                    name: 1,
+                  },
+                },
+              ],
+              as: "User",
+            },
+          },
+          {
+            $addFields: {
+              User: { $first: "$User" },
+            },
+          },
+          {
+            $project: {
+              receiverId: 0,
+            },
+          },
+        ],
+        as: "tag",
+      },
+    },
+    { $addFields: { tag: "$tag.User" } },
+    {
+      $lookup: {
         from: "channels",
         let: { channelId: "$channelId" },
         pipeline: [
@@ -463,6 +518,7 @@ exports.getMyFollowLinks = (
         profileImage: 1,
         profileImageType: 1,
         likeStatus: { $ifNull: ["$likeStatus", null] },
+        tag: { $ifNull: ["$tag", null] },
         media: [
           {
             path: "$closeUp",
@@ -493,7 +549,6 @@ exports.getMyFollowLinks = (
             type: "video",
           },
         ],
-        tags: 1,
       },
     },
   ])

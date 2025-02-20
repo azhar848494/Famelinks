@@ -1956,10 +1956,9 @@ exports.updateHiringProfile = (profileId, profileType, data) => {
 };
 
 exports.getInviteApplicants = (data) => {
-  console.log('Search ::: ', data.search)
   return hiringprofile.aggregate([
     {
-      $match: { type: data.type },
+      $match: { type: data.type, userId: { $ne: data.userId } },
     },
     { $project: { _id: 0, userId: 1 } },
     {
@@ -2400,7 +2399,7 @@ exports.getApplicantsCrew = (selfMasterId, jobId, page) => {
 
   return jobs.aggregate([
     { $match: { _id: ObjectId(jobId) } },
-    { $project: { _id: 1, lastVisited: 1 } },
+    { $project: { _id: 1, lastVisited: 1, hiredApplicants: 1 } },
     {
       $lookup: {
         from: "jobapplications",
@@ -2614,13 +2613,7 @@ exports.getApplicantsCrew = (selfMasterId, jobId, page) => {
     },
     {
       $addFields: {
-        Hired: {
-          $cond: [
-            { $isArray: "$hiredApplicants" },
-            { $size: "$hiredApplicants" },
-            0,
-          ],
-        },
+        hired: { $size: "$hiredApplicants" },
       },
     },
     {
@@ -2649,7 +2642,7 @@ exports.getApplicantsCrew = (selfMasterId, jobId, page) => {
       },
     },
     { $addFields: { newApplicants: { $size: "$newApplicants" } } },
-    { $project: { lastVisited: 0 } },
+    { $project: { lastVisited: 0, hiredApplicants: 0} },
   ]);
 };
 

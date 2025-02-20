@@ -10,13 +10,13 @@ module.exports = async (request) => {
 
   if (request.body.hashTag && request.body.hashTag != "") {
     let temp = request.body.hashTag.replace(/ /g, "").toLowerCase();
-    let splitTemp = temp.split("");
-    if (splitTemp[0] == '#') {
-      splitTemp[1] = splitTemp[1].toUpperCase();
-    } else {
-      splitTemp[0] = splitTemp[0].toUpperCase();
-    }
-    temp = splitTemp.join("");
+    // let splitTemp = temp.split("");
+    // if (splitTemp[0] == '#') {
+    //   splitTemp[1] = splitTemp[1].toUpperCase();
+    // } else {
+    //   splitTemp[0] = splitTemp[0].toUpperCase();
+    // }
+    // temp = splitTemp.join("");
 
     let challenge = await ChallengeDB.findOne({ hashTag: temp }).lean();
 

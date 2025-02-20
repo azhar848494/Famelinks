@@ -65,6 +65,7 @@ const getMyTrendzSuggestions = (page, userId) => {
       {
         $match: {
           userId: { $eq: userId },
+          pickerId: { $exists: false },
         },
       },
       {
