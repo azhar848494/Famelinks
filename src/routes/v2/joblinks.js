@@ -37,6 +37,7 @@ const saveTalent = require('../../controllers/v2/joblinks/saveUnsaveTalent');
 const greetVideo = require('../../controllers/v2/joblinks/greetVideo');
 const getHiringProfile = require('../../controllers/v2/joblinks/getHiringProfile');
 const getApplicants = require('../../controllers/v2/joblinks/getApplicants');
+const getInviteApplicants = require('../../controllers/v2/joblinks/getInviteApplicants');
 const searchJobs = require('../../controllers/v2/joblinks/searchJobs');
 const inviteForJob = require('../../controllers/v2/joblinks/inviteForJob');
 const getJobDetails = require('../../controllers/v2/joblinks/getJobDetails');
@@ -175,6 +176,12 @@ router.get('/applicants/:jobId',
   requestValidatorCallback(validator.getApplicants),
   expressCallback(getApplicants)
 );
+
+router.get('/:jobId/applicants',
+  requestValidatorCallback(validator.getInviteApplicants),
+  expressCallback(getInviteApplicants)
+);
+
 router.get('/searchJobs/:title/',
   requestValidatorCallback(validator.searchJobs),
   expressCallback(searchJobs)

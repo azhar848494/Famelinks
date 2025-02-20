@@ -68,8 +68,6 @@ module.exports = async (request) => {
   }
 
   let application = await checkApplication(jobId, childProfileId);
-
-  console.log('application ::: ', application)
   
   if (application) {
     if (application.status == "applied") {
@@ -93,7 +91,7 @@ module.exports = async (request) => {
 
     if (application.status == "withdraw") {
       return serializeHttpResponse(400, {
-        message: "Job have withdraw this job. You can't apply again.",
+        message: "As you have recently withdrawn from this job, you cannot apply again.",
       });
     }
   }

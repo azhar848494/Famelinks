@@ -9,6 +9,7 @@ const profileJoblinks = require("../../models/v2/profileJoblinks");
 const hiringprofile = require("../../models/v2/hiringProfiles");
 const invitations = require("../../models/v2/invitations");
 const categoriesSuggestions = require("../../models/v2/categoriesSuggestions");
+const { options } = require("joi");
 
 exports.addJobCategory = (jobData) => {
   return jobCategories.create(jobData);
@@ -50,6 +51,19 @@ exports.getAllJobCategories = (jobType) => {
 
 exports.getJob = (jobId) => {
   return jobs.findOne({ _id: ObjectId(jobId) });
+};
+
+exports.getJobByData = (data) => {
+  return jobs.findOne({
+    createdBy: data.createdBy,
+    jobType: data.jobType,
+    title: data.title,
+    jobLocation: data.jobLocation,
+    startDate: data.startDate,
+    endDate: data.endDate,
+    deadline: data.deadline,
+    jobCategory: data.jobCategory,
+  }).lean();
 };
 
 exports.checkJob = (jobId) => {
@@ -1939,6 +1953,102 @@ exports.getHiringProfile = (profileId, profileType) => {
 
 exports.updateHiringProfile = (profileId, profileType, data) => {
   return hiringprofile.updateOne({ userId: profileId, type: profileType }, { $set: data });
+};
+
+exports.getInviteApplicants = (data) => {
+  console.log('Search ::: ', data.search)
+  return hiringprofile.aggregate([
+    {
+      $match: { type: data.type },
+    },
+    { $project: { _id: 0, userId: 1 } },
+    {
+      $lookup: {
+        from: "users",
+        let: { userId: "$userId" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+        ],
+        as: "profile",
+      },
+    },
+    { $addFields: { profile: { $first: '$profile' } } },
+    {
+      $match: data.search != null ? {
+        $or: [
+          { 'profile.profileJoblinks.name': { $regex: `^.*?${data.search}.*?$`, $options: 'i' } },
+          { 'profile.name': { $regex: `^.*?${data.search}.*?$`, $options: 'i' } },
+          { 'profile.username': { $regex: `^.*?${data.search}.*?$`, $options: 'i' } },
+        ],
+      } : {},
+    },
+    {
+      $lookup: {
+        from: "invitations",
+        let: { to: "$userId", from: data.userId, type: data.type },
+        pipeline: [
+          {
+            $match: {
+              $and: [
+                { $expr: { $eq: ["$to", "$$to"] } },
+                { $expr: { $eq: ["$from", "$$from"] } },
+                { $expr: { $eq: ["$jobType", "$$type"] } },
+                { status: "invited" },
+                { category: "job" },
+              ],
+            },
+          },
+          { $project: { _id: 1 } },
+        ],
+        as: "invitation",
+      },
+    },
+    {
+      $lookup: {
+        from: "followers",
+        let: { followeeId: "$userId" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$followeeId", "$$followeeId"] },
+              acceptedDate: { $ne: null },
+              type: "user",
+            },
+          },
+          { $project: { _id: 1 } },
+        ],
+        as: "followersCount",
+      },
+    },
+    { $addFields: { followersCount: { $size: "$followersCount" } } },
+    {
+      $set: {
+        invitation: {
+          $cond: [{ $ne: [0, { $size: "$invitation" }] }, true, false],
+        },
+      },
+    },
+    {
+      $project: {
+        _id: '$profile._id',
+        type: '$profile.type',
+        name: '$profile.name',
+        username: '$profile.username',
+        profileImage: '$profile.profileImage',
+        profileImageType: '$profile.profileImageType',
+        profile: {
+          name: "$profile.profileJoblinks.name",
+          profileImage: "$profile.profileJoblinks.profileImage",
+          profileImageType: "$profile.profileJoblinks.profileImageType",
+        },
+        invitation: 1,
+        followersCount: 1,
+      },
+    },
+    { $sort: { createdAt: -1 } },
+    { $skip: (data.page - 1) * 10 },
+    { $limit: 10 },
+  ]);
 };
 
 exports.getApplicantsFaces = (selfMasterId, jobId, page) => {

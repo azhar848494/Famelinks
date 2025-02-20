@@ -1,5 +1,6 @@
 const serializeHttpResponse = require('../../../helpers/serialize-http-response');
 const createJob = require("../../../services/v2/joblinks/createJob")
+const { getJobByData } = require("../../../data-access/v2/joblinks")
 
 module.exports = async (request) => {
 
@@ -16,6 +17,13 @@ module.exports = async (request) => {
   payload.createdBy = request.user._id;
 
   payload.lastVisited = new Date()
+
+  let job = await getJobByData(payload);
+  if(job != null){    
+    return serializeHttpResponse(500, {
+      message: "Same job already created",
+    });
+  }
 
   result = await createJob(payload);
 

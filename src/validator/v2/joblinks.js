@@ -330,6 +330,16 @@ module.exports = {
     }),
   },
 
+  getInviteApplicants: {
+    params: joi.object({
+      jobId: joi.string().trim().required(),
+    }),
+    query: joi.object({
+      page: joi.number().min(1),
+      search: joi.string().trim(),
+    }),
+  },
+
   searchJobs: {
     params: joi.object({
       title: joi.string().trim().required(),
