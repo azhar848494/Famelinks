@@ -3600,6 +3600,9 @@ exports.getProfileJoblinks = (profileId, page) => {
       },
     },
     {
+      $addFields: {hiredByMe: {$first: '$hiredByMe.totalItemsCount'}}
+    },
+    {
       $project: {
         _id: 1,
         name: "$profileJoblinks.name",
