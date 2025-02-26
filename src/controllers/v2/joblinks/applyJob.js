@@ -53,11 +53,11 @@ module.exports = async (request) => {
     });
   }
 
-  if (request.user.type == "agency" && jobType == "faces") {
-    return serializeHttpResponse(400, {
-      message: "Operation denied. Agency cannot apply to front faces jobs",
-    });
-  }
+  // if (request.user.type == "agency" && jobType == "faces") {
+  //   return serializeHttpResponse(400, {
+  //     message: "Operation denied. Agency cannot apply to front faces jobs",
+  //   });
+  // }
 
   childProfileId = request.user._id;
 

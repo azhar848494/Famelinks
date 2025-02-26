@@ -76,17 +76,17 @@ module.exports = {
   },
   jobShortlist: {
     title: "Job Shortlist",
-    body: "you to for the job",
+    body: "you for the job",
     action: "has shortlisted",
   },
   jobSelection: {
     title: "Job Shortlist",
-    body: "you to for the job",
+    body: "you for the job",
     action: "has selected",
   },
   jobInvitation: {
     title: "Job Invitation",
-    body: "you to for the job",
+    body: "you for the job",
     action: "has invited",
   },
   followInvitation: {

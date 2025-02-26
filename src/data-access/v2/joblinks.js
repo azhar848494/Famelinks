@@ -1812,10 +1812,76 @@ exports.createdJobs = (data) => {
               profileImage: "$user.profileImage",
               profileImageType: "$user.profileImageType",
               profile: "$user.profile",
+              status: 1,
             },
           },
         ],
         as: "applicants",
+      },
+    },
+    {
+      $lookup: {
+        from: "jobapplications",
+        let: { jobId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$jobId", "$$jobId"] },
+              status: { $eq: "hired" },
+            },
+          },
+          { $project: { _id: 0, userId: 1, status: 1 } },
+          {
+            $addFields: {
+              statusOrder: {
+                $switch: {
+                  branches: [
+                    { case: { $eq: ["$status", "hired"] }, then: 1 },
+                  ],
+                  default: 0
+                }
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: "users",
+              let: { userId: "$userId" },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                {
+                  $project: {
+                    type: 1,
+                    name: 1,
+                    username: 1,
+                    profileImage: 1,
+                    profileImageType: 1,
+                    profile: {
+                      name: "$profileJoblinks.name",
+                      profileImage: "$profileJoblinks.profileImage",
+                      profileImageType: "$profileJoblinks.profileImageType",
+                    },
+                  },
+                },
+              ],
+              as: "user",
+            },
+          },
+          { $addFields: { user: { $first: "$user" } } },
+          { $sort: { statusOrder: 1 } },
+          {
+            $project: {
+              type: "$user.type",
+              name: "$user.name",
+              username: "$user.username",
+              profileImage: "$user.profileImage",
+              profileImageType: "$user.profileImageType",
+              profile: "$user.profile",
+              status: 1,
+            },
+          },
+        ],
+        as: "hiredApplicants",
       },
     },
     {
@@ -1835,6 +1901,7 @@ exports.createdJobs = (data) => {
         height: 1,
         createdAt: 1,
         applicants: 1,
+        hiredApplicants: 1
       },
     },
     { $sort: { createdAt: -1 } },
@@ -3204,7 +3271,7 @@ exports.getSavedTalents = (data) => {
 };
 
 exports.closeJob = (jobId, close) => {
-  return jobs.updateOne({ _id: jobId }, { isClosed: close, status: 'closed' });
+  return jobs.updateOne({ _id: jobId }, { isClosed: close, status: close ? 'closed' : 'open' });
 };
 
 exports.deleteJob = (jobId) => {

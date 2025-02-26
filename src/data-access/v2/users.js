@@ -1471,8 +1471,8 @@ exports.getNotifications = (userId, page, type, category) => {
       { $match: { $expr: { $eq: [1, { $size: "$sourceDetails" }] } } },
       { $project: { sourceDetails: 0 } },
       { $sort: { updatedAt: -1 } },
-      { $skip: (page - 1) * 10 },
-      { $limit: 10 },
+      { $skip: (page - 1) * 15 },
+      { $limit: 15 },
     ]);
   }
 };
@@ -3600,7 +3600,7 @@ exports.getProfileJoblinks = (profileId, page) => {
       },
     },
     {
-      $addFields: {hiredByMe: {$first: '$hiredByMe.totalItemsCount'}}
+      $addFields: { hiredByMe: { $first: '$hiredByMe.totalItemsCount' } }
     },
     {
       $project: {
@@ -4220,7 +4220,7 @@ exports.getOtherProfileJoblinks = (
           from: "jobs",
           pipeline: [
             {
-              $match: {  status: 'open',isClosed: false, jobType: "faces", createdBy: userId },
+              $match: { status: 'open', isClosed: false, jobType: "faces", createdBy: userId },
             },
             {
               $lookup: {
@@ -4370,7 +4370,7 @@ exports.getOtherProfileJoblinks = (
         $lookup: {
           from: "jobs",
           pipeline: [
-            { $match: {  status: 'open',isClosed: false, jobType: "crew", createdBy: userId } },
+            { $match: { status: 'open', isClosed: false, jobType: "crew", createdBy: userId } },
             {
               $lookup: {
                 from: "jobcategories",
@@ -4919,6 +4919,38 @@ exports.getOtherProfileJoblinks = (
           from: "jobs",
           let: { createdBy: userId },
           pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$createdBy", "$$createdBy"] },
+              },
+            },
+            {
+              $project: {
+                itemsCount: { $sum: { $size: "$hiredApplicants" } },
+              },
+            },
+            {
+              $group: {
+                _id: "$userId",
+                totalItemsCount: { $sum: "$itemsCount" }
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                totalItemsCount: 1
+              }
+            }
+          ],
+          as: "hired",
+        },
+      },
+      { $set: { hired: { $first: "$hired.totalItemsCount" } } },
+      {
+        $lookup: {
+          from: "jobs",
+          let: { createdBy: userId },
+          pipeline: [
             { $match: { $expr: { $eq: ["$createdBy", "$$createdBy"] } } },
             { $project: { hiredApplicants: 1 } },
             { $set: { hiredApplicants: { $size: "$hiredApplicants" } } },
@@ -4926,8 +4958,7 @@ exports.getOtherProfileJoblinks = (
           as: "totalJobs",
         },
       },
-      { $set: { TotalJobs: { $size: "$totalJobs" } } },
-      { $set: { Hired: { $sum: "$totalJobs.hiredApplicants" } } },
+      { $set: { totalJobs: { $size: "$totalJobs" } } },
       {
         $lookup: {
           from: "fametrendzs",
@@ -5021,7 +5052,7 @@ exports.getOtherProfileJoblinks = (
           as: "openJobs",
         },
       },
-      { $set: { OpenJobs: { $size: "$openJobs" } } },
+      { $set: { openJobsCount: { $size: "$openJobs" } } },
       { $addFields: { followStatus: 0 } },
       {
         $lookup: {
@@ -5092,8 +5123,9 @@ exports.getOtherProfileJoblinks = (
           from: "jobs",
           pipeline: [
             {
-              $match: { 
-                status: 'open', isClosed: false, jobType: "faces", createdBy: userId },
+              $match: {
+                status: 'open', isClosed: false, jobType: "faces", createdBy: userId
+              },
             },
             {
               $lookup: {
@@ -5256,8 +5288,11 @@ exports.getOtherProfileJoblinks = (
         $lookup: {
           from: "jobs",
           pipeline: [
-            { $match: {
-              status: 'open', isClosed: false, jobType: "crew", createdBy: userId } },
+            {
+              $match: {
+                status: 'open', isClosed: false, jobType: "crew", createdBy: userId
+              }
+            },
             {
               $lookup: {
                 from: "jobapplications",
@@ -5427,11 +5462,12 @@ exports.getOtherProfileJoblinks = (
             profile_type: "$profile_type",
             location: { $first: "$location" },
           },
-          TotalJobs: 1,
-          Hired: 1,
+          totalJobs: 1,
+          hired: 1,
           TrendzsSponsored: 1,
           TrendzsSponsoredCount: 1,
-          OpenJobs: 1,
+          openJobs: 1,
+          openJobsCount: 1,
           clubOffers: 1,
           jobsFaces: 1,
           jobsCrew: 1,
@@ -6903,47 +6939,6 @@ exports.getBrandProfileJoblinks = (userId, page) => {
           },
           {
             $lookup: {
-              from: "jobapplications",
-              let: { jobId: "$_id" },
-              pipeline: [
-                {
-                  $match: {
-                    $expr: { $eq: ["$jobId", "$$jobId"] },
-                    $or: [{ status: "applied" }, { status: "shortlisted" }],
-                  },
-                },
-                { $project: { _id: 0, userId: 1 } },
-                {
-                  $lookup: {
-                    from: "users",
-                    let: { userId: "$userId" },
-                    pipeline: [
-                      { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
-                      { $project: { profileImage: "$profileJoblinks.profileImage", profileImageType: "$profileJoblinks.profileImageType" } },
-                    ],
-                    as: "user",
-                  },
-                },
-                {
-                  $addFields: {
-                    profileImage: { $first: "$user.profileImage" },
-                    profileImageType: { $first: "$user.profileImageType" },
-                    _id: { $first: "$user._id" },
-                  },
-                },
-                {
-                  $group: {
-                    _id: "$_id",
-                    profileImage: { $first: "$profileImage" },
-                    profileImageType: { $first: "$profileImageType" },
-                  },
-                },
-              ],
-              as: "applicants",
-            },
-          },
-          {
-            $lookup: {
               from: "locatns",
               let: { value: "$jobLocation" },
               pipeline: [
@@ -6960,28 +6955,131 @@ exports.getBrandProfileJoblinks = (userId, page) => {
               pipeline: [
                 {
                   $match: {
-                    $and: [
-                      { $expr: { $eq: ["$jobId", "$$jobId"] } },
-                      { $expr: { $eq: ["$userId", userId] } },
-                      { status: "applied" },
-                    ],
+                    $expr: { $eq: ["$jobId", "$$jobId"] },
+                    status: { $ne: "withdraw" },
                   },
                 },
-                { $project: { _id: 1 } },
+                { $project: { _id: 0, userId: 1, status: 1 } },
+                {
+                  $addFields: {
+                    statusOrder: {
+                      $switch: {
+                        branches: [
+                          { case: { $eq: ["$status", "hired"] }, then: 1 },
+                        ],
+                        default: 0
+                      }
+                    }
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "users",
+                    let: { userId: "$userId" },
+                    pipeline: [
+                      { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                      {
+                        $project: {
+                          type: 1,
+                          name: 1,
+                          username: 1,
+                          profileImage: 1,
+                          profileImageType: 1,
+                          profile: {
+                            name: "$profileJoblinks.name",
+                            profileImage: "$profileJoblinks.profileImage",
+                            profileImageType: "$profileJoblinks.profileImageType",
+                          },
+                        },
+                      },
+                    ],
+                    as: "user",
+                  },
+                },
+                { $addFields: { user: { $first: "$user" } } },
+                { $sort: { statusOrder: 1 } },
+                {
+                  $project: {
+                    type: "$user.type",
+                    name: "$user.name",
+                    username: "$user.username",
+                    profileImage: "$user.profileImage",
+                    profileImageType: "$user.profileImageType",
+                    profile: "$user.profile",
+                    status: 1,
+                  },
+                },
               ],
-              as: "isApplied",
+              as: "applicants",
             },
           },
           {
-            $set: {
-              isApplied: {
-                $cond: [{ $eq: [0, { $size: "$isApplied" }] }, false, true],
-              },
+            $lookup: {
+              from: "jobapplications",
+              let: { jobId: "$_id" },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: { $eq: ["$jobId", "$$jobId"] },
+                    status: { $eq: "hired" },
+                  },
+                },
+                { $project: { _id: 0, userId: 1, status: 1 } },
+                {
+                  $addFields: {
+                    statusOrder: {
+                      $switch: {
+                        branches: [
+                          { case: { $eq: ["$status", "hired"] }, then: 1 },
+                        ],
+                        default: 0
+                      }
+                    }
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "users",
+                    let: { userId: "$userId" },
+                    pipeline: [
+                      { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                      {
+                        $project: {
+                          type: 1,
+                          name: 1,
+                          username: 1,
+                          profileImage: 1,
+                          profileImageType: 1,
+                          profile: {
+                            name: "$profileJoblinks.name",
+                            profileImage: "$profileJoblinks.profileImage",
+                            profileImageType: "$profileJoblinks.profileImageType",
+                          },
+                        },
+                      },
+                    ],
+                    as: "user",
+                  },
+                },
+                { $addFields: { user: { $first: "$user" } } },
+                { $sort: { statusOrder: 1 } },
+                {
+                  $project: {
+                    type: "$user.type",
+                    name: "$user.name",
+                    username: "$user.username",
+                    profileImage: "$user.profileImage",
+                    profileImageType: "$user.profileImageType",
+                    profile: "$user.profile",
+                    status: 1,
+                  },
+                },
+              ],
+              as: "hiredApplicants",
             },
           },
           {
             $project: {
-              applicants: 1,
               jobType: 1,
               title: 1,
               jobLocation: { $first: "$jobLocation" },
@@ -6996,7 +7094,8 @@ exports.getBrandProfileJoblinks = (userId, page) => {
               jobDetails: 1,
               experienceLevel: 1,
               height: 1,
-              isApplied: 1,
+              applicants: 1,
+              hiredApplicants: 1
             },
           },
         ],
@@ -7008,8 +7107,9 @@ exports.getBrandProfileJoblinks = (userId, page) => {
         from: "jobs",
         pipeline: [
           {
-            $match: { 
-              status: 'open',isClosed: false, jobType: "faces", createdBy: userId },
+            $match: {
+              status: 'open', isClosed: false, jobType: "faces", createdBy: userId
+            },
           },
           {
             $lookup: {
@@ -7136,8 +7236,11 @@ exports.getBrandProfileJoblinks = (userId, page) => {
       $lookup: {
         from: "jobs",
         pipeline: [
-          { $match: {
-            status: 'open', isClosed: false, jobType: "crew", createdBy: userId } },
+          {
+            $match: {
+              status: 'open', isClosed: false, jobType: "crew", createdBy: userId
+            }
+          },
           {
             $lookup: {
               from: "jobapplications",

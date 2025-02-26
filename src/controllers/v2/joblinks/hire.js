@@ -78,7 +78,7 @@ module.exports = async (request) => {
         pushToken: user.pushToken,
         category: "jobs_offers",
         // count: user.commentsCount,
-        userId: request.user._id,
+        userId: user._id,
         targetMedia: user.profileImage,
       },
       true,
