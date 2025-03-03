@@ -9,7 +9,8 @@ module.exports = async (request) => {
     request.user._id,
     request.user._id,
     sponsorId,
-    request.query.page
+    request.query.page,
+    request.query.search,
   );
   return serializeHttpResponse(200, {
     message: "Challenges Fetched",

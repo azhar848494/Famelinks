@@ -8,12 +8,15 @@ const {
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
-module.exports = async (profileId, userId, sponsorId, page) => {
+module.exports = async (profileId, userId, sponsorId, page, search) => {
   let filterObj = {};
   if (sponsorId != "*") {
     filterObj.$expr = { $eq: ["$sponsor", ObjectId(sponsorId)] };
   } else {
     filterObj.$expr = { $and: [{ $lt: ["$startDate", new Date()] }] }
+  }
+  if (search) {
+    filterObj = { hashTag: { $regex: `^.*?${search}.*?$`, $options: "i" } };
   }
 
   const result = await getDashboardOpenChallenges(userId, filterObj, page);
@@ -41,7 +44,7 @@ module.exports = async (profileId, userId, sponsorId, page) => {
             : "default";
       requiredItems = item.milestoneAggrement.milestoneValue;
       item.percentCompleted = items > requiredItems ? 100 : Math.round((items / requiredItems) * 100);
-      item.isCompleted =  Math.round((items / requiredItems) * 100) >= 100;
+      item.isCompleted = Math.round((items / requiredItems) * 100) >= 100;
       // item.participantsCount = await getChallengeParticipantsCount(item._id);
       return item;
     })

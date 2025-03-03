@@ -7467,6 +7467,8 @@ exports.getBrandProfileJoblinks = (userId, page) => {
         jobsCrew: 1,
         InvitesSent: 1,
         location: { $first: "$location" },
+        greetText: "$profileJoblinks.greetText",
+        greetVideo: "$profileJoblinks.greetVideo",
       },
     },
   ]);
