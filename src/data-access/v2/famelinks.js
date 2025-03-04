@@ -10,6 +10,8 @@ const UsersDB = require("../../models/v2/users");
 const NotificationDB = require("../../models/v2/notifications");
 const MessageDB = require("../../models/v2/messages2");
 const FametrendzDB = require("../../models/v2/fametrendzs");
+const FollowersDB = require("../../models/v2/followers");
+const InvitationsDB = require("../../models/v2/invitations");
 
 exports.addPost = (data) => {
   return FamelinksDB.create(data);
@@ -2287,8 +2289,12 @@ exports.getTodaysPosts = (userId) => {
   return FamelinksDB.find({ userId, createdAt: { $gte: todaysDate } }).count();
 };
 
-exports.getUnseenCount = (userId) => {
-  return NotificationDB.find({ userId, isSeen: false }).count();
+exports.getUnseenCount = async (userId) => {
+  const result = await FollowersDB.find({ followerId: userId, acceptedDate: { $eq: null } }).count();
+  const result2 = await InvitationsDB.find({ to: userId }).count();
+  const result3 = await NotificationDB.find({ userId, isSeen: false }).count();
+  console.log('Data3 Count ::: ', (result + result2 + result3));
+  return result + result2 + result3;
 };
 
 exports.getUnseenMessageCount = (userId) => {

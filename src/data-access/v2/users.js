@@ -21,6 +21,7 @@ const invitationsDB = require("../../models/v2/invitations");
 const agencyTags = require("../../models/v2/agencyTags");
 const WinnerDB = require("../../models/v2/winners");
 const locatnsDB = require("../../models/v2/locatns");
+const followersLookup = require('../../lookups/followers.lookup')
 const ObjectId = mongoose.Types.ObjectId;
 
 exports.findUserByMobileNumber = (mobileNumber) => {
@@ -1030,37 +1031,53 @@ exports.getContestants = (search, page) => {
   //   .limit(10);
 };
 
-exports.getSearchContestants = (search, page) => {
+exports.getSearchContestants = (search, page, userId, postType) => {
+  let linkType;
+  switch (postType) {
+    case 'famelinks':
+      linkType = 'profileFamelinks';
+      break;
+    case 'funlinks':
+      linkType = 'profileFunlinks';
+      break;
+    case 'followlinks':
+      linkType = 'profileFollowlinks';
+      break;
+    case 'joblinks':
+      linkType = 'profileJoblinks';
+      break;
+  }
   return UserDB.aggregate([
     {
       $match:
       {
+        _id: { $ne: userId },
         $or: [
-          { name: { $regex: `^.*?${search}.*?$` } },
-          { username: { $regex: `^.*?${search}.*?$` } },
+          { name: { $regex: `^.*?${search}.*?$`, $options: 'i' } },
+          { username: { $regex: `^.*?${search}.*?$`, $options: 'i' } },
         ]
       },
     },
-    {
-      $lookup: {
-        from: "famelinks",
-        let: { userId: "$_id" },
-        pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ["$userId", "$$userId"] },
-              isDeleted: false,
-              isSafe: true,
-              isBlocked: false,
-            },
-          },
-          { $sort: { createdAt: -1 } },
-          { $limit: 1 },
-        ],
-        as: "famelinksPost",
-      },
-    },
-    { $match: { $expr: { $ne: [0, { $size: "$famelinksPost" }] } } },
+    // {
+    //   $lookup: {
+    //     from: "famelinks",
+    //     let: { userId: "$_id" },
+    //     pipeline: [
+    //       {
+    //         $match: {
+    //           $expr: { $eq: ["$userId", "$$userId"] },
+    //           isDeleted: false,
+    //           isSafe: true,
+    //           isBlocked: false,
+    //         },
+    //       },
+    //       { $sort: { createdAt: -1 } },
+    //       { $limit: 1 },
+    //     ],
+    //     as: "famelinksPost",
+    //   },
+    // },
+    // { $match: { $expr: { $ne: [0, { $size: "$famelinksPost" }] } } },
     { $sort: { createdAt: -1 } },
     {
       $lookup: {
@@ -1073,20 +1090,23 @@ exports.getSearchContestants = (search, page) => {
         as: "location",
       },
     },
+    ...followersLookup({ userId, followeeId: '$_id' }),
     {
       $project: {
+        type: 1,
+        username: 1,
         name: 1,
         location: { $first: "$location" },
         gender: 1,
         ageGroup: 1,
         profileImage: 1,
         profileImageType: 1,
-        type: 1,
         profile: {
-          name: "$profileFamelinks.name",
-          profileImage: "$profileFamelinks.profileImage",
-          profileImageType: "$profileFamelinks.profileImageType",
-        }
+          name: `$${linkType}.name`,
+          profileImage: `$${linkType}.profileImage`,
+          profileImageType: `$${linkType}.profileImageType`,
+        },
+        followStatus: '$followStatus',
       },
     },
     { $skip: (page - 1) * 10 },

@@ -218,6 +218,119 @@ exports.getUserJobs = (joblinksId, page) => {
   ]);
 };
 
+
+exports.getSearchJobs = (joblinksId, page, search) => {
+  let pagination = page ? page : 1;
+  return jobs.aggregate([
+    {
+      $match: {
+        title: { $regex: `^.*?${search}.*?$`, $options: "i" },
+        status: 'open',
+        isClosed: false,
+        createdBy: { $ne: joblinksId },
+      },
+    },
+    {
+      $lookup: {
+        from: "jobapplications",
+        let: { joblinksId: joblinksId },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$userId", "$$joblinksId"] }, status: { $ne: "withdraw" }, } },
+          { $project: { jobId: 1, _id: 0 } },
+        ],
+        as: "jobsApplied",
+      },
+    },
+    { $addFields: { jobIds: "$jobsApplied.jobId" } },
+    { $match: { $expr: { $not: [{ $in: ["$_id", "$jobIds"] }] } } },
+    {
+      $lookup: {
+        from: "jobcategories",
+        let: { jobCategory: "$jobCategory" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $in: ["$_id", "$$jobCategory"] },
+            },
+          },
+          { $project: { _id: 1, jobName: 1, jobType: 1, jobCategory: 1 } },
+        ],
+        as: "jobDetails",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        let: { userId: "$createdBy" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+          {
+            $project: {
+              name: 1,
+              type: 1,
+              username: 1,
+              profileImageType: 1,
+              profileImage: 1,
+              profile: {
+                name: "$profileJoblinks.name",
+                profileImageType: "$profileJoblinks.profileImageType",
+                profileImage: "$profileJoblinks.profileImage",
+                profession: "$profileJoblinks.profession",
+                bio: "$profileJoblinks.bio",
+              },
+            },
+          },
+        ],
+        as: "user",
+      },
+    },
+    { $addFields: { user: { $first: "$user" } } },
+    {
+      $lookup: {
+        from: "users",
+        let: { userId: joblinksId },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+          { $project: { _id: 0, savedJobs: "$profileJoblinks.savedJobs" } },
+        ],
+        as: "savedJobs",
+      },
+    },
+    { $addFields: { savedJobs: { $first: "$savedJobs.savedJobs" } } },
+    { $addFields: { savedStatus: { $in: ["$_id", "$savedJobs"] } } },
+    {
+      $lookup: {
+        from: "locatns",
+        let: { value: "$jobLocation" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$value"] } } },
+          { $project: { type: 1, value: 1, } },
+        ],
+        as: "jobLocation",
+      },
+    },
+    { $addFields: { jobLocation: { $first: "$jobLocation" } } },
+    {
+      $project: {
+        jobIds: 0,
+        jobsApplied: 0,
+        jobCategory: 0,
+        savedApplicants: 0,
+        shortlistedApplicants: 0,
+        hiredApplicants: 0,
+        isClosed: 0,
+        updatedAt: 0,
+        createdByFaces: 0,
+        createdByCrew: 0,
+        savedJobs: 0,
+      },
+    },
+    { $sort: { createdAt: -1 } },
+    { $skip: (pagination - 1) * 10 },
+    { $limit: 10 },
+  ]);
+};
+
 exports.getAgentJobs = (joblinksId, page) => {
   let pagination = page ? page : 1;
   return jobs.aggregate([
@@ -2709,7 +2822,7 @@ exports.getApplicantsCrew = (selfMasterId, jobId, page) => {
       },
     },
     { $addFields: { newApplicants: { $size: "$newApplicants" } } },
-    { $project: { lastVisited: 0, hiredApplicants: 0} },
+    { $project: { lastVisited: 0, hiredApplicants: 0 } },
   ]);
 };
 

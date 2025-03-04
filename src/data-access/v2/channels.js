@@ -146,6 +146,77 @@ exports.searchChannel = (userId, data, page) => {
           { isSafe: true },
         ],
       },
+    },    
+    {
+      $lookup: {
+        from: "followlinks",
+        let: { channelId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$channelId", "$$channelId"] },
+              isDeleted: false,
+            },
+          },
+          { $project: { _id: 1, likesCount: 1, media: [
+            {
+              path: "$video",
+              type: "video",
+            },
+            {
+              path: "$closeUp",
+              type: "closeUp",
+            },
+            {
+              path: "$medium",
+              type: "medium",
+            },
+            {
+              path: "$long",
+              type: "long",
+            },
+            {
+              path: "$pose1",
+              type: "pose1",
+            },
+            {
+              path: "$pose2",
+              type: "pose2",
+            },
+            {
+              path: "$additional",
+              type: "additional",
+            },
+          ], userId: 1 } },
+          { $sort: { likesCount: -1 } },
+          { $limit: 5 },
+          {
+            $lookup: {
+              from: "users",
+              let: { userId: "$userId" },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                {
+                  $project: {
+                    name: "$profileFollowlinks.name",
+                    _id: 0,
+                  },
+                },
+              ],
+              as: "user",
+            },
+          },
+          { $addFields: { name: { $first: "$user.name" } } },
+          {
+            $project: {
+              likesCount: 0,
+              userId: 0,
+              user: 0,
+            },
+          },
+        ],
+        as: "posts",
+      },
     },
     {
       $lookup: {
@@ -196,7 +267,7 @@ exports.searchChannel = (userId, data, page) => {
       },
     },
     { $sort: { updatedAt: -1 } },
-    { $project: { name: 1,following: 1, followersCount: 1 } },
+    // { $project: { name: 1,following: 1, followersCount: 1 } },
     { $skip: (pagination - 1) * 10 },
     { $limit: 10 },
   ]);

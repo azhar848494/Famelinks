@@ -348,8 +348,8 @@ module.exports = {
 
   search: {
     payload: joi.object({
-      search: joi.string().trim().min(2).required(),
-      page: joi.number().min(1).required(),
+      search: joi.string().trim(),
+      page: joi.number().min(1),
       type: joi.string().trim().valid("famelinks", "funlinks", "followlinks", "joblinks"),
     }),
   },
