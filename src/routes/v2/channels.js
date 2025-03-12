@@ -11,15 +11,17 @@ const followChannel = require('../../controllers/v2/channels/followChannel')
 const unFollowChannel = require('../../controllers/v2/channels/unFollowChannel')
 const searchChannel = require('../../controllers/v2/channels/searchChannel')
 const getChannelPosts = require('../../controllers/v2/channels/getChannelPosts')
+const getChannelGridController = require('../../controllers/v2/channels/getChannelGrid')
 
 router.get('/search/:data', requestValidatorCallback(validator.searchChannel), expressCallback(searchChannel))
+router.get('/:channelId', requestValidatorCallback(validator.getChannelGrid), expressCallback(getChannelGridController));
 
 router.post('/', requestValidatorCallback(validator.channel), expressCallback(createChannel))
 router.post('/follow/:channelId', requestValidatorCallback(validator.followUnfollow), expressCallback(followChannel))
 
 router.delete('/unfollow/:channelId', requestValidatorCallback(validator.followUnfollow), expressCallback(unFollowChannel))
 
-router.get('/post',
+router.get('/explore/post',
   requestValidatorCallback(validator.getChannelPosts),
   expressCallback(getChannelPosts)
 );

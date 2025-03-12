@@ -13,6 +13,15 @@ module.exports = {
     }),
   },
 
+  getChannelGrid: {
+    params: joi.object().keys({
+      channelId: joi.string().trim().required(),
+    }),
+    query: joi.object().keys({
+      page: joi.number().min(1).required(),
+    }),
+  },
+
   searchChannel: joi.object({
     query: joi.object({
       page: joi.number().min(1).required(),
@@ -21,6 +30,7 @@ module.exports = {
       data: joi.string().trim().required(),
     }),
   }),
+  
   getChannelPosts: {
       query: joi.object({
           page: joi.number().min(1).required()

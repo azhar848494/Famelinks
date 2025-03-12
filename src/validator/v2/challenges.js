@@ -34,7 +34,7 @@ module.exports = {
     query: joi.object().keys({
       page: joi.number().min(1).required(),
     }),
-  },
+  }, 
 
   getOneChallenge: {
     params: joi.object().keys({
