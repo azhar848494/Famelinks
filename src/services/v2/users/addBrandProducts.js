@@ -4,7 +4,7 @@ const appConfig = require("../../../../configs/app.config");
 
 const { addPost } = require("../../../data-access/v2/brandProducts");
 
-module.exports = async (user, files, payload, token, profileId) => {
+module.exports = async (user, files, payload, token, profileId, isWelcomeVideo) => {
   //hashTag, id) => {
   let data, buttonData, descriptionData;
   payload.purchaseUrl === null ||
@@ -53,6 +53,10 @@ module.exports = async (user, files, payload, token, profileId) => {
     allotedCoins: payload.allotedCoins || 0,
     isSafe: true,
   };
+
+  if (isWelcomeVideo) {
+      postObject.isWelcomeVideo = isWelcomeVideo;
+  }
 
   let urls = files
     .filter((image) => image.type === "image")

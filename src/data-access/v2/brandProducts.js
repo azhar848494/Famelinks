@@ -7,8 +7,19 @@ const brandTags = require("../../models/v2/brandTags");
 
 const ObjectId = mongoose.Types.ObjectId;
 
+exports.getWelcomeVideo = (profileId) => {
+  return BrandProductsDB.aggregate([
+    { $match: { userId: profileId, isWelcomeVideo: { $ne: null } } },
+  ]);
+};
+
 exports.addPost = (data) => {
+  console.log('addPost data ::: ', data);
   return BrandProductsDB.create(data);
+};
+
+exports.updatePost2 = (postId, post) => {
+  return BrandProductsDB.updateOne({ _id: postId }, { $set: post });
 };
 
 exports.addBrandProductCoins = (productId, allotedCoins, giftCoins, balance) => {
@@ -1099,11 +1110,12 @@ exports.getBrandProductsBySearch = (page, search) => {
   return BrandProductsDB.aggregate([
     {
       $match: {
-        $and: [
-          { isDeleted: false },
-          { isSafe: true },
-          { name: { $regex: `^.*?${search}.*?$`, $options: "x" } },
+        $or: [
+          { name: { $regex: `^.*?${search}.*?$`, $options: "i" } },
+          { hashTag: { $regex: `^.*?${search}.*?$`, $options: "i" } },
         ],
+        isDeleted: false,
+        isSafe: true,
       },
     },
     {

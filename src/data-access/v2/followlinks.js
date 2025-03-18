@@ -258,16 +258,7 @@ exports.getMyFollowLinks = (
   filterObj
 ) => {
   return FollowlinksDB.aggregate([
-    {
-      $match: {
-        isWelcomeVideo: { $exists: false },
-        userId: profileId,
-        isDeleted: false,
-        isSafe: true,
-        isBlocked: false,
-      },
-    },
-    { $match: filterObj },
+    { $match: { ...filterObj, isWelcomeVideo: { $exists: false } } },
     //MasterIdMigration
     {
       $lookup: {
@@ -552,7 +543,7 @@ exports.getMyFollowLinks = (
       },
     },
   ])
-    .sort({ createdAt: "desc" })
+    .sort({ createdAt: 1 })
     .skip((page - 1) * 10)
     .limit(10);
 };

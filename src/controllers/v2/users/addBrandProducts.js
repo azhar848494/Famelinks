@@ -3,10 +3,47 @@ const addPostService = require("../../../services/v2/users/addBrandProducts");
 const ChallengeDB = require("../../../models/v2/challenges");
 const { updateUser } = require("../../../data-access/v2/users");
 const { addBrandProductCoins } = require("../../../data-access/v2/brandProducts");
+const { getWelcomeVideo, updatePost2 } = require("../../../data-access/v2/brandProducts");
 
 module.exports = async (request) => {
+  console.log('request ::: ', request.body);
   let giftCoins = request.body.giftCoins
   let allotedCoins = request.body.allotedCoins
+
+  if (request.body.isWelcomeVideo && request.body.isWelcomeVideo === true) {
+    let uploadPost;
+
+    let result = await getWelcomeVideo(request.user._id);
+    if (result && result.length > 0) {
+      result[0].media[0].media = request.files[0]["media"];
+      await updatePost2(result[0]._id, result[0]);
+
+      return serializeHttpResponse(200, {
+        message: "Post upload successful",
+      });
+    }
+
+    uploadPost = await addPostService(
+      request.user,
+      request.files,
+      request.body,
+      request.headers.authorization,
+      request.user._id,
+      request.body.isWelcomeVideo
+    );
+
+    if (uploadPost) {
+      return serializeHttpResponse(200, {
+        message: "Post upload successful",
+      });
+    }
+
+    if (!uploadPost) {
+      return serializeHttpResponse(500, {
+        message: "Post upload unsuccessful",
+      });
+    }
+  }
 
   if (request.body.hashTag && request.body.hashTag != "") {
     let temp = request.body.hashTag.replace(/ /g, "").toLowerCase();
@@ -79,7 +116,7 @@ module.exports = async (request) => {
     request.user._id
   );
 
-  if(result){
+  if (result) {
     await addBrandProductCoins(
       result._id,
       allotedCoins,

@@ -14,10 +14,9 @@ var ObjectId = require("mongoose").Types.ObjectId;
 //-----------------------v2------------------------//
 module.exports = async (profileId, page, childProfileId, selfMasterId, hashTagId) => {
   let filterObj = {};
-  let sorted = {};
+  let sorted = {}; 
 
   if (hashTagId != null) {
-    { }
     filterObj = {
       challengeId: { $in: [ObjectId(hashTagId)] },
       isDeleted: false,

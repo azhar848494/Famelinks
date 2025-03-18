@@ -518,6 +518,7 @@ module.exports = {
       tags: joi.array().optional(),
       giftCoins: joi.number().default(0).allow("", null),
       allotedCoins: joi.number().default(0).allow("", null),
+      isWelcomeVideo: joi.boolean(),
     }),
   },
 

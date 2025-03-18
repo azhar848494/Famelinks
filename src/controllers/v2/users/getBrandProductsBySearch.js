@@ -3,6 +3,7 @@ const getBrandProductsBySearchService = require("../../../services/v2/users/getB
 
 module.exports = async (request) => {
   let selfId = request.user._id
+  console.log('Data ::: ', request.query.search)
   const result = await getBrandProductsBySearchService(
     request.query.page,
     request.query.search,

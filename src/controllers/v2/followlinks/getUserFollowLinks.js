@@ -3,8 +3,7 @@ const getMyFollowLinksService = require('../../../services/v2/followlinks/getMyF
 const { isValidObjectId } = require('../../../utils/db');
 
 module.exports = async (request) => {
-    let postId = request.query.postId;
-    postId = postId ? postId : "*";
+    let hashTagId = request.query.hashTagId;
 
     if (!isValidObjectId(request.params.userId)) {
         return serializeHttpResponse(400, {
@@ -17,7 +16,7 @@ module.exports = async (request) => {
         request.query.page,
         request.user._id,
         request.user._id,
-        postId
+        hashTagId
     );
 
     return serializeHttpResponse(200, {

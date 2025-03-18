@@ -5743,8 +5743,15 @@ exports.getStorelinks = (profileId, followerId, page) => {
           //   },
           // },
           { $match: { $expr: { $eq: ["$userId", "$$userId"] } } },
-          { $sort: { createdAt: -1 } },
-          { $project: { media: 1 } },
+          { $sort: { isWelcomeVideo: -1, createdAt: -1 } },
+          {
+            $project: {
+              media: 1,
+              isWelcomeVideo: {
+                $cond: [{ $ifNull: ["$isWelcomeVideo", false] }, 1, 0],
+              },
+            }
+          },
           {
             $set: {
               media: {

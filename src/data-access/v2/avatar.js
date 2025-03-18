@@ -1,3 +1,9 @@
+// const avatarDB = require('../../models/v2/users')
+
+// exports.getAvatar = () => {
+//     return avatarDB.find().lean()
+// }
+ 
 const avatarDB = require('../../models/v2/avatar')
 
 exports.getAvatar = () => {

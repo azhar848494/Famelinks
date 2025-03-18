@@ -290,6 +290,7 @@ exports.getChannelGrid = (data) => {
         isSafe: true,
       },
     },
+    { $sort: { createdAt: 1 } },
     {
       $project: {
         _id: 1,
@@ -336,7 +337,7 @@ exports.getChannelGrid = (data) => {
         as: "postCount",
       },
     },
-    { $addFields: { postCount: { $size: "$postCount" } } },    
+    { $addFields: { postCount: { $size: "$postCount" } } },
     {
       $lookup: {
         from: "followers",
@@ -378,6 +379,7 @@ exports.getChannelGrid = (data) => {
               video: 1,
               likesCount: 1,
               userId: 1,
+              viewCount: { $size: '$reachIds' },
             },
           },
           { $sort: { likesCount: -1 } },

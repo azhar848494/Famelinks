@@ -6,18 +6,25 @@ module.exports = async (
   page,
   selfProfileId,
   selfMasterId,
-  postId
+  hashTagId
 ) => {
   let filterObj = {};
 
-  if (postId != "*") {
-    filterObj = {
-      $or: [
-        { $expr: { $eq: ["$_id", ObjectId(postId)] } },
-        { $expr: { $lt: ["$_id", ObjectId(postId)] } },
-      ],
-    };
-  }
+  filterObj = {
+    channelId: hashTagId != null ? ObjectId(hashTagId) : ObjectId(profileId),
+    isDeleted: false,
+    isSafe: true,
+    isBlocked: false,
+  };
+
+  // if (postId != "*") {
+  //   filterObj = {
+  //     $or: [
+  //       { $expr: { $eq: ["$_id", ObjectId(postId)] } },
+  //       { $expr: { $lt: ["$_id", ObjectId(postId)] } },
+  //     ],
+  //   };
+  // }
   const result = await getMyFollowLinks(
     ObjectId(profileId),
     page,

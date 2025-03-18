@@ -1218,12 +1218,12 @@ exports.uploadGreetingVideo = (req, res, next) => {
 
     if (req.files.greetVideo && req.files.greetVideo[0]) {
       let filename = req.files.greetVideo[0].filename;
-      
+
       req.files.greetVideo = filename;
     }
     if (req.files.thumbnail && req.files.thumbnail[0]) {
       let filename = req.files.thumbnail[0].filename;
-     
+
       req.files.thumbnail = filename;
     }
 
@@ -1662,7 +1662,13 @@ exports.uploadBrandProductsMedia = (req, res, next) => {
           const item = file.filename;
           filePath = path.resolve(`uploads/${item}`);
           filesToUnlink.push(filePath);
-          if (!(file.mimetype.split("video").length - 1)) {
+          console.log('mime type ::: ', file.mimetype);
+          if (file.mimetype == "application/octet-stream") {
+            finalFiles.push({
+              type: "video",
+              media: item,
+            });
+          } else if (!(file.mimetype.split("video").length - 1)) {
             finalFiles.push({
               type: "image",
               media: item,

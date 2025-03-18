@@ -30,6 +30,7 @@ const brandProductSchema = new Schema({
     isDeleted: { type: Boolean, default: false },
     isSafe: { type: Boolean, default: false },
     tags: { type: [ObjectId], default: [] },
+    isWelcomeVideo: { type: Boolean },
     // allotedCoins: { type: Number, default: 0 },
     // giftCoins: { type: Number, default: 0 }
 }, {
