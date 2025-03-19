@@ -10,12 +10,22 @@ module.exports = async (
 ) => {
   let filterObj = {};
 
-  filterObj = {
-    channelId: hashTagId != null ? ObjectId(hashTagId) : ObjectId(profileId),
-    isDeleted: false,
-    isSafe: true,
-    isBlocked: false,
-  };
+  if (hashTagId) {
+    filterObj = {
+      channelId: ObjectId(hashTagId),
+      isDeleted: false,
+      isSafe: true,
+      isBlocked: false,
+    };
+
+  } else {
+    filterObj = {
+      userId: ObjectId(profileId),
+      isDeleted: false,
+      isSafe: true,
+      isBlocked: false,
+    };
+  }
 
   // if (postId != "*") {
   //   filterObj = {

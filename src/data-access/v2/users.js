@@ -564,128 +564,306 @@ exports.getFollowers = (userId, page, selfUserId) => {
     .limit(15);
 };
 
-exports.getFollowees = (userId, page, selfUserId) => {
-  return FollowerDB.aggregate([
-    { $match: { followerId: ObjectId(userId), acceptedDate: { $ne: null }, type: 'user' } },
-    { $addFields: { followStatus: 0 } },
-    {
-      $lookup: {
-        from: "followers",
-        let: { followeeId: "$followeeId" }, //master user Id
-        pipeline: [
-          {
-            $match: {
-              followerId: selfUserId,
-              $expr: { $eq: ["$followeeId", "$$followeeId"] },
-              acceptedDate: { $eq: null },
-              type: "user",
-            },
-          },
-          { $project: { _id: 1 } },
-        ],
-        as: "requested",
-      },
-    },
-    {
-      $addFields: {
-        followStatus: {
-          $cond: [{ $eq: [{ $size: "$requested" }, 1] }, 1, "$followStatus"],
-        },
-      },
-    },
-    {
-      $lookup: {
-        from: "followers",
-        let: { followeeId: "$followeeId" }, //master user Id
-        pipeline: [
-          {
-            $match: {
-              followerId: selfUserId,
-              $expr: { $eq: ["$followeeId", "$$followeeId"] },
-              acceptedDate: { $ne: null },
-              type: "user",
-            },
-          },
-          { $project: { _id: 1 } },
-        ],
-        as: "following",
-      },
-    },
-    {
-      $addFields: {
-        followStatus: {
-          $cond: [{ $eq: [{ $size: "$following" }, 1] }, 2, "$followStatus"],
-        },
-      },
-    },
-    {
-      $addFields: {
-        followStatus: {
-          $switch: {
-            branches: [
-              { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
-              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
-              { case: { $eq: ["$followStatus", 2] }, then: "Following" },
+exports.getFollowees = (userId, page, selfUserId, type) => {
+  switch (type) {
+    case 'all':
+      break;
+    case 'channel':
+      return FollowerDB.aggregate([
+        { $match: { followerId: ObjectId(userId), acceptedDate: { $ne: null }, type: 'channel' } },
+        { $addFields: { followStatus: 0 } },
+        {
+          $lookup: {
+            from: "followers",
+            let: { followeeId: "$followeeId" }, //master user Id
+            pipeline: [
+              {
+                $match: {
+                  followerId: selfUserId,
+                  $expr: { $eq: ["$followeeId", "$$followeeId"] },
+                  acceptedDate: { $eq: null },
+                  type: "user",
+                },
+              },
+              { $project: { _id: 1 } },
             ],
-            default: "Follow",
+            as: "requested",
           },
         },
-      },
-    },
-    {
-      $lookup: {
-        from: "users",
-        let: { followeeId: "$followeeId" },
-        pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ["$_id", "$$followeeId"] },
-              // isDeleted: false,
-              // isSuspended: false,
+        {
+          $addFields: {
+            followStatus: {
+              $cond: [{ $eq: [{ $size: "$requested" }, 1] }, 1, "$followStatus"],
             },
           },
-          {
-            $lookup: {
-              from: "locatns",
-              let: { value: "$location" },
-              pipeline: [
-                { $match: { $expr: { $eq: ["$_id", "$$value"] } } },
-                { $project: { type: 1, value: 1 } },
-              ],
-              as: "location",
+        },
+        {
+          $lookup: {
+            from: "followers",
+            let: { followeeId: "$followeeId" }, //master user Id
+            pipeline: [
+              {
+                $match: {
+                  followerId: selfUserId,
+                  $expr: { $eq: ["$followeeId", "$$followeeId"] },
+                  acceptedDate: { $ne: null },
+                  type: "user",
+                },
+              },
+              { $project: { _id: 1 } },
+            ],
+            as: "following",
+          },
+        },
+        {
+          $addFields: {
+            followStatus: {
+              $cond: [{ $eq: [{ $size: "$following" }, 1] }, 2, "$followStatus"],
             },
           },
-          {
-            $project: {
-              type: 1,
-              name: 1,
-              username: 1,
-              profileImage: 1,
-              profileImageType: 1,
-              location: { $first: "$location" },
-              //MasterIdMigration
-              profile: {
-                name: "$profileFollowlinks.name",
-                profileImage: "$profileFollowlinks.profileImage",
-                profileImageType: "$profileFollowlinks.profileImageType",
+        },
+        {
+          $addFields: {
+            followStatus: {
+              $switch: {
+                branches: [
+                  { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
+                  { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
+                  { case: { $eq: ["$followStatus", 2] }, then: "Following" },
+                ],
+                default: "Follow",
               },
             },
           },
-        ],
-        as: "masterUser",
-      },
-    },
-    { $addFields: { masterUser: { $first: "$masterUser" } } },
-    { $sort: { updatedAt: -1 } },
-    {
-      $project: {
-        followStatus: 1,
-        masterUser: 1,
-      },
-    },
-  ])
-    .skip((page - 1) * 15)
-    .limit(15);
+        },
+        {
+          $lookup: {
+            from: "channels",
+            let: { followeeId: "$followeeId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ["$_id", "$$followeeId"] },
+                  // isDeleted: false,
+                  // isSuspended: false,
+                },
+              },
+              {
+                $lookup: {
+                  from: "followers",
+                  let: { followeeId: "$_id" },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: { $eq: ["$followeeId", "$$followeeId"] },
+                        acceptedDate: { $ne: null },
+                        type: "channel",
+                      },
+                    },
+                    { $project: { _id: 1 } },
+                  ],
+                  as: "followersCount",
+                },
+              },
+              { $addFields: { followersCount: { $size: "$followersCount" } } },
+              {
+                $lookup: {
+                  from: "followlinks",
+                  let: { value: "$_id" },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: { $eq: ["$channelId", "$$value"] },
+                      },
+                    },
+                    { $project: { _id: 1 } },
+                  ],
+                  as: "postCount",
+                },
+              },
+              { $addFields: { postCount: { $size: "$postCount" } } },
+              {
+                $project: {
+                  name: 1,
+                  followersCount: 1,
+                  postCount: 1,
+                },
+              },
+            ],
+            as: "channel",
+          },
+        },
+        { $addFields: { channel: { $first: "$channel" } } },
+        {
+          $lookup: {
+            from: "followlinks",
+            let: { channelId: "$followeeId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ["$channelId", "$$channelId"] },
+                  isDeleted: false,
+                },
+              },
+              { $sort: { createdAt: 1 } },
+              {
+                $project: {
+                  _id: 1,
+                  closeUp: 1,
+                  medium: 1,
+                  long: 1,
+                  pose1: 1,
+                  pose2: 1,
+                  additional: 1,
+                  video: 1,
+                  likesCount: 1,
+                  userId: 1,
+                  viewCount: { $size: '$reachIds' },
+                },
+              },
+            ],
+            as: "posts",
+          },
+        },
+        { $addFields: { posts: { $first: "$posts" } } },
+        { $sort: { updatedAt: -1 } },
+        {
+          $project: {
+            _id: '$followeeId',
+            name: '$channel.name',
+            followersCount: '$channel.followersCount',
+            postCount: '$channel.postCount',
+            posts: 1,
+            followStatus: 1,
+          },
+        },
+      ])
+        .skip((page - 1) * 15)
+        .limit(15);
+      break;
+    case 'user':
+      return FollowerDB.aggregate([
+        { $match: { followerId: ObjectId(userId), acceptedDate: { $ne: null }, type: 'user' } },
+        { $addFields: { followStatus: 0 } },
+        {
+          $lookup: {
+            from: "followers",
+            let: { followeeId: "$followeeId" }, //master user Id
+            pipeline: [
+              {
+                $match: {
+                  followerId: selfUserId,
+                  $expr: { $eq: ["$followeeId", "$$followeeId"] },
+                  acceptedDate: { $eq: null },
+                  type: "user",
+                },
+              },
+              { $project: { _id: 1 } },
+            ],
+            as: "requested",
+          },
+        },
+        {
+          $addFields: {
+            followStatus: {
+              $cond: [{ $eq: [{ $size: "$requested" }, 1] }, 1, "$followStatus"],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: "followers",
+            let: { followeeId: "$followeeId" }, //master user Id
+            pipeline: [
+              {
+                $match: {
+                  followerId: selfUserId,
+                  $expr: { $eq: ["$followeeId", "$$followeeId"] },
+                  acceptedDate: { $ne: null },
+                  type: "user",
+                },
+              },
+              { $project: { _id: 1 } },
+            ],
+            as: "following",
+          },
+        },
+        {
+          $addFields: {
+            followStatus: {
+              $cond: [{ $eq: [{ $size: "$following" }, 1] }, 2, "$followStatus"],
+            },
+          },
+        },
+        {
+          $addFields: {
+            followStatus: {
+              $switch: {
+                branches: [
+                  { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
+                  { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
+                  { case: { $eq: ["$followStatus", 2] }, then: "Following" },
+                ],
+                default: "Follow",
+              },
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            let: { followeeId: "$followeeId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ["$_id", "$$followeeId"] },
+                  // isDeleted: false,
+                  // isSuspended: false,
+                },
+              },
+              {
+                $lookup: {
+                  from: "locatns",
+                  let: { value: "$location" },
+                  pipeline: [
+                    { $match: { $expr: { $eq: ["$_id", "$$value"] } } },
+                    { $project: { type: 1, value: 1 } },
+                  ],
+                  as: "location",
+                },
+              },
+              {
+                $project: {
+                  type: 1,
+                  name: 1,
+                  username: 1,
+                  profileImage: 1,
+                  profileImageType: 1,
+                  location: { $first: "$location" },
+                  //MasterIdMigration
+                  profile: {
+                    name: "$profileFollowlinks.name",
+                    profileImage: "$profileFollowlinks.profileImage",
+                    profileImageType: "$profileFollowlinks.profileImageType",
+                  },
+                },
+              },
+            ],
+            as: "masterUser",
+          },
+        },
+        { $addFields: { masterUser: { $first: "$masterUser" } } },
+        { $sort: { updatedAt: -1 } },
+        {
+          $project: {
+            followStatus: 1,
+            masterUser: 1,
+          },
+        },
+      ])
+        .skip((page - 1) * 15)
+        .limit(15);
+  }
 };
 
 exports.submitReport = (userId, data) => {
@@ -1392,11 +1570,24 @@ exports.getFollowRequestCount = (userId) => {
   ]);
 };
 
-exports.markAsRead = (userId) => {
-  return NotificationDB.updateMany(
-    { userId: userId, isSeen: false },
-    { $set: { isSeen: true } }
-  );
+exports.markAsRead = async (userId, type) => {
+  switch (type) {
+    case 'general':
+    case 'offer':
+      return NotificationDB.updateMany(
+        { userId: userId, isSeen: false },
+        { $set: { isSeen: true } }
+      );
+    case 'request':
+      await invitationsDB.updateMany(
+        { to: userId, isSeen: false },
+        { $set: { isSeen: true } }
+      );
+      return FollowerDB.updateMany(
+        { followerId: userId, isSeen: false },
+        { $set: { isSeen: true } }
+      );
+  }
 };
 
 exports.getNotifications = (userId, page, type, category) => {

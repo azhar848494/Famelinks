@@ -425,6 +425,7 @@ router.delete(
 
 router.patch(
   "/notifications/mark-as-read",
+  requestValidatorCallback(validator.markAsRead),
   expressCallback(readNotificationsController)
 );
 

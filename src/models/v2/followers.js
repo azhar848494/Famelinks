@@ -9,7 +9,8 @@ module.exports = mongoose.model('followers', new Schema({
     postId: { type: ObjectId },//Used this for recommendation
     // accept: { type: Boolean, default: false },
     acceptedDate: { type: Date, default: null },
-    type: { type: String, enum: ['user', 'channel'], required: true }
+    type: { type: String, enum: ['user', 'channel'], required: true },
+    isSeen: { type: Boolean, default: false },
 }, {
     versionKey: false,
     timestamps: true

@@ -5,6 +5,7 @@ const expressCallback = require('../../helpers/express-callback');
 const requestValidatorCallback = require('../../helpers/request-validator-callback');
 
 const getOpenChallengesController = require('../../controllers/v2/challenges/getOpenChallenges');
+const getTrendController = require('../../controllers/v2/challenges/getTrend');
 const getUpcomingChallengesController = require('../../controllers/v2/challenges/getUpcomingChallenges');
 const getChallengePostsController = require('../../controllers/v2/challenges/getChallengePosts');
 const getDashboardOpenChallengesController = require('../../controllers/v2/challenges/getDashboardOpenChallenges');
@@ -20,6 +21,8 @@ const addFunChallengeCtrl = require('../../controllers/v2/challenges/addFunChall
 
 const router = express.Router();
 
+
+router.get('/getTrend', requestValidatorCallback(validator.getTrend), expressCallback(getTrendController));
 router.get('/winners', requestValidatorCallback(validator.getChallengeWinners), expressCallback(getWinnersController));
 router.get('/funlinks/explore', requestValidatorCallback(validator.funlinksExplore), expressCallback(exploreFunlinksController));
 router.get('/followlinks/explore', requestValidatorCallback(validator.followlinksExplore), expressCallback(exploreFollowlinks))
@@ -36,9 +39,9 @@ router.put('/:challengeId/impressions', requestValidatorCallback(validator.updat
 
 
 router.post('/createChallenge',
-    requestValidatorCallback(validator.createChallenge),
-    expressCallback(addFunChallengeCtrl)
-  );
+  requestValidatorCallback(validator.createChallenge),
+  expressCallback(addFunChallengeCtrl)
+);
 
 module.exports = router;
 

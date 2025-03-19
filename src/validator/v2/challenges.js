@@ -11,6 +11,12 @@ module.exports = {
     }),
   },
 
+  getTrend: {
+    query: joi.object().keys({
+      page: joi.number().min(1).required(),
+    }),
+  },
+
   getUpcomingChallenges: {
     params: joi.object().keys({
       type: joi.string().trim().valid("famelinks", "funlinks", "fameContest").required(),

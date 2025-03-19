@@ -2290,8 +2290,8 @@ exports.getTodaysPosts = (userId) => {
 };
 
 exports.getUnseenCount = async (userId) => {
-  const result = await FollowersDB.find({ followerId: userId, acceptedDate: { $eq: null } }).count();
-  const result2 = await InvitationsDB.find({ to: userId }).count();
+  const result = await FollowersDB.find({ followerId: userId, isSeen: false }).count();
+  const result2 = await InvitationsDB.find({ to: userId, isSeen: false }).count();
   const result3 = await NotificationDB.find({ userId, isSeen: false }).count();
   console.log('Data3 Count ::: ', (result + result2 + result3));
   return result + result2 + result3;

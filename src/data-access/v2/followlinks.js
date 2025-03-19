@@ -472,7 +472,7 @@ exports.getMyFollowLinks = (
         as: "channels",
       },
     },
-    { $addFields: { channels: { $first:  "$channels" } } },
+    { $addFields: { channels: { $first: "$channels" } } },
     {
       $lookup: {
         from: "brandproducts",
@@ -489,7 +489,7 @@ exports.getMyFollowLinks = (
         as: "product",
       },
     },
-    { $addFields: { product: { $first:  "$product" } } },
+    { $addFields: { product: { $first: "$product" } } },
     {
       $project: {
         channels: 1,
@@ -542,8 +542,11 @@ exports.getMyFollowLinks = (
         ],
       },
     },
+    {
+      $sort: { likesCount: 1 },
+    }
   ])
-    .sort({ createdAt: 1 })
+    // .sort({ createdAt: 1 })
     .skip((page - 1) * 10)
     .limit(10);
 };
@@ -582,7 +585,7 @@ exports.getFollowLinks = (followLinksId, userId, page, filterObj) => {
           as: "channels",
         },
       },
-      { $addFields: { channels: { $first:  "$channels" } } },
+      { $addFields: { channels: { $first: "$channels" } } },
       {
         $match: {
           isDeleted: false,
@@ -642,7 +645,7 @@ exports.getFollowLinks = (followLinksId, userId, page, filterObj) => {
           ],
           as: "challenges",
         },
-      }, 
+      },
       {
         $lookup: {
           from: "likes",
@@ -825,7 +828,7 @@ exports.getFollowLinks = (followLinksId, userId, page, filterObj) => {
           as: "product",
         },
       },
-      { $addFields: { product: { $first:  "$product" } } },
+      { $addFields: { product: { $first: "$product" } } },
       {
         $project: {
           createdAt: 1,
@@ -893,8 +896,8 @@ exports.getFollowLinks = (followLinksId, userId, page, filterObj) => {
       },
       { $sort: { isWelcomeVideo: -1, createdAt: -1 } },
     ])
-    .skip((page - 1) * 12)
-    .limit(12)
+      .skip((page - 1) * 12)
+      .limit(12)
   );
 };
 

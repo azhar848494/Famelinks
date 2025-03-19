@@ -176,6 +176,7 @@ module.exports = {
       .required(),
     query: joi.object({
       page: joi.number().required(),
+      requestType: joi.string().trim().valid("all", "channel", "user"),
     }),
   },
 
@@ -592,6 +593,12 @@ module.exports = {
     }),
   },
 
+  markAsRead: {
+    query: joi.object({
+      type: joi.string().trim().required(),
+    }),
+  },
+
   productId: {
     params: joi.object({
       productId: joi.string().trim().required(),
@@ -638,6 +645,7 @@ module.exports = {
     query: joi.object({
       page: joi.number().min(1).required(),
       search: joi.string().trim(),
+      type: joi.string().trim(),
     }),
   },
 

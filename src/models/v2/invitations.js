@@ -13,6 +13,7 @@ module.exports = mongoose.model(
       to: { type: ObjectId, required: true },
       status: { type: String, required: true, enum: ["invited", "withdrawn"] },
       category: { type: String, enum: ["job", "follow"] }, // follow => A user invites other user to follow him/her. job => brand/agency invites user for the job.
+      isSeen: { type: Boolean, default: false },
     },
     {
       versionKey: false,

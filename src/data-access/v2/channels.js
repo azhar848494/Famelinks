@@ -160,36 +160,15 @@ exports.searchChannel = (userId, data, page) => {
           },
           {
             $project: {
-              _id: 1, likesCount: 1, media: [
-                {
-                  path: "$video",
-                  type: "video",
-                },
-                {
-                  path: "$closeUp",
-                  type: "closeUp",
-                },
-                {
-                  path: "$medium",
-                  type: "medium",
-                },
-                {
-                  path: "$long",
-                  type: "long",
-                },
-                {
-                  path: "$pose1",
-                  type: "pose1",
-                },
-                {
-                  path: "$pose2",
-                  type: "pose2",
-                },
-                {
-                  path: "$additional",
-                  type: "additional",
-                },
-              ], userId: 1
+              _id: 1, likesCount: 1,              
+              closeUp: 1,
+              medium: 1,
+              long: 1,
+              pose1: 1,
+              pose2: 1,
+              additional: 1,
+              video: 1,
+              userId: 1,
             }
           },
           { $sort: { likesCount: -1 } },
@@ -214,7 +193,6 @@ exports.searchChannel = (userId, data, page) => {
           {
             $project: {
               likesCount: 0,
-              userId: 0,
               user: 0,
             },
           },
@@ -382,7 +360,7 @@ exports.getChannelGrid = (data) => {
               viewCount: { $size: '$reachIds' },
             },
           },
-          { $sort: { likesCount: -1 } },
+          { $sort: { viewCount: -1 } },
           { $skip: (data.page - 1) * 10 },
           { $limit: 10 },
           {
@@ -412,6 +390,58 @@ exports.getChannelGrid = (data) => {
         as: "posts",
       },
     },
+    {
+      $lookup: {
+        from: "followlinks",
+        let: { channelId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$channelId", "$$channelId"] },
+              isDeleted: false,
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              closeUp: 1,
+              medium: 1,
+              long: 1,
+              pose1: 1,
+              pose2: 1,
+              additional: 1,
+              video: 1,
+              userId: 1,
+            },
+          },
+          { $limit: 1 },
+          {
+            $lookup: {
+              from: "users",
+              let: { userId: "$userId" },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                {
+                  $project: {
+                    name: "$profileFollowlinks.name",
+                    _id: 0,
+                  },
+                },
+              ],
+              as: "user",
+            },
+          },
+          { $addFields: { name: { $first: "$user.name" } } },
+          {
+            $project: {
+              user: 0,
+            },
+          },
+        ],
+        as: "firstPosts",
+      },
+    },
+    { $addFields: { firstPosts: { $first: "$firstPosts" } } },
   ]);
 };
 
@@ -470,7 +500,6 @@ exports.getchannelPosts = (userId, page) => {
           {
             $project: {
               likesCount: 0,
-              userId: 0,
               user: 0,
             },
           },
@@ -521,11 +550,6 @@ exports.getchannelPosts = (userId, page) => {
       },
     },
     { $addFields: { followersCount: { $size: "$followersCount" } } },
-    {
-      $match: {
-        following: false,
-      },
-    },
   ])
     .sort({
       updatedAt: "desc",
