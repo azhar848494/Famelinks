@@ -16,7 +16,7 @@ module.exports = async (request) => {
             message: 'User Not found',
         });
     }
-    const result = await getFollowersFollowees(request.params.userId, request.params.type, request.query.page, request.user._id);
+    const result = await getFollowersFollowees(request.params.userId, request.params.type, request.query.page, request.user._id, request.query.requestType);
     return serializeHttpResponse(200, {
         message: 'Fetched',
         result

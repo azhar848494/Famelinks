@@ -165,6 +165,7 @@ module.exports = {
       .required(),
     query: joi.object({
       page: joi.number().min(1).required(),
+      requestType: joi.string().trim().valid("all", "channel", "user"),
     }),
   },
 
