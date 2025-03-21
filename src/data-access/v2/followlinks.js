@@ -255,7 +255,8 @@ exports.getMyFollowLinks = (
   page,
   selfProfileId,
   selfMasterId,
-  filterObj
+  filterObj,
+  sortObj
 ) => {
   return FollowlinksDB.aggregate([
     { $match: { ...filterObj, isWelcomeVideo: { $exists: false } } },
@@ -504,6 +505,7 @@ exports.getMyFollowLinks = (
         gender: 1,
         challenges: 1,
         likesCount: 1,
+        viewCount: { $size: '$reachIds' },
         commentsCount: 1,
         description: 1,
         profileImage: 1,
@@ -543,7 +545,7 @@ exports.getMyFollowLinks = (
       },
     },
     {
-      $sort: { likesCount: 1 },
+      $sort: { ...sortObj },
     }
   ])
     // .sort({ createdAt: 1 })

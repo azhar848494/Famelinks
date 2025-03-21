@@ -30,6 +30,13 @@ module.exports = {
       data: joi.string().trim().required(),
     }),
   }),
+
+  getPopularChannel: joi.object({
+    query: joi.object({
+      page: joi.number().min(1).required(),
+      search: joi.string().trim(),
+    }),
+  }),
   
   getChannelPosts: {
       query: joi.object({

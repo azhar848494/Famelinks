@@ -8,8 +8,8 @@ exports.getClubOffersApplied = async (followlinksId, funlinksId, userType, page)
     return await getClubOffersApplied(followlinksId, funlinksId, userType, page)
 }
 
-exports.getClubOffersInProgress = async (followlinksId, funlinksId, userType, page) => {
-    return await getClubOffersInProgress(followlinksId, funlinksId, userType, page)
+exports.getClubOffersInProgress = async (followlinksId, funlinksId, userType, page, search) => {
+    return await getClubOffersInProgress(followlinksId, funlinksId, userType, page, search)
 }
 
 exports.getClubOffersCompleted = async (followlinksId, funlinksId, userType, page) => {

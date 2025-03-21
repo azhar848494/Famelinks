@@ -11,7 +11,7 @@ module.exports = {
             requiredMilestone: joi.number().min(1).required(),
             days: joi.number().min(1).required(),
             category: joi.array().items(joi.string().trim().required()),
-            location: joi.array().items(joi.string().trim()).required(),
+            location: joi.string().trim().required(),
             ageGroup: joi.array().items(joi.string().trim().required()),
             gender: joi.string().trim().required(),
             message: joi.string().trim().allow('', null),
@@ -42,6 +42,7 @@ module.exports = {
         }),
         query: joi.object({
             page: joi.number().optional().default(1),
+            search: joi.string().trim(),
         })
     },
 

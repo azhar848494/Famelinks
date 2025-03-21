@@ -160,7 +160,7 @@ exports.searchChannel = (userId, data, page) => {
           },
           {
             $project: {
-              _id: 1, likesCount: 1,              
+              _id: 1, likesCount: 1,
               closeUp: 1,
               medium: 1,
               long: 1,
@@ -252,6 +252,146 @@ exports.searchChannel = (userId, data, page) => {
     // { $project: { name: 1,following: 1, followersCount: 1 } },
     { $skip: (pagination - 1) * 10 },
     { $limit: 10 },
+  ]);
+};
+
+exports.getPopularChannel = (userId, data, page) => {
+  let pagination = page ? page : 1;
+  let obj = {};
+  if (data) {
+    obj = {
+      $and: [
+        { name: { $regex: `^.*?${data}.*?$`, $options: "i" } },
+        { isDeleted: false },
+        { isSafe: true },
+      ],
+    }
+  } else {
+    obj = {
+      isDeleted: false,
+      isSafe: true,
+    }
+  }
+  return ChannelsDB.aggregate([
+    {
+      $match: obj,
+    },
+    {
+      $project: { name: 1 },
+    },
+    {
+      $lookup: {
+        from: "followlinks",
+        let: { channelId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$channelId", "$$channelId"] },
+              isDeleted: false,
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              closeUp: 1,
+              medium: 1,
+              long: 1,
+              pose1: 1,
+              pose2: 1,
+              additional: 1,
+              video: 1,
+              userId: 1,
+            },
+          },
+          { $limit: 1 },
+          {
+            $lookup: {
+              from: "users",
+              let: { userId: "$userId" },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                {
+                  $project: {
+                    name: "$profileFollowlinks.name",
+                    _id: 0,
+                  },
+                },
+              ],
+              as: "user",
+            },
+          },
+          { $addFields: { name: { $first: "$user.name" } } },
+          {
+            $project: {
+              user: 0,
+            },
+          },
+        ],
+        as: "firstPosts",
+      },
+    },
+    { $addFields: { firstPosts: { $first: "$firstPosts" } } },    
+    {
+      $lookup: {
+        from: "followers",
+        let: { followeeId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              followerId: userId,
+              $expr: { $eq: ["$followeeId", "$$followeeId"] },
+              acceptedDate: { $ne: null },
+              type: "channel",
+            },
+          },
+          { $project: { _id: 1 } },
+        ],
+        as: "followStatus",
+      },
+    },
+    {
+      $addFields: {
+        followStatus: {
+          $cond: [{ $eq: [{ $size: "$followStatus" }, 1] }, true, false],
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "followlinks",
+        let: { value: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$channelId", "$$value"] },
+            },
+          },
+          { $project: { _id: 1 } },
+        ],
+        as: "postCount",
+      },
+    },
+    { $addFields: { postCount: { $size: "$postCount" } } },
+    {
+      $lookup: {
+        from: "followers",
+        let: { followeeId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$followeeId", "$$followeeId"] },
+              acceptedDate: { $ne: null },
+              type: "channel",
+            },
+          },
+          { $project: { _id: 1 } },
+        ],
+        as: "followersCount",
+      },
+    },
+    { $addFields: { followersCount: { $size: "$followersCount" } } },
+    { $skip: (pagination - 1) * 15 },
+    { $limit: 15 },
   ]);
 };
 

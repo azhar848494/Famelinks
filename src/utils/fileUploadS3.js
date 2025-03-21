@@ -1474,6 +1474,10 @@ exports.uploadClubOfferMedia = (req, res, next) => {
       if (req.body.ageGroup) {
         req.body.ageGroup = JSON.parse(req.body.ageGroup);
       }
+
+      if (req.body.location) {
+        req.body.location = JSON.parse(req.body.location);
+      }
     } catch (error) {
       return next(
         serializeHttpResponse(400, {

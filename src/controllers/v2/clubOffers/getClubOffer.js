@@ -15,7 +15,7 @@ module.exports = async (request) => {
             result = await getClubOffersApplied(request.user._id, request.user._id, request.user.type, page);
             break;            
         case 'progress':
-            result = await getClubOffersInProgress(request.user._id, request.user._id, request.user.type, page);
+            result = await getClubOffersInProgress(request.user._id, request.user._id, request.user.type, page, request.query.search);
             break;
         case 'completed':
             result = await getClubOffersCompleted(request.user._id, request.user._id, request.user.type, page);

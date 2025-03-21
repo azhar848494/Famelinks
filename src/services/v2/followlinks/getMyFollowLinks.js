@@ -9,6 +9,7 @@ module.exports = async (
   hashTagId
 ) => {
   let filterObj = {};
+  let sortObj = {};
 
   if (hashTagId) {
     filterObj = {
@@ -17,7 +18,7 @@ module.exports = async (
       isSafe: true,
       isBlocked: false,
     };
-
+    sortObj = { viewCount: -1 }
   } else {
     filterObj = {
       userId: ObjectId(profileId),
@@ -25,6 +26,7 @@ module.exports = async (
       isSafe: true,
       isBlocked: false,
     };
+    sortObj = { createdAt: -1 }
   }
 
   // if (postId != "*") {
@@ -40,7 +42,8 @@ module.exports = async (
     page,
     selfProfileId,
     selfMasterId,
-    filterObj
+    filterObj,
+    sortObj
   );
 
   return result.map(item => {

@@ -547,7 +547,7 @@ exports.getClubOffersApplied = (followlinksId, funlinksId, userType, page) => {
     return []
 }
 
-exports.getClubOffersInProgress = (followlinksId, funlinksId, userType, page) => {
+exports.getClubOffersInProgress = (followlinksId, funlinksId, userType, page, search) => {
     let pagination = page ? page : 1
     let currentDate = new Date()
     let MS_PER_DAY = 1000 * 24 * 60 * 60

@@ -2914,7 +2914,7 @@ exports.getProfileFollowlinks = async (profileId, followerId, page) => {
             $match: {
               $expr: { $eq: ["$followerId", "$$followerId"] },
               acceptedDate: { $ne: null },
-              type: "user",
+              // type: "user",
             },
           },
           {

@@ -1115,6 +1115,7 @@ exports.getBrandProductsBySearch = (page, search, selfId) => {
           { name: { $regex: `^.*?${search}.*?$`, $options: "i" } },
           { hashTag: { $regex: `^.*?${search}.*?$`, $options: "i" } },
         ],
+        isWelcomeVideo: { $exists: false },
         isDeleted: false,
         isSafe: true,
       },
@@ -1175,6 +1176,7 @@ exports.getBrandProduct = (page, selfId, type) => {
         {
           $match: {
             $and: [
+              { isWelcomeVideo: { $exists: false } },
               { isDeleted: false },
               { isSafe: true },
               { isBlocked: false },
@@ -1240,7 +1242,7 @@ exports.getBrandProduct = (page, selfId, type) => {
         },
         { $addFields: { savedStatus: { $in: ["$_id", "$savedProducts"] } } },
         {
-          $project: { coins: 0, balance: 0, savedProducts: 0},
+          $project: { coins: 0, balance: 0, savedProducts: 0 },
         },
         { $skip: (page - 1) * 10 },
         { $limit: 10 },
@@ -1269,6 +1271,7 @@ exports.getBrandProduct = (page, selfId, type) => {
                   isDeleted: false,
                   isSafe: true,
                   isBlocked: false,
+                  isWelcomeVideo: { $exists: false },
                   $expr: { $in: ['$_id', '$$value'] },
                 },
               },
