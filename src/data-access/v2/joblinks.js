@@ -2248,6 +2248,33 @@ exports.getApplicantsFaces = (selfMasterId, jobId, page) => {
             },
           },
           { $project: { _id: 0, userId: 1, status: 1, updatedAt: 1 } },
+          {
+            $lookup: {
+              from: "hiringprofiles",
+              let: { profileId: '$userId' },
+              pipeline: [
+                {
+                  $match: {
+                    type: 'faces',
+                    $expr: { $eq: ["$userId", "$$profileId"] },
+                  }
+                },
+                {
+                  $project: {
+                    _id: 0,
+                    height: 1,
+                    weight: 1,
+                    bust: 1,
+                    waist: 1,
+                    hip: 1,
+                    eyeColor: 1,
+                    complexion: 1,
+                  },
+                },
+              ],
+              as: "hiringProfile",
+            },
+          },
           //MasterIdMigration
           {
             $lookup: {
@@ -2274,28 +2301,6 @@ exports.getApplicantsFaces = (selfMasterId, jobId, page) => {
                 },
               ],
               as: "profile",
-            },
-          },
-          {
-            $lookup: {
-              from: "hiringprofiles",
-              let: { profileId: { $first: "$profile.profileFaces" } },
-              pipeline: [
-                { $match: { $expr: { $eq: ["$_id", "$$profileId"] } } },
-                {
-                  $project: {
-                    _id: 0,
-                    height: 1,
-                    weight: 1,
-                    bust: 1,
-                    waist: 1,
-                    hip: 1,
-                    eyeColor: 1,
-                    complexion: 1,
-                  },
-                },
-              ],
-              as: "hiringProfile",
             },
           },
           {
@@ -2539,38 +2544,38 @@ exports.getApplicantsFaces = (selfMasterId, jobId, page) => {
         as: "applicants",
       },
     },
-    {
-      $addFields: {
-        hired: { $size: "$hiredApplicants" },
-      },
-    },
-    {
-      $addFields: {
-        totalApplicants: {
-          $cond: [{ $isArray: "$applicants" }, { $size: "$applicants" }, 0],
-        },
-      },
-    },
-    {
-      $lookup: {
-        from: "jobapplications",
-        let: { jobId: "$_id", lastVisited: "$lastVisited" },
-        pipeline: [
-          {
-            $match: {
-              $and: [
-                { $expr: { $eq: ["$jobId", "$$jobId"] } },
-                { status: { $ne: "withdraw" } },
-                { $expr: { $gte: ["$createdAt", "$$lastVisited"] } },
-              ],
-            },
-          },
-        ],
-        as: "newApplicants",
-      },
-    },
-    { $addFields: { newApplicants: { $size: "$newApplicants" } } },
-    { $project: { lastVisited: 0, hiredApplicants: 0 } },
+    // {
+    //   $addFields: {
+    //     hired: { $size: "$hiredApplicants" },
+    //   },
+    // },
+    // {
+    //   $addFields: {
+    //     totalApplicants: {
+    //       $cond: [{ $isArray: "$applicants" }, { $size: "$applicants" }, 0],
+    //     },
+    //   },
+    // },
+    // {
+    //   $lookup: {
+    //     from: "jobapplications",
+    //     let: { jobId: "$_id", lastVisited: "$lastVisited" },
+    //     pipeline: [
+    //       {
+    //         $match: {
+    //           $and: [
+    //             { $expr: { $eq: ["$jobId", "$$jobId"] } },
+    //             { status: { $ne: "withdraw" } },
+    //             { $expr: { $gte: ["$createdAt", "$$lastVisited"] } },
+    //           ],
+    //         },
+    //       },
+    //     ],
+    //     as: "newApplicants",
+    //   },
+    // },
+    // { $addFields: { newApplicants: { $size: "$newApplicants" } } },
+    // { $project: { lastVisited: 0, hiredApplicants: 0 } },
   ]);
 };
 
@@ -2623,9 +2628,14 @@ exports.getApplicantsCrew = (selfMasterId, jobId, page) => {
           {
             $lookup: {
               from: "hiringprofiles",
-              let: { profileId: { $first: "$profile.profileCrew" } },
+              let: { profileId: '$userId' },
               pipeline: [
-                { $match: { $expr: { $eq: ["$_id", "$$profileId"] } } },
+                {
+                  $match: {
+                    type: 'crew',
+                    $expr: { $eq: ["$userId", "$$profileId"] },
+                  }
+                },
                 {
                   $project: {
                     _id: 0,
