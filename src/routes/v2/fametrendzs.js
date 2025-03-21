@@ -20,6 +20,7 @@ const getSavedFametrendzsController = require('../../controllers/v3/fametrendzs/
 const getEditFametrendzController = require('../../controllers/v3/fametrendzs/getEditFametrendz')
 const getTrendSuggestions = require('../../controllers/v3/fametrendzs/getTrendSuggestions');
 const updateFametrendz = require('../../controllers/v3/fametrendzs/updateFametrendz')
+const closeTrendz = require('../../controllers/v3/fametrendzs/closeTrendz')
 const deleteFametrendz = require('../../controllers/v3/fametrendzs/deleteFametrendz')
 const deleteSuggestionTrendz = require('../../controllers/v3/fametrendzs/deleteSuggestionTrendz')
 const validator = require('../../validator/v3/fametrendz');
@@ -28,6 +29,11 @@ router.post('/createFametrendz',
   uploadChannelBanner,
   requestValidatorCallback(validator.createFametrendz),
   expressCallback(createFametrendzController)
+);
+
+router.put('/close/:trendzId',
+  requestValidatorCallback(validator.closeTrendz),
+  expressCallback(closeTrendz)
 );
 
 router.put('/updateFametrendz/:trendzId',

@@ -28,7 +28,6 @@ const getOneSuggestionTrendz = (trendId) => {
 };
 
 const updateFametrendz = (trendzId, data) => {
-  console.log('Data :: ', data)
   return fameTrendzDB.updateOne({ _id: trendzId }, { $set: data });
 };
 

@@ -1113,7 +1113,7 @@ exports.getBrandProductsBySearch = (page, search, selfId) => {
       $match: {
         $or: [
           { name: { $regex: `^.*?${search}.*?$`, $options: "i" } },
-          { hashTag: { $regex: `^.*?${search}.*?$`, $options: "i" } },
+          // { hashTag: { $regex: `^.*?${search}.*?$`, $options: "i" } },
         ],
         isWelcomeVideo: { $exists: false },
         isDeleted: false,
@@ -1302,7 +1302,7 @@ exports.getBrandProduct = (page, selfId, type) => {
                     {
                       $project: {
                         _id: 0,
-                        name: "$profileStorelinks.name",
+                        name: { $ifNull: ["$profileStorelinks.name", '$name'] },
                       },
                     },
                   ],

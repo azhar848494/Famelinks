@@ -89,6 +89,12 @@ module.exports = {
     }),
   },
 
+  closeTrendz: {
+    params: joi.object({
+      trendzId: joi.string().trim().required(),
+    }),
+  },
+
   updateFametrendz: {
     params: joi.object({
       trendzId: joi.string().trim().required(),
