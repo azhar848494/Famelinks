@@ -7,7 +7,9 @@ const {
 } = require("../../../data-access/v2/users");
 const {
   getTodaysPosts,
-  getUnseenCount,
+  getUnseenGeneralCount,
+  getUnseenRequestCount,
+  getUnseenOfferCount,
   getUnseenMessageCount,
   getTodaysfamelinksContestPost,
   getTodaysambassadorTrendzPost,
@@ -119,7 +121,9 @@ module.exports = async (userId, selfUserId, swapId) => {
         await getRecommendations(null, user._id)
       ).length;
     }
-    user.unseenCount = await getUnseenCount(userId);
+    user.unSeenGeneralCount = await getUnseenGeneralCount(userId);
+    user.unSeenRequestCount = await getUnseenRequestCount(userId);
+    user.unSeenOfferCount = await getUnseenOfferCount(userId);
     user.unseenMessageCount = await getUnseenMessageCount(userId);
   }
   return user;

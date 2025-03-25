@@ -178,6 +178,7 @@ module.exports = {
     query: joi.object({
       page: joi.number().required(),
       requestType: joi.string().trim().valid("all", "channel", "user"),
+      search: joi.string().trim(),
     }),
   },
 
@@ -280,6 +281,7 @@ module.exports = {
   getFollowSuggestions: {
     query: joi.object({
       page: joi.number().min(1).required(),
+      search: joi.string().trim(),
     }),
   },
 

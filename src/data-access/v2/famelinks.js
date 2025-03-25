@@ -2289,11 +2289,26 @@ exports.getTodaysPosts = (userId) => {
   return FamelinksDB.find({ userId, createdAt: { $gte: todaysDate } }).count();
 };
 
+exports.getUnseenGeneralCount = async (userId) => {
+  return await NotificationDB.find({ category: 'general', userId, isSeen: false }).count();
+};
+
+exports.getUnseenRequestCount = async (userId) => {
+  const result = await NotificationDB.find({ category: 'request', userId, isSeen: false }).count();
+  const result2 = await FollowersDB.find({ followerId: userId, isSeen: false }).count();
+  return result + result2;
+};
+
+exports.getUnseenOfferCount = async (userId) => {
+  const result = await NotificationDB.find({ category: 'jobs_offers', userId, isSeen: false }).count();
+  const result2 = await InvitationsDB.find({ to: userId, isSeen: false }).count();
+  return result + result2;
+};
+
 exports.getUnseenCount = async (userId) => {
   const result = await FollowersDB.find({ followerId: userId, isSeen: false }).count();
   const result2 = await InvitationsDB.find({ to: userId, isSeen: false }).count();
   const result3 = await NotificationDB.find({ userId, isSeen: false }).count();
-  console.log('Data3 Count ::: ', (result + result2 + result3));
   return result + result2 + result3;
 };
 

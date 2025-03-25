@@ -485,7 +485,7 @@ exports.getTrend = (data) => {
                 },
                 {
                   $addFields: {
-                    likesCount: "$likes1Count",
+                    likesCount: "$likes2Count",
                   },
                 },
                 { $project: { _id: 1, likesCount: 1 } },

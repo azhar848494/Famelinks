@@ -2164,16 +2164,14 @@ exports.getInviteApplicants = (data) => {
     {
       $lookup: {
         from: "invitations",
-        let: { to: "$userId", from: data.userId, type: data.type },
+        let: { to: "$userId", from: data.userId, type: data.type, jobId: data.jobId },
         pipeline: [
           {
             $match: {
+              jobId: ObjectId(data.jobId),
               $and: [
                 { $expr: { $eq: ["$to", "$$to"] } },
                 { $expr: { $eq: ["$from", "$$from"] } },
-                { $expr: { $eq: ["$jobType", "$$type"] } },
-                { status: "invited" },
-                { category: "job" },
               ],
             },
           },
@@ -2208,6 +2206,28 @@ exports.getInviteApplicants = (data) => {
       },
     },
     {
+      $lookup: {
+        from: "jobapplications",
+        let: { userId: "$userId", jobId: data.jobId },
+        pipeline: [
+          {
+            $match: {
+              jobId: ObjectId(data.jobId),
+              $expr: { $eq: ["$userId", "$$userId"] }
+            },
+          },
+          { $project: { _id: 1 } },
+        ],
+        as: "applicants",
+      },
+    },
+    {
+      $match: {
+        invitation: false,
+        applicants: { $eq: []},
+      }
+    },
+    {
       $project: {
         _id: '$profile._id',
         type: '$profile.type',
@@ -2222,6 +2242,7 @@ exports.getInviteApplicants = (data) => {
         },
         invitation: 1,
         followersCount: 1,
+        applicants: 1,
       },
     },
     { $sort: { createdAt: -1 } },
@@ -2527,8 +2548,8 @@ exports.getApplicantsFaces = (selfMasterId, jobId, page) => {
               profileImageType: {
                 $first: { $first: "$profile.profileImageType" },
               },
-              greetVideo: { $first: { $first: "$profile.greetVideo" } },
-              greetText: { $first: { $first: "$profile.greetText" } },
+              greetVideo: { $first: { $first: "$profile.profile.greetVideo" } },
+              greetText: { $first: { $first: "$profile.profile.greetText" } },
               hiringProfile: { $first: { $first: "$hiringProfile" } },
               masterProfile: { $first: "$MasterProfile" },
               posts: { $first: "$posts" },

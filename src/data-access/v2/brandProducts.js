@@ -1130,18 +1130,36 @@ exports.getBrandProductsBySearch = (page, search, selfId) => {
             $project: {
               _id: 0,
               balance: 1,
-              giftCoins: 1,
+              perTagCoins: 1,
             },
           },
         ],
         as: "coins",
       },
     },
-    { $addFields: { giftCoins: { $first: "$coins.giftCoins" } } },
+    //MasterIdMigration
+    {
+      $lookup: {
+        from: "users",
+        let: { userId: "$userId" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+          {
+            $project: {
+              _id: 0,
+              name: { $ifNull: ["$profileStorelinks.name", '$name'] },
+            },
+          },
+        ],
+        as: "createdBy",
+      },
+    },
+    { $addFields: { createdBy: { $first: "$createdBy.name" } } },
     { $addFields: { balance: { $first: "$coins.balance" } } },
+    { $addFields: { perTagCoins: { $first: "$coins.perTagCoins" } } },
     {
       $match: {
-        $expr: { $gte: ["$balance", "$giftCoins"] },
+        $expr: { $gte: ["$balance", "$perTagCoins"] },
       },
     },
     {
@@ -1160,7 +1178,7 @@ exports.getBrandProductsBySearch = (page, search, selfId) => {
     },
     { $addFields: { savedStatus: { $in: ["$_id", "$savedProducts"] } } },
     {
-      $project: { coins: 0, giftCoins: 0, balance: 0, savedProducts: 0 },
+      $project: { coins: 0, balance: 0, savedProducts: 0 },
     },
     { $skip: (page - 1) * 10 },
     { $limit: 10 },
