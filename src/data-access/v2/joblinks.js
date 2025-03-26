@@ -2223,7 +2223,7 @@ exports.getInviteApplicants = (data) => {
     },
     {
       $match: {
-        invitation: false,
+        // invitation: false,
         applicants: { $eq: []},
       }
     },

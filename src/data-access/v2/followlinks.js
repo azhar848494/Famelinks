@@ -825,23 +825,7 @@ exports.getFollowLinks = (followLinksId, userId, page, filterObj) => {
                 isDeleted: false,
               },
             },
-            { $project: { userId: 1 } },
-            {
-              $lookup: {
-                from: "users",
-                let: { value: "$userId" },
-                pipeline: [
-                  {
-                    $match: {
-                      $expr: { $eq: ["$_id", "$$value"] },
-                    },
-                  },
-                  { $project: { name: 1 } },
-                ],
-                as: "users",
-              },
-            },
-            { $project: { _id: 1, hashTag: { $first: '$users.name' } } },
+            { $project: { _id: 1, hashTag: '$name' } },
           ],
           as: "product",
         },
