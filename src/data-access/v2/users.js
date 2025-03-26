@@ -1235,7 +1235,30 @@ exports.getFollowSuggestions = (userId, page, search) => {
         ],
         as: "location",
       },
+    },    
+    {
+      $lookup: {
+        from: "followers",
+        let: { followeeId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$followeeId", "$$followeeId"] },
+              acceptedDate: { $ne: null },
+              type: "user",
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              count: { $sum: 1 },
+            },
+          },
+        ],
+        as: "userFollowers",
+      },
     },
+    { $addFields: { followerCount: { $first: "$userFollowers.count" } } },
     {
       $project: {
         type: 1,
@@ -1252,6 +1275,7 @@ exports.getFollowSuggestions = (userId, page, search) => {
           profileImageType: "$profileFollowlinks.profileImageType",
         },
         followStatus: 1,
+        followerCount: 1,
       },
     },
     { $skip: (page - 1) * 15 },
@@ -1842,7 +1866,7 @@ exports.markAsRead = async (userId, type) => {
         { $set: { isSeen: true } }
       );
       return FollowerDB.updateMany(
-        { followerId: userId, isSeen: false },
+        { followeeId: userId, isSeen: false },
         { $set: { isSeen: true } }
       );
   }

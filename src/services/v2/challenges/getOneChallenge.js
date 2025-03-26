@@ -28,7 +28,6 @@ module.exports = async (challengeId, userId) => {
                         : "default";
             requiredItems = item.milestoneAggrement.milestoneValue;
             item.percentCompleted = items > requiredItems ? 100 : Math.round((items / requiredItems) * 100);
-            item.isCompleted = Math.round((items / requiredItems) * 100) >= 100;
             // item.participantsCount = await getChallengeParticipantsCount(item._id);
             return item;
         })

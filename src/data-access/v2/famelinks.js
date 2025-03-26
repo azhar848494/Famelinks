@@ -2295,7 +2295,7 @@ exports.getUnseenGeneralCount = async (userId) => {
 
 exports.getUnseenRequestCount = async (userId) => {
   const result = await NotificationDB.find({ category: 'request', userId, isSeen: false }).count();
-  const result2 = await FollowersDB.find({ followerId: userId, isSeen: false }).count();
+  const result2 = await FollowersDB.find({ followeeId: userId, isSeen: false }).count();
   return result + result2;
 };
 

@@ -1547,13 +1547,13 @@ exports.getTalents = (page, masterId, joblinksId) => {
           { $match: { $expr: { $eq: ["$_id", "$$profileJoblinks"] } } },
           {
             $project: {
-              name: "$profileJoblinks.",
-              profileFaces: "$profileJoblinks.",
-              profileCrew: "$profileJoblinks.",
-              greetVideo: "$profileJoblinks.",
-              greetText: "$profileJoblinks.",
-              profileImage: "$profileJoblinks.",
-              profileImageType: "$profileJoblinks.",
+              name: "$profileJoblinks.name",
+              profileFaces: "$profileJoblinks.profileFaces",
+              profileCrew: "$profileJoblinks.profileCrew",
+              greetVideo: "$profileJoblinks.greetVideo",
+              greetText: "$profileJoblinks.greetText",
+              profileImage: "$profileJoblinks.profileImage",
+              profileImageType: "$profileJoblinks.profileImageType",
             },
           },
           {
@@ -2806,8 +2806,8 @@ exports.getApplicantsCrew = (selfMasterId, jobId, page) => {
               profileImageType: {
                 $first: { $first: "$profile.profileImageType" },
               },
-              greetVideo: { $first: { $first: "$profile.greetVideo" } },
-              greetText: { $first: { $first: "$profile.greetText" } },
+              greetVideo: { $first: { $first: "$profile.profile.greetVideo" } },
+              greetText: { $first: { $first: "$profile.profile.greetText" } },
               hiringProfile: { $first: { $first: "$hiringProfile" } },
               masterProfile: { $first: "$masterProfile" },
               chatId: { $first: "$chatId" },
@@ -6333,7 +6333,9 @@ exports.getNewTalents = (data) => {
                 name: "$profileJoblinks.name",
                 profileImage: "$profileJoblinks.profileImage",
                 profileImageType: "$profileJoblinks.profileImageType",
-              }
+              },
+              greetText: "$profileJoblinks.greetText",
+              greetVideo: "$profileJoblinks.greetVideo",
             },
           },
           {
