@@ -3650,6 +3650,17 @@ exports.getSavedFametrendzs = (page, userId) => {
         ],
         as: "sponsor",
       },
+    },    
+    {
+      $lookup: {
+        from: "locatns",
+        let: { value: "$location" },
+        pipeline: [
+          { $match: { $expr: { $in: ["$_id", "$$value"] } } },
+          { $project: { type: 1, value: 1, } },
+        ],
+        as: "location",
+      },
     },
   ])
     .sort({ createdAt: "desc" })

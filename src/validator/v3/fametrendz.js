@@ -116,7 +116,19 @@ module.exports = {
       paymentId: joi.string().trim(),
       trendzCategory: joi.array().items(joi.string().trim()),
       userId: joi.string().trim(),
-      status: joi.string().trim(),
+      status: joi.string().trim(),      
+      milestoneAggrement: joi
+        .object()
+        .keys({
+          budget: joi.number().optional(),
+          minCost: joi.number().optional(),
+          constant: joi.number().optional(),
+          reachMultiplier: joi.number().optional(),
+          perImpressionCost: joi.number().optional(),
+          milestoneValue: joi.number().optional(),
+        })
+        .optional(),
+        paymentRef: joi.string().trim(),
     }),
   },
 
