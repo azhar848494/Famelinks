@@ -19,6 +19,7 @@ const brandProductDB = require("../../models/v2/brandProducts");
 const hiringprofile = require("../../models/v2/hiringProfiles");
 const invitationsDB = require("../../models/v2/invitations");
 const agencyTags = require("../../models/v2/agencyTags");
+const sessions = require("../../models/v2/sessions");
 const WinnerDB = require("../../models/v2/winners");
 const locatnsDB = require("../../models/v2/locatns");
 const followersLookup = require('../../lookups/followers.lookup')
@@ -753,7 +754,7 @@ exports.getFollowees = (userId, page, selfUserId, type, search) => {
           $lookup: {
             from: "users",
             let: { followeeId: "$followeeId" },
-            pipeline: [              
+            pipeline: [
               {
                 $match: obj,
               },
@@ -1235,7 +1236,7 @@ exports.getFollowSuggestions = (userId, page, search) => {
         ],
         as: "location",
       },
-    },    
+    },
     {
       $lookup: {
         from: "followers",
@@ -8673,6 +8674,10 @@ exports.getAgencyBySearch = async (searchData, selfMasterId) => {
   ]);
 };
 
+exports.storeSession = (data) => {
+  return sessions.create(data);
+};
+
 exports.addAgencyTags = (receiverId, postId, status) => {
   return agencyTags.create({ receiverId, postId, status });
 };
@@ -8763,7 +8768,12 @@ exports.followRequest = (followerId, followeeId, type, postId) => {
 exports.updateprofileImage = (masterId) => {
   return UserDB.updateOne(
     { _id: ObjectId(masterId) },
-    { profileImage: null, profileImageType: null }
+    {
+      profileImage: null,
+      profileImageX50: null,
+      profileImageX300: null,
+      profileImageType: null
+    }
   );
 };
 
@@ -8801,28 +8811,48 @@ exports.getCollablinksProfile = (profileId) => {
 exports.updateFamelinksImage = (profileId) => {
   return UserDB.updateOne(
     { _id: ObjectId(profileId) },
-    { "profileFamelinks.profileImage": null, "profileFamelinks.profileImageType": null }
+    {
+      "profileFamelinks.profileImage": null,
+      "profileFamelinks.profileImageX50": null,
+      "profileFamelinks.profileImageX300": null,
+      "profileFamelinks.profileImageType": null,
+    }
   );
 };
 
 exports.updateFunlinksImage = (profileId) => {
   return UserDB.updateOne(
     { _id: ObjectId(profileId) },
-    { "profileFunlinks.profileImage": null, "profileFunlinks.profileImageType": null }
+    {
+      "profileFunlinks.profileImage": null,
+      "profileFunlinks.profileImageX50": null,
+      "profileFunlinks.profileImageX300": null,
+      "profileFunlinks.profileImageType": null,
+    }
   );
 };
 
 exports.updatejoblinksImage = (profileId) => {
   return UserDB.updateOne(
     { _id: ObjectId(profileId) },
-    { "profileJoblinks.profileImage": null, "profileJoblinks.profileImageType": null }
+    {
+      "profileJoblinks.profileImage": null,
+      "profileJoblinks.profileImageX50": null,
+      "profileJoblinks.profileImageX300": null,
+      "profileJoblinks.profileImageType": null,
+    }
   );
 };
 
 exports.updateStorelinksImage = (profileId) => {
   return UserDB.updateOne(
     { _id: ObjectId(profileId) },
-    { "profileStorelinks.profileImage": null, "profileStorelinks.profileImageType": null }
+    {
+      "profileStorelinks.profileImage": null,
+      "profileStorelinks.profileImageX50": null,
+      "profileStorelinks.profileImageX300": null,
+      "profileStorelinks.profileImageType": null,
+    }
   );
 };
 
@@ -8830,7 +8860,12 @@ exports.updateCollablinksImage = (
   profileId) => {
   return UserDB.updateOne(
     { _id: ObjectId(profileId) },
-    { "profileCollablinks.profileImage": null, "profileCollablinks.profileImageType": null }
+    {
+      "profileCollablinks.profileImage": null,
+      "profileCollablinks.profileImageX50": null,
+      "profileCollablinks.profileImageX300": null,
+      "profileCollablinks.profileImageType": null,
+    }
   );
 };
 
@@ -8838,7 +8873,12 @@ exports.updateFollowlinksImage = (
   profileId) => {
   return UserDB.updateOne(
     { _id: ObjectId(profileId) },
-    { "profileFollowlinks.profileImage": null, "profileFollowlinks.profileImageType": null }
+    {
+      "profileFollowlinks.profileImage": null,
+      "profileFollowlinks.profileImageX50": null,
+      "profileFollowlinks.profileImageX300": null,
+      "profileFollowlinks.profileImageType": null,
+    }
   );
 };
 

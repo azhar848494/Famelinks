@@ -23,6 +23,12 @@ module.exports = async (request) => {
     if (request.files.profileImage) {
       request.body.profileImage = request.files.profileImage;
     }
+    if (request.files.profileImageX50) {
+      request.body.profileImageX50 = request.files.profileImageX50;
+    }
+    if (request.files.profileImageX300) {
+      request.body.profileImageX300 = request.files.profileImageX300;
+    }
   }
   
   let result = await updateChildProfile(

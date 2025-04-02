@@ -16,6 +16,8 @@ module.exports = new Schema(
     isBlocked: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
     profileImage: { type: String, default: null },
+    profileImageX50: { type: String, default: null },
+    profileImageX300: { type: String, default: null },
     savedMusic: { type: [ObjectId] },
     profileImageType: {
       type: String,

@@ -29,6 +29,12 @@ module.exports = async (userId, payload, files) => {
     if (files.profileImage) {
       payload.profileImage = files.profileImage;
     }
+    if (files.profileImageX50) {
+      payload.profileImageX50 = files.profileImageX50;
+    }
+    if (files.profileImageX300) {
+      payload.profileImageX300 = files.profileImageX300;
+    }
     if (files.brandDoc) {
       brand.verificationDoc = files.brandDoc;
       payload.verificationStatus = "Submitted";

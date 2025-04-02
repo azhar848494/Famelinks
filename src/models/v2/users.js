@@ -122,6 +122,8 @@ module.exports = mongoose.model(
           ],
         },
         profileImage: { type: String, default: null },
+        profileImageX50: { type: String, default: null },
+        profileImageX300: { type: String, default: null },
         profileImageType: {
           type: String,
           default: null,

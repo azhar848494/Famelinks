@@ -13,6 +13,8 @@ module.exports = new Schema(
     bio: { type: String, default: null },
     profession: { type: String, default: null },
     profileImage: { type: String, default: null },
+    profileImageX50: { type: String, default: null },
+    profileImageX300: { type: String, default: null },
     likes0Count: { type: Number, default: 0 },
     likes1Count: { type: Number, default: 0 },
     likes2Count: { type: Number, default: 0 },

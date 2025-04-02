@@ -51,7 +51,9 @@ module.exports = async (
             result[0].score = 0;
             result[0].trendzSet = result[0].trendsWon.length;
             if (result[0].titlesWon && result[0].titlesWon.length == 0) {
-              result[0].Contesting = result[0].masterUser.location.value;
+              if(result[0].masterUser.location){
+                result[0].Contesting = result[0].masterUser.location.value;
+              }
             }
             return result;
           }

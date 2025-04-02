@@ -81,6 +81,7 @@ const checkFamecoinController = require("../../controllers/v2/users/checkFameCoi
 const checkProductByHashtagController = require("../../controllers/v2/users/checkProductByHashtag");
 const accountSettings = require('../../controllers/v2/users/accountSettings')
 const inviteToFollowController = require('../../controllers/v2/users/inviteToFollow')
+const storeSessionController = require('../../controllers/v2/users/storeSession')
 const searchAgencyController = require('../../controllers/v2/users/searchAgency')
 const getBrandProductController = require('../../controllers/v2/users/getBrandProductsBySearch')
 const getBrandProduct = require('../../controllers/v2/users/getBrandProduct')
@@ -238,6 +239,13 @@ router.post(
   requestValidatorCallback(validator.invitation),
   expressCallback(inviteToFollowController),
 )
+
+router.post(
+  '/session/:type',
+  requestValidatorCallback(validator.session),
+  expressCallback(storeSessionController),
+)
+
 router.put(
   "/register",
   uploadProfileImage,

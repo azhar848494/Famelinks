@@ -53,6 +53,8 @@ module.exports = {
   register: {
     files: joi.object({
       profileImage: joi.string().trim(),
+      profileImageX50: joi.string().trim(),
+      profileImageX300: joi.string().trim(),
     }),
     payload: joi.object({
       gender: joi.string().trim().valid("male", "female", "other").required(),
@@ -289,6 +291,8 @@ module.exports = {
     files: joi
       .object({
         profileImage: joi.string().trim(),
+        profileImageX50: joi.string().trim(),
+        profileImageX300: joi.string().trim(),
       })
       .exist()
       .invalid(null, {})
@@ -296,6 +300,8 @@ module.exports = {
     payload: joi.object({
       profileImageType: joi.string().trim().valid("avatar", "image"),
       profileImage: joi.string().trim(),
+      profileImageX50: joi.string().trim(),
+      profileImageX300: joi.string().trim(),
     }),
   },
 
@@ -546,6 +552,8 @@ module.exports = {
   updateProfile: {
     files: joi.object({
       profileImage: joi.string().trim(),
+      profileImageX50: joi.string().trim(),
+      profileImageX300: joi.string().trim(),
     }),
     params: joi.object({
       linkType: joi
@@ -569,6 +577,8 @@ module.exports = {
       profession: joi.string().trim().allow("", null).optional(),
       url: joi.string().trim().allow("", null).optional(),
       profileImage: joi.string().trim(),
+      profileImageX50: joi.string().trim(),
+      profileImageX300: joi.string().trim(),
       profileImageType: joi.string().trim().valid("avatar", "image"),
       greetText: joi.string().trim().allow("", null).optional(),
       clubCategory: joi.array().items(joi.string().trim()).allow(null, ""),
@@ -628,6 +638,12 @@ module.exports = {
         .trim()
         .valid("suspend", "delete", "restore")
         .required(),
+    }),
+  },
+
+  session: {
+    params: joi.object({
+      type: joi.string().trim().valid("in", "out").required(),
     }),
   },
 

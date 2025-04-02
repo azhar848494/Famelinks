@@ -210,6 +210,14 @@ exports.uploadProfileImage = (req, res, next) => {
       name: "profileImage",
       maxCount: 1,
     },
+    {
+      name: "profileImageX50",
+      maxCount: 1,
+    },
+    {
+      name: "profileImageX300",
+      maxCount: 1,
+    },
   ])(req, res, async (err) => {
     if (err) {
       return serializeHttpResponse(500, {
@@ -264,6 +272,77 @@ exports.uploadProfileImage = (req, res, next) => {
         );
       }
     }
+
+    //x50    
+    if (req.files && req.files.profileImageX50 && req.files.profileImageX50[0]) {
+      req.files.profileImageX50 = req.files.profileImageX50[0].filename;
+    }
+
+    if (req.files && req.files.profileImageX50) {
+      const filePath = path.resolve(`uploads/${req.files.profileImageX50}`);
+      const resizedImages = resize(filePath, req.files.profileImageX50);
+      try {
+        await Promise.all(
+          resizedImages.map(async (file) => {
+            await s3
+              .upload({
+                Key: file.Key,
+                Body: file.Body,
+                Bucket: `${appConfig.s3.bucket.name}/${appConfig.s3.bucket.profile}`,
+                ACL: "public-read",
+              })
+              .promise();
+            if (file.isOriginal) {
+              await unlink(path.resolve(`uploads/${file.Key}`));
+            }
+            return;
+          })
+        );
+      } catch (err) {
+        return next(
+          serializeHttpResponse(500, {
+            message: "Something went wrong when uploading profile image",
+            error: err,
+          })
+        );
+      }
+    }
+
+    //x300    
+    if (req.files && req.files.profileImageX300 && req.files.profileImageX300[0]) {
+      req.files.profileImageX300 = req.files.profileImageX300[0].filename;
+    }
+
+    if (req.files && req.files.profileImageX300) {
+      const filePath = path.resolve(`uploads/${req.files.profileImageX300}`);
+      const resizedImages = resize(filePath, req.files.profileImageX300);
+      try {
+        await Promise.all(
+          resizedImages.map(async (file) => {
+            await s3
+              .upload({
+                Key: file.Key,
+                Body: file.Body,
+                Bucket: `${appConfig.s3.bucket.name}/${appConfig.s3.bucket.profile}`,
+                ACL: "public-read",
+              })
+              .promise();
+            if (file.isOriginal) {
+              await unlink(path.resolve(`uploads/${file.Key}`));
+            }
+            return;
+          })
+        );
+      } catch (err) {
+        return next(
+          serializeHttpResponse(500, {
+            message: "Something went wrong when uploading profile image",
+            error: err,
+          })
+        );
+      }
+    }
+
     return next();
   });
 };

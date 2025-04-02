@@ -8,6 +8,8 @@ module.exports = mongoose.Schema(
     bio: { type: String, default: null },
     profession: { type: String, default: "" },
     profileImage: { type: String, default: null },
+    profileImageX50: { type: String, default: null },
+    profileImageX300: { type: String, default: null },
     restrictedList: { type: [ObjectId] },
     isRegistered: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },
