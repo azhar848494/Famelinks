@@ -1324,7 +1324,7 @@ exports.searchClubOffersByName = (selfMasterId, search, followlinksId, funlinksI
                     pipeline: [
                         {
                             $match: {
-                                name: { $regex: `^${search}.*`, $options: 'gi' },
+                                name: { $regex: `^${search}.*`, $options: 'i' },
                                 isDeleted: false,
                                 isSuspended: false,
                                 $expr: { $not: { $in: ['$_id', '$$blockList'] } }

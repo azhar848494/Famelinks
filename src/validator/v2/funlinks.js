@@ -105,7 +105,7 @@ module.exports = {
   getMusic: {
     query: joi.object({
       page: joi.number().min(1).required(),
-      search: joi.string().trim().min(2),
+      search: joi.string().trim(),
       type: joi
         .string()
         .valid("trending", "voice", "songs", "saved")

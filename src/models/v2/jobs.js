@@ -6,6 +6,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const heightSchema = new Schema({
     foot: { type: Number, required: true },
     inch: { type: Number, required: true },
+    toInch: { type: Number, required: true },
 }, {
     _id: false,
     versionKey: false
@@ -34,7 +35,7 @@ module.exports = mongoose.model('jobs', new Schema({
             "groupH",
         ]
     },
-    height: { type: heightSchema, default: { foot: 0, inch: 0 } },
+    height: { type: heightSchema, default: { foot: 0, inch: 0, toInch: 0 } },
     gender: { type: String, enum: ["male", "female", "all"], },
     jobCategory: { type: [ObjectId], required: true, default: [] },
     isClosed: { type: Boolean, default: false },

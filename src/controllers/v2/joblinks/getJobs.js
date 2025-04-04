@@ -3,7 +3,7 @@ const getJobs = require("../../../services/v2/joblinks/createdJobs");
 
 module.exports = async (request) => {
   const userId = request.user._id
-
+ 
   const type = request.params.type
   const page = request.query.page
 

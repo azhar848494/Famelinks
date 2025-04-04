@@ -37,6 +37,7 @@ module.exports = {
       height: joi.object().keys({
         foot: joi.number().required(),
         inch: joi.number().required(),
+        toInch: joi.number().required(),
       }),
       gender: joi.string().trim().valid("male", "female", "all").optional(),
       jobCategory: joi.array().items(joi.string().trim()).required(),
@@ -87,6 +88,7 @@ module.exports = {
       height: joi.object().keys({
         foot: joi.number().optional(),
         inch: joi.number().optional(),
+        toInch: joi.number().optional(),
       }),
       gender: joi.string().trim().valid("male", "female", "all").optional(),
       jobCategory: joi.array().items(joi.string().trim()).optional(),
