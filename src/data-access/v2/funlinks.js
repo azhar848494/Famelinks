@@ -1152,7 +1152,7 @@ exports.getMusic2 = (page, search, type, savedMusic) => {
         as: "count",
       },
     },
-    { $addFields: { count: { $ifNull: [{$first: '$count.total'}, 0] } } },
+    { $addFields: { count: { $ifNull: [{ $first: '$count.total' }, 0] } } },
     { $sort: { updatedAt: -1 } },
     { $skip: (page - 1) * 25 },
     { $limit: 25 },
@@ -1378,185 +1378,61 @@ exports.addMusic = (music, name, duration, thumbnail) => {
 };
 
 exports.getFunlinksMusicPosts = (userId, musicId, page) => {
-  return FunlinksDB.aggregate([
-    // Self User
-    {
-      $lookup: {
-        from: "users",
-        let: { userId: "$userId" },
-        pipeline: [
-          { $match: { _id: ObjectId(userId) } },
-          { $project: { blockList: 1 } },
-        ],
-        as: "selfUser",
-      },
-    },
-    { $addFields: { blockedUserIds: { $first: "$selfUser.blockList" } } },
+  return MusicDB.aggregate([
     {
       $match: {
-        $expr: {
-          $and: [
-            { $eq: [ObjectId(musicId), "$musicId"] },
-            { $not: [{ $in: ["$userId", "$blockedUserIds"] }] },
-          ],
-        },
-      },
-    },
-    // User
-    {
-      $lookup: {
-        from: "users",
-        let: { userId: "$userId" },
-        pipeline: [
-          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
-          {
-            $project: {
-              name: 1,
-              dob: 1,
-              bio: 1,
-              profession: 1,
-              profileImage: 1,
-              profileImageType: 1,
-              username: 1,
-              _id: 1,
-              type: 1,
-            },
-          },
-        ],
-        as: "user",
-      },
-    },
-    { $addFields: { user: { $first: "$user" } } },
-    // Challenge
-    {
-      $lookup: {
-        from: "challenges",
-        let: { challengeId: "$challengeId" },
-        pipeline: [
-          {
-            $match: {
-              $expr: { $in: ["$_id", "$$challengeId"] },
-              isDeleted: false,
-            },
-          },
-          // { $project: { name: 1 } }
-        ],
-        as: "challenges",
-      },
-    },
-    {
-      $lookup: {
-        from: "likes",
-        let: { mediaId: "$_id" },
-        pipeline: [
-          {
-            $match: {
-              userId: ObjectId(userId),
-              $expr: { $eq: ["$mediaId", "$$mediaId"] },
-            },
-          },
-          { $project: { status: 1, _id: 0 } },
-        ],
-        as: "likeStatus",
-      },
-    },
-    { $addFields: { likeStatus: { $first: "$likeStatus.status" } } },
-    { $addFields: { followStatus: 0 } },
-    {
-      $lookup: {
-        from: "followers",
-        let: { followeeId: "$user._id" }, //master user Id
-        pipeline: [
-          {
-            $match: {
-              followerId: ObjectId(userId),
-              $expr: { $eq: ["$followeeId", "$$followeeId"] },
-              acceptedDate: { $eq: null },
-              type: 'user'
-            },
-          },
-          { $project: { _id: 1 } },
-        ],
-        as: "requested",
-      },
-    },
-    { $addFields: { followStatus: { $cond: [{ $eq: [{ $size: '$requested' }, 1] }, 1, '$followStatus'] } } },
-    {
-      $lookup: {
-        from: "followers",
-        let: { followeeId: "$user._id" }, //master user Id
-        pipeline: [
-          {
-            $match: {
-              followerId: ObjectId(userId),
-              $expr: { $eq: ["$followeeId", "$$followeeId"] },
-              acceptedDate: { $ne: null },
-              type: 'user'
-            },
-          },
-          { $project: { _id: 1 } },
-        ],
-        as: "following",
-      },
-    },
-    { $addFields: { followStatus: { $cond: [{ $eq: [{ $size: '$following' }, 1] }, 2, '$followStatus'] } } },
-    {
-      $addFields: {
-        followStatus: {
-          $switch: {
-            branches: [
-              { case: { $eq: ['$followStatus', 0] }, then: 'Follow' },
-              { case: { $eq: ['$followStatus', 1] }, then: 'Requested' },
-              { case: { $eq: ['$followStatus', 2] }, then: 'Following' }
-            ],
-            default: 'Follow'
-          }
-        }
-      }
-    },
-    {
-      $lookup: {
-        from: "locatns",
-        let: { value: "$location" },
-        pipeline: [
-          { $match: { $expr: { $eq: ["$_id", "$$value"] } } },
-          { $project: { type: 1, value: 1, } },
-        ],
-        as: "location",
+        _id: ObjectId(musicId),
       },
     },
     {
       $project: {
-        createdAt: 1,
-        updatedAt: 1,
         name: 1,
-        profession: 1,
-        location: { $first: "$location" },
-        gender: 1,
-        challenges: 1,
-        user: 1,
-        description: 1,
-        profileImage: 1,
-        profileImageType: 1,
-        // seen: 1,
-        likesCount: 1,
-        commentsCount: 1,
-        followStatus: 1,
-        // followStatus: { $ifNull: [{ $toBool: "$followStatus" }, false] },
-        likeStatus: { $ifNull: [{ $toBool: "$likeStatus" }, false] },
-        // video: 1,
-        media: [
-          {
-            path: "$video",
-            type: "video",
-          },
-        ],
+        music: 1,
+        by: 1,
       },
     },
-  ])
-    .sort({ updatedAt: "desc" })
-    .skip((page - 1) * 10)
-    .limit(10);
+    {
+      $lookup: {
+        from: "funlinks",
+        let: { value: "$_id" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$musicId", "$$value"] } } },
+          {
+            $project: { video: 1, userId: 1, musicName: 1, createdAt: 1 },
+          },
+          {
+            $facet: {
+              data: [
+                { $sort: { createdAt: -1 } },
+                { $skip: (page - 1) * 10 },
+                { $limit: 10 },
+              ],
+              firstPost: [
+                { $sort: { createdAt: 1 } },
+                { $limit: 1 },
+              ],
+              count: [
+                { $count: "total" },
+              ],
+            },
+          },
+        ],
+        as: "posts",
+      },
+    },
+    {
+      $addFields: { posts: { $first: "$posts" }, },
+    },
+    {
+      $addFields: { postCounts: { $first: "$posts.count.total" }, },
+    },
+    {
+      $addFields: { firstPost: { $first: "$posts.firstPost" } },
+    },
+    {
+      $addFields: { posts: "$posts.data" },
+    },
+  ]);
 };
 
 exports.getMusicById = (musicId) => {

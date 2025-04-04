@@ -10,17 +10,13 @@ module.exports = async (request) => {
         });
     }
 
-    const user = await getSavedMusicIds(request.user._id);
-    const isSaved = user.savedMusic && user.savedMusic.length
-        ? user.savedMusic.filter(musicId => musicId.toString() == request.params.musicId.toString()).length > 0
-        : false;
-    const result = await getMusicPostsService(request.user._id, request.params.musicId, request.query.page);
+    let result = await getMusicPostsService(request.user._id, request.params.musicId, request.query.page);
+    if (result) {
+        result = result[0];
+    }
 
     return serializeHttpResponse(200, {
         message: 'FunLinks Fetched',
-        result: {
-            data: result,
-            isSaved: isSaved
-        }
+        result
     });
 };

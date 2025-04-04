@@ -51,6 +51,7 @@ module.exports = {
       page: joi.number().min(1).required(),
       postId: joi.string(),
       hashTagId: joi.string(),
+      musicId: joi.string(),
     }),
   },
 

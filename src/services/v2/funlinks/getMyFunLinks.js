@@ -4,17 +4,26 @@ const {
 } = require("../../../data-access/v2/funlinks");
 var ObjectId = require("mongoose").Types.ObjectId;
 
-module.exports = async (userId, userProfileId, selfMasterId, hashTagId) => {
+module.exports = async (userId, userProfileId, selfMasterId, hashTagId, musicId) => {
 
   let filterObj = {};
 
   if (hashTagId != null) {
-    filterObj = {
-      challengeId: ObjectId(hashTagId),
-      isDeleted: false,
-      isSafe: true,
-      isBlocked: false,
-    };
+    if (musicId != null) {
+      filterObj = {
+        musicId: ObjectId(musicId),
+        isDeleted: false,
+        isSafe: true,
+        isBlocked: false,
+      };
+    } else {
+      filterObj = {
+        challengeId: ObjectId(hashTagId),
+        isDeleted: false,
+        isSafe: true,
+        isBlocked: false,
+      };
+    }
   } else {
     filterObj = {
       userId: ObjectId(userId),
