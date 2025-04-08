@@ -46,7 +46,7 @@ exports.getMostLikedPosts = (
               dob: 1,
               bio: 1,
               profession: 1,
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profileImageType: 1,
               username: 1,
               _id: 1,
@@ -243,7 +243,7 @@ exports.getRecentUsers = (limit) => {
       }
     },
     { $addFields: { cardTitle: "$name" } },
-    { $project: { _id: 1, name:1, username:1, profileImage: 1, profileImageType: 1, type: 1, cardTitle: 1 } },
+    { $project: { _id: 1, name:1, username:1, profileImage: '$profileImageX50', profileImageType: 1, type: 1, cardTitle: 1 } },
     { $set: { profileImageType: { $cond: [{ $ifNull: ["$profileImageType", false] }, '$profileImageType', ""] } } },
     { $sort: { createdAt: -1 } },
     { $limit: limit }

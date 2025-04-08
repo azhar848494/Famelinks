@@ -6,19 +6,30 @@ module.exports = async (
   page,
   selfProfileId,
   selfMasterId,
-  hashTagId
+  hashTagId,
+  productId,
 ) => {
   let filterObj = {};
   let sortObj = {};
 
   if (hashTagId) {
-    filterObj = {
-      channelId: ObjectId(hashTagId),
-      isDeleted: false,
-      isSafe: true,
-      isBlocked: false,
-    };
-    sortObj = { viewCount: -1 }
+    if (productId) {
+      filterObj = {
+        productId: ObjectId(productId),
+        isDeleted: false,
+        isSafe: true,
+        isBlocked: false,
+      };
+      sortObj = { createdAt: -1 }
+    } else {
+      filterObj = {
+        channelId: ObjectId(hashTagId),
+        isDeleted: false,
+        isSafe: true,
+        isBlocked: false,
+      };
+      sortObj = { viewCount: -1 }
+    }
   } else {
     filterObj = {
       userId: ObjectId(profileId),

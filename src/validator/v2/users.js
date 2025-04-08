@@ -674,6 +674,27 @@ module.exports = {
     }),
   },
 
+  getProductGrid: {
+    params: joi.object().keys({
+      id: joi.string().trim().required(),
+    }),
+    query: joi.object().keys({
+      page: joi.number().min(1).required(),
+    }),
+  },
+
+  getParticularProduct: {
+    params: joi.object({
+      userId: joi.string().required(),
+    }),
+    query: joi.object({
+      page: joi.number().min(1).required(),
+      postId: joi.string(),
+      hashTagId: joi.string(),
+      productId: joi.string(),
+    }),
+  },
+
   removeProfileImage: {
     query: joi.object({
       masterId: joi.string().trim(),

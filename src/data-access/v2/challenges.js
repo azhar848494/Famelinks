@@ -30,7 +30,7 @@ exports.getOpenFametrendzs = (search, page, userId) => {
         foreignField: "_id",
         localField: "sponsor",
         pipeline: [
-          { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+          { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
           {
             $set: {
               profileImageType: {
@@ -277,7 +277,7 @@ exports.getOpenFametrendzs = (search, page, userId) => {
                   $project: {
                     username: 1,
                     profileImageType: 1,
-                    profileImage: 1,
+                    profileImage: '$profileImageX50',
                   },
                 },
               ],
@@ -289,7 +289,7 @@ exports.getOpenFametrendzs = (search, page, userId) => {
               _id: '$_id',
               username: { $first: "$masterUser.username" },
               profileImageType: { $first: "$masterUser.profileImageType" },
-              profileImage: { $first: "$masterUser.profileImage" },
+              profileImage: { $first: "$masterUser.profileImageX50" },
             },
           },
         ],
@@ -362,7 +362,7 @@ exports.getTrend = (data) => {
               foreignField: "_id",
               localField: "sponsor",
               pipeline: [
-                { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+                { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
                 {
                   $set: {
                     profileImageType: {
@@ -439,7 +439,7 @@ exports.getTrend = (data) => {
                     },
                   },
                 },
-                { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1, followStatus: 1 } },
+                { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1, followStatus: 1 } },
               ],
               as: "sponsor",
             },
@@ -605,11 +605,11 @@ exports.getOpenChallenges = (search, page, userId) => {
               name: 1,
               username: 1,
               profileImageType: 1,
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profile: {
                 name: "$profileFunlinks.name",
                 profileImageType: "$profileFunlinks.profileImageType",
-                profileImage: "$profileFunlinks.profileImage",
+                profileImage: "$profileFunlinks.profileImageX50",
               },
             },
           },
@@ -800,7 +800,7 @@ exports.getUpcomingFametrendzs = (page, type, filterObj, userId) => {
         localField: "sponsor",
         pipeline: [
 
-          { $project: { _id: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+          { $project: { _id: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
 
           {
             $set: {
@@ -937,7 +937,7 @@ exports.getFameChallengeDetails = (data) => {
         foreignField: "_id",
         localField: "sponsor",
         pipeline: [
-          { $project: { type: 1, username: 1, name: 1, profileImageType: 1, profileImage: 1 } },
+          { $project: { type: 1, username: 1, name: 1, profileImageType: 1, profileImageX50: 1 } },
         ],
         as: "sponsor",
       },
@@ -1070,7 +1070,7 @@ exports.getFunChallengeDetails = (data) => {
         foreignField: "_id",
         localField: "createdBy",
         pipeline: [
-          { $project: { type: 1, username: 1, name: 1, profileImageType: 1, profileImage: 1 } },
+          { $project: { type: 1, username: 1, name: 1, profileImageType: 1, profileImageX50: 1 } },
         ],
         as: "sponsor",
       },
@@ -1178,7 +1178,7 @@ exports.getOneFamelinksChallenge = (challengeId, userId) => {
         foreignField: "_id",
         localField: "sponsor",
         pipeline: [
-          { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+          { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
           {
             $set: {
               profileImageType: {
@@ -1439,7 +1439,7 @@ exports.getOneFamelinksChallenge = (challengeId, userId) => {
                   $project: {
                     username: 1,
                     profileImageType: 1,
-                    profileImage: 1,
+                    profileImage: '$profileImageX50',
                   },
                 },
               ],
@@ -1451,7 +1451,7 @@ exports.getOneFamelinksChallenge = (challengeId, userId) => {
               _id: '$_id',
               username: { $first: "$masterUser.username" },
               profileImageType: { $first: "$masterUser.profileImageType" },
-              profileImage: { $first: "$masterUser.profileImage" },
+              profileImage: { $first: "$masterUser.profileImageX50" },
             },
           },
         ],
@@ -1632,7 +1632,7 @@ exports.getChallengeFamelinks = (challengeId, page, userId, profileId) => {
                 name: "$profileFamelinks.name",
                 bio: "$profileFamelinks.bio",
                 profession: "$profileFamelinks.profession",
-                profileImage: "$profileFamelinks.profileImage",
+                profileImage: "$profileFamelinks.profileImageX50",
                 profileImageType: "$profileFamelinks.profileImageType",
               }
             },
@@ -1821,7 +1821,7 @@ exports.getChallengeFamelinks = (challengeId, page, userId, profileId) => {
         user: 1,
         description: 1,
         sponsor: 1,
-        // profileImage: 1,
+        // profileImage: '$profileImageX50',
         likes0Count: 1,
         likes1Count: 1,
         likes2Count: 1,
@@ -1936,13 +1936,13 @@ exports.getChallengeFunlinks = (challengeId, page, userId) => {
               type: 1,
               dob: 1,
               name: 1,
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profileImageType: 1,
               profile: {
                 name: "$profileFamelinks.name",
                 bio: "$profileFamelinks.bio",
                 profession: "$profileFamelinks.profession",
-                profileImage: "$profileFamelinks.profileImage",
+                profileImage: "$profileFamelinks.profileImageX50",
                 profileImageType: "$profileFamelinks.profileImageType",
               }
             },
@@ -2153,7 +2153,7 @@ exports.getChallengeFunlinks = (challengeId, page, userId) => {
         challenges: 1,
         user: 1,
         description: 1,
-        // profileImage: 1,
+        // profileImage: '$profileImageX50',
         seen: 1,
         musicId: 1,
         musicName: 1,
@@ -2243,7 +2243,7 @@ exports.getChallengeFollowlinks = (challengeId, page, userId) => {
                 name: "$profileFollowlinks.name",
                 bio: "$profileFollowlinks.bio",
                 profession: "$profileFollowlinks.profession",
-                profileImage: "$profileFollowlinks.profileImage",
+                profileImage: "$profileFollowlinks.profileImageX50",
                 profileImageType: "$profileFollowlinks.profileImageType",
               }
             },
@@ -2440,7 +2440,7 @@ exports.getChallengeFollowlinks = (challengeId, page, userId) => {
         challenges: 1,
         user: 1,
         description: 1,
-        // profileImage: 1,
+        // profileImage: '$profileImageX50',
         seen: 1,
         likesCount: 1,
         commentsCount: 1,
@@ -2493,7 +2493,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
           foreignField: "_id",
           localField: "sponsor",
           pipeline: [
-            { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+            { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
             {
               $set: {
                 profileImageType: {
@@ -2754,7 +2754,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
                     $project: {
                       username: 1,
                       profileImageType: 1,
-                      profileImage: 1,
+                      profileImage: '$profileImageX50',
                     },
                   },
                 ],
@@ -2766,7 +2766,7 @@ exports.getDashboardOpenChallenges = (userId, filterObj, page) => {
                 _id: '$_id',
                 username: { $first: "$masterUser.username" },
                 profileImageType: { $first: "$masterUser.profileImageType" },
-                profileImage: { $first: "$masterUser.profileImage" },
+                profileImage: { $first: "$masterUser.profileImageX50" },
               },
             },
           ],
@@ -2886,11 +2886,11 @@ exports.exploreFunlinks = (page, userId, profileId) => {
               name: 1,
               username: 1,
               profileImageType: 1,
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profile: {
                 name: "$profileFunlinks.name",
                 profileImageType: "$profileFunlinks.profileImageType",
-                profileImage: "$profileFunlinks.profileImage",
+                profileImage: "$profileFunlinks.profileImageX50",
               },
             },
           },
@@ -3086,7 +3086,7 @@ exports.getFameLinksChallengesBySearch = (searchData, linkType) => {
 //               from: "users",
 //               foreignField: "_id", //v2 => profileFamelinks
 //               localField: "userId",
-//               pipeline: [{ $project: { _id: 0, name: 1, type: 1, profileImage: 1 } }],
+//               pipeline: [{ $project: { _id: 0, name: 1, type: 1, profileImageX50: 1 } }],
 //               as: "users",
 //             },
 //           },
@@ -3110,7 +3110,7 @@ exports.getFameLinksChallengesBySearch = (searchData, linkType) => {
 //               name: { $first: "$name" },
 //               type: { $first: "$type" },
 //               country: { $first: "$country" },
-//               profileImage: { $first: "$profileImage" },
+//               profileImage: { $first: ".profileImageX50" },
 //               likes1Count: { $first: "$likes1Count" },
 //               likes2Count: { $first: "$likes2Count" },
 //               likesCount: { $first: "$likesCount" },
@@ -3182,7 +3182,7 @@ exports.getChallengeWinners = (userId) => {
         localField: "sponsor",
         foreignField: "_id",
         pipeline: [
-          { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+          { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
 
           {
             $set: {
@@ -3429,7 +3429,7 @@ exports.getChallengeWinners = (userId) => {
                     name: 1,
                     username: 1,
                     type: 1,
-                    profileImage: 1,
+                    profileImage: '$profileImageX50',
                     profileImageType: 1,
                   },
                 },
@@ -3444,7 +3444,7 @@ exports.getChallengeWinners = (userId) => {
               name: { $first: "$users.name" },
               username: { $first: "$users.username" },
               type: { $first: "$users.type" },
-              profileImage: { $first: "$users.profileImage" },
+              profileImage: { $first: "$users.profileImageX50" },
               profileImageType: { $first: "$users.profileImageType" },
             },
           },
@@ -3456,7 +3456,7 @@ exports.getChallengeWinners = (userId) => {
               username: { $first: "$username" },
               type: { $first: "$type" },
               country: { $first: "$country" },
-              profileImage: { $first: "$profileImage" },
+              profileImage: { $first: ".profileImageX50" },
               profileImageType: { $first: "$profileImageType" },
               likes1Count: { $first: "$likes1Count" },
               likes2Count: { $first: "$likes2Count" },
@@ -3569,7 +3569,7 @@ exports.getSavedFametrendzs = (page, userId) => {
         localField: "sponsor",
         foreignField: "_id",
         pipeline: [
-          { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+          { $project: { _id: 1, type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
 
           {
             $set: {
@@ -3694,7 +3694,7 @@ exports.getUpcomingFamecontest = (
         localField: "sponsoredBy",
         pipeline: [
           {
-            $project: { _id: 0, name: 1, profileImage: 1, profileImageType: 1 },
+            $project: { _id: 0, name: 1, profileImage: '$profileImageX50', profileImageType: 1 },
           },
 
           {

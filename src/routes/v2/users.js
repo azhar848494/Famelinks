@@ -64,6 +64,8 @@ const bannerDeleteController = require("../../controllers/v2/users/bannerDelete"
 const addRecommendationController = require("../../controllers/v2/users/addRecommendation");
 const getRecommendationsController = require("../../controllers/v2/users/getRecommendations");
 const getBrandProductsController = require("../../controllers/v2/users/getBrandProducts");
+const getProductGridController = require("../../controllers/v2/users/getProductGrid");
+const getParticularProductController = require("../../controllers/v2/users/getParticularProduct");
 const getOneBrandProductsController = require("../../controllers/v2/users/getOneBrandProduct");
 const getMyBrandProductsController = require("../../controllers/v2/users/getMyBrandProduct");
 const readNotificationsController = require("../../controllers/v2/users/readNotifications");
@@ -307,6 +309,10 @@ router.get(
   "/me",
   expressCallback(getMeController),
 );
+
+
+router.get('/grid/:id', requestValidatorCallback(validator.getProductGrid), expressCallback(getProductGridController));
+router.get('/particular/:userId', requestValidatorCallback(validator.getParticularProduct), expressCallback(getParticularProductController));
 
 router.get(
   "/check/username/:username",

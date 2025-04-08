@@ -61,7 +61,7 @@ exports.getFunLinks = (masterUserId, page, profileId, filterObj) => {
                 name: "$profileFunlinks.name",
                 bio: "$profileFunlinks.bio",
                 profession: "$profileFunlinks.profession",
-                profileImage: "$profileFunlinks.profileImage",
+                profileImage: "$profileFunlinks.profileImageX50",
                 profileImageType: "$profileFunlinks.profileImageType",
               }
             },
@@ -259,7 +259,7 @@ exports.getFunLinks = (masterUserId, page, profileId, filterObj) => {
         // fametrendzs: 1,
         user: 1,
         description: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         seen: 1,
         likesCount: 1,
@@ -335,7 +335,7 @@ exports.getFunlinksFollowlinks = (funLinksId, userId, page, filterObj) => {
                 name: "$profileFunlinks.name",
                 bio: "$profileFunlinks.bio",
                 profession: "$profileFunlinks.profession",
-                profileImage: "$profileFunlinks.profileImage",
+                profileImage: "$profileFunlinks.profileImageX50",
                 profileImageType: "$profileFunlinks.profileImageType",
               }
             },
@@ -527,7 +527,7 @@ exports.getFunlinksFollowlinks = (funLinksId, userId, page, filterObj) => {
         // fametrendzs: 1,
         user: 1,
         description: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         seen: 1,
         likesCount: 1,
@@ -586,7 +586,7 @@ exports.getMyFunLinks = (
                 name: "$profileFunlinks.name",
                 bio: "$profileFunlinks.bio",
                 profession: "$profileFunlinks.profession",
-                profileImage: "$profileFunlinks.profileImage",
+                profileImage: "$profileFunlinks.profileImageX50",
                 profileImageType: "$profileFunlinks.profileImageType",
               }
             },
@@ -743,7 +743,7 @@ exports.getMyFunLinks = (
         musicName: 1,
         audio: 1,
         description: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         likeStatus: { $ifNull: ["$likeStatus", null] },
         media: [
@@ -788,7 +788,7 @@ exports.getMyFunLinks = (
 //                 pipeline: [{
 //                     $match: { $expr: { $eq: ["$_id", "$$userId"] } }
 //                 }, {
-//                     $project: { name: 1, dob: 1, bio: 1, profession: 1, profileImage: 1 }
+//                     $project: { name: 1, dob: 1, bio: 1, profession: 1, profileImageX50: 1 }
 //                 }],
 //                 as: 'user'
 //             }
@@ -817,7 +817,7 @@ exports.getMyFunLinks = (
 //             challenges: 1,
 //             user: 1,
 //             description: 1,
-//             profileImage: 1,
+//             profileImage: '$profileImageX50',
 //             maleSeen: 1,
 //             femaleSeen: 1,
 //             likes0Count: 1,
@@ -1066,7 +1066,7 @@ exports.getMyFunLinks = (
 //                             state: 1,
 //                             country: 1,
 //                             gender: 1,
-//                             profileImage: 1
+//                             profileImageX50: 1
 //                         }
 //                     }
 //                 ],
@@ -1203,7 +1203,7 @@ exports.getFunLinksById = (userId, postId, profileId) => {
                 name: "$profileFunlinks.name",
                 bio: "$profileFunlinks.bio",
                 profession: "$profileFunlinks.profession",
-                profileImage: "$profileFunlinks.profileImage",
+                profileImage: "$profileFunlinks.profileImageX50",
                 profileImageType: "$profileFunlinks.profileImageType",
               }
             },
@@ -1333,9 +1333,9 @@ exports.getFunLinksById = (userId, postId, profileId) => {
         location: { $first: "$location" },
         gender: 1,
         challenges: 1,
-        user: 1, //{ name: 1, dob: 1, bio: 1, profession: 1, profileImage: 1, _id: 1, username: 1, type: 1 },
+        user: 1, //{ name: 1, dob: 1, bio: 1, profession: 1, profileImage: '$profileImageX50', _id: 1, username: 1, type: 1 },
         description: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         likesCount: 1,
         commentsCount: 1,

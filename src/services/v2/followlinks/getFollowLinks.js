@@ -6,7 +6,7 @@ const {
   getFameLinksFollowlinks,
 } = require("../../../data-access/v2/famelinks");
 const { getFunlinksFollowlinks } = require("../../../data-access/v2/funlinks");
-const { getBrandPosts } = require("../../../data-access/v2/brandProducts");
+const { getBrandPosts } = require("../../../data-access/v3/brandProducts");
 const { getCollabLinks } = require("../../../data-access/v3/collablinks");
 var ObjectId = require("mongoose").Types.ObjectId;
 

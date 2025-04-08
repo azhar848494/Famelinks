@@ -67,7 +67,7 @@ exports.getChannelSuggestion = (selfMasterId, page) => {
                       name: "$profileFollowlinks.name",
                       bio: "$profileFollowlinks.bio",
                       profession: "$profileFollowlinks.profession",
-                      profileImage: "$profileFollowlinks.profileImage",
+                      profileImage: "$profileFollowlinks.profileImageX50",
                       profileImageType: "$profileFollowlinks.profileImageType",
                     }
                   },

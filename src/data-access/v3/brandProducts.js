@@ -4,86 +4,27 @@ const ObjectId = mongoose.Types.ObjectId;
 
 const BrandProductDB = require("../../models/v2/brandProducts");
 
-const getBrandPosts = (page) => {
-    let pagination = ((page - 1) * 1)
+const getBrandPosts = (userId, page) => {
     return BrandProductDB.aggregate([
         { $sort: { createdAt: -1 } },
+        // User
         {
             $lookup: {
-                from: "profilestorelinks",
+                from: "users",
                 let: { userId: "$userId" },
                 pipeline: [
                     { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
                     {
                         $project: {
                             name: 1,
-                            // dob: 1,
+                            dob: 1,
                             bio: 1,
                             profession: 1,
-                            profileImage: 1,
+                            profileImage: '$profileImageX50',
                             profileImageType: 1,
-                            // username: 1, //this is present master user table
+                            username: 1,
                             _id: 1,
-                            // type: 1, //this is present master user table
-                        },
-                    },
-                    {
-                        $lookup: {
-                            from: "users",
-                            let: { userId: "$_id" },
-                            pipeline: [
-                                {
-                                    $match: {
-                                        $expr: { $eq: ["$profileStorelinks", "$$userId"] },
-                                        isDeleted: false,
-                                        isSuspended: false,
-                                    },
-                                },
-                                {
-                                    $project: {
-                                        username: 1, //this is present master user table
-                                        type: 1, //this is present master user table
-                                        _id: 1,
-                                        dob: 1,
-                                        profileFamelinks: 1,
-                                        // name: 1,
-                                    },
-                                },
-                            ],
-                            as: "masterUser",
-                        },
-                    },
-                    {
-                        $addFields: {
-                            username: { $first: "$masterUser.username" },
-                            type: { $first: "$masterUser.type" },
-                            dob: { $first: "$masterUser.dob" },
-                            _id: { $first: "$masterUser._id" },
-                            // name: { $first: "$masterUser.name" },
-                        },
-                    },
-                    {
-                        $group: {
-                            _id: "$_id",
-                            name: { $first: "$name" },
-                            type: { $first: "$type" },
-                            username: { $first: "$username" },
-                            dob: { $first: "$dob" },
-                            bio: { $first: "$bio" },
-                            profession: { $first: "$profession" },
-                            profileImage: { $first: "$profileImage" },
-                            profileImageType: { $first: "$profileImageType" },
-                        },
-                    },
-                    {
-                        $set: {
-                            profileImageType: {
-                                $cond: [
-                                    { $ifNull: ["$profileImageType", false] },
-                                    "$profileImageType",
-                                    "",
-                                ],
-                            },
+                            type: 1,
                         },
                     },
                 ],
@@ -91,6 +32,118 @@ const getBrandPosts = (page) => {
             },
         },
         { $addFields: { user: { $first: "$user" } } },
+        {
+            $lookup: {
+                from: "users",
+                let: { userId: userId },
+                pipeline: [
+                    { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                    { $project: { _id: 0, savedProducts: 1 } },
+                ],
+                as: "savedProducts",
+            },
+        },
+        {
+            $addFields: { savedProducts: { $first: "$savedProducts.savedProducts" } },
+        },
+        { $addFields: { savedStatus: { $in: ["$_id", "$savedProducts"] } } },
+        {
+            $lookup: {
+                from: "users",
+                let: { value: "$_id" },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: { $in: ["$$value", "$savedProducts"] },
+                        },
+                    },
+                    { $project: { _id: 1 } },
+                ],
+                as: "savedCount",
+            },
+        },
+        { $addFields: { savedCount: { $size: "$savedCount" } } },
+        {
+            $lookup: {
+                from: "followlinks",
+                let: { value: "$_id" },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: { $eq: ["$productId", "$$value"] },
+                        },
+                    },
+                    { $project: { _id: 1 } },
+                ],
+                as: "tagCount",
+            },
+        },
+        { $addFields: { tagCount: { $size: "$tagCount" } } },
+        { $addFields: { followStatus: 0 } },
+        {
+            $lookup: {
+                from: "followers",
+                let: { followeeId: "$user._id" }, //master user Id
+                pipeline: [
+                    {
+                        $match: {
+                            followerId: userId,
+                            $expr: { $eq: ["$followeeId", "$$followeeId"] },
+                            acceptedDate: { $eq: null },
+                            type: "user",
+                        },
+                    },
+                    { $project: { _id: 1 } },
+                ],
+                as: "requested",
+            },
+        },
+        {
+            $addFields: {
+                followStatus: {
+                    $cond: [{ $eq: [{ $size: "$requested" }, 1] }, 1, "$followStatus"],
+                },
+            },
+        },
+        {
+            $lookup: {
+                from: "followers",
+                let: { followeeId: "$user._id" }, //master user Id
+                pipeline: [
+                    {
+                        $match: {
+                            followerId: userId,
+                            $expr: { $eq: ["$followeeId", "$$followeeId"] },
+                            acceptedDate: { $ne: null },
+                            type: "user",
+                        },
+                    },
+                    { $project: { _id: 1 } },
+                ],
+                as: "following",
+            },
+        },
+        {
+            $addFields: {
+                followStatus: {
+                    $cond: [{ $eq: [{ $size: "$following" }, 1] }, 2, "$followStatus"],
+                },
+            },
+        },
+        {
+            $addFields: {
+                followStatus: {
+                    $switch: {
+                        branches: [
+                            { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
+                            { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
+                            { case: { $eq: ["$followStatus", 2] }, then: "Following" },
+                        ],
+                        default: "Follow",
+                    },
+                },
+            },
+        },
         {
             $addFields: {
                 tags: {
@@ -103,46 +156,31 @@ const getBrandPosts = (page) => {
             },
         },
         {
-            $lookup: {
-              from: "locatns",
-              let: { value: "$location" },
-              pipeline: [
-                { $match: { $expr: { $eq: ["$_id", "$$value"] } } },
-                { $project: { type: 1, value: 1, } },
-              ],
-              as: "location",
-            },
-          },
-        {
             $project: {
-                brands: 1,
-                type: "brand",
-                createdAt: 1,
-                updatedAt: 1,
+                type: 'store',
                 name: 1,
                 profession: 1,
-                location: { $first: "$location" },
-                hashTag: 1,
                 price: 1,
-                buttonName: 1,
+                hashTag: 1,
                 purchaseUrl: 1,
                 gender: 1,
                 user: 1,
                 description: 1,
-                profileImage: 1,
+                profileImage: '$profileImageX50',
                 profileImageType: 1,
-                likes0Count: 1,
-                likes1Count: 1,
-                likes2Count: 1,
+                buttonName: 1,
                 commentsCount: 1,
-                tags: 1,
-                savedStatus: 1,
+                followStatus: 1,
                 media: 1,
-                winnerTitles: [],
+                createdAt: 1,
+                updatedAt: 1,
+                savedStatus: 1,
+                savedCount: 1,
+                tagCount: 1,
             },
         },
-        { $skip: pagination },
-        { $limit: 1 }
+        { $skip: (page - 1) * 10 },
+        { $limit: 10 },
     ])
 }
 

@@ -125,7 +125,7 @@ exports.getClubOffersNew = (followlinksId, funlinksId, userType, page) => {
                                 isDeleted: false, isSuspended: false
                             }
                         },
-                        { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+                        { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
                         
                     ],
                     as: 'createdBy'
@@ -235,7 +235,7 @@ exports.getClubOffersNew = (followlinksId, funlinksId, userType, page) => {
                                 isDeleted: false, isSuspended: false
                             }
                         },
-                        { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+                        { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
                         
                     ],
                     as: 'createdBy'
@@ -336,7 +336,7 @@ exports.getClubOffersApplied = (followlinksId, funlinksId, userType, page) => {
                                 isDeleted: false, isSuspended: false
                             }
                         },
-                        { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+                        { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
                         
                     ],
                     as: 'createdBy'
@@ -435,11 +435,11 @@ exports.getClubOffersApplied = (followlinksId, funlinksId, userType, page) => {
                                 type: 1,
                                 username: 1,
                                 name: 1,
-                                profileImage: 1,
+                                profileImage: '$profileImageX50',
                                 profileImageType: 1,
                                 profile: {
                                     name: "$profileFollowlinks.name",
-                                    profileImage: "$profileFollowlinks.profileImage",
+                                    profileImage: "$profileFollowlinks.profileImageX50",
                                     profileImageType: "$profileFollowlinks.profileImageType",
                                 },
                             }
@@ -461,11 +461,11 @@ exports.getClubOffersApplied = (followlinksId, funlinksId, userType, page) => {
                                 type: 1,
                                 username: 1,
                                 name: 1,
-                                profileImage: 1,
+                                profileImage: '$profileImageX50',
                                 profileImageType: 1,
                                 profile: {
                                     name: "$profileFunlinks.name",
-                                    profileImage: "$profileFunlinks.profileImage",
+                                    profileImage: "$profileFunlinks.profileImageX50",
                                     profileImageType: "$profileFunlinks.profileImageType",
                                 },
                             },
@@ -488,7 +488,7 @@ exports.getClubOffersApplied = (followlinksId, funlinksId, userType, page) => {
                                 isDeleted: false, isSuspended: false
                             }
                         },
-                        { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+                        { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
                         
                     ],
                     as: 'createdBy'
@@ -577,7 +577,7 @@ exports.getClubOffersInProgress = (followlinksId, funlinksId, userType, page, se
                                 isDeleted: false, isSuspended: false
                             }
                         },
-                        { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+                        { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
                         
                     ],
                     as: 'createdBy'
@@ -773,7 +773,7 @@ exports.getClubOffersInProgress = (followlinksId, funlinksId, userType, page, se
                                 isDeleted: false, isSuspended: false
                             }
                         },
-                        { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+                        { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
                         
                     ],
                     as: 'createdBy'
@@ -960,7 +960,7 @@ exports.getClubOffersCompleted = (followlinksId, funlinksId, userType, page) => 
                                 isDeleted: false, isSuspended: false
                             }
                         },
-                        { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+                        { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
                         
                     ],
                     as: 'createdBy'
@@ -1065,7 +1065,7 @@ exports.getClubOffersCompleted = (followlinksId, funlinksId, userType, page) => 
                                 isDeleted: false, isSuspended: false
                             }
                         },
-                        { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+                        { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
                         
                     ],
                     as: 'createdBy'
@@ -1250,7 +1250,7 @@ exports.searchClubOffersByName = (selfMasterId, search, followlinksId, funlinksI
                                 isSuspended: false,
                             },
                         },
-                        { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+                        { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
                         
                     ],
                     as: "createdBy",
@@ -1360,7 +1360,7 @@ exports.searchClubOffersByName = (selfMasterId, search, followlinksId, funlinksI
                                 isDeleted: false, isSuspended: false
                             }
                         },
-                        { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+                        { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
                         
                     ],
                     as: 'createdBy'
@@ -1539,7 +1539,7 @@ exports.getApplicants = (offerId) => {
                                         ]
                                     }
                                 },
-                                { $project: { name: 1, type: 1, usertype: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1, profileFollowlinks: 1, profileFunlinks: 1, followersCount: 1 } },
+                                { $project: { name: 1, type: 1, usertype: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1, profileFollowlinks: 1, profileFunlinks: 1, followersCount: 1 } },
                                 
                                 {
                                     $lookup: {
@@ -1567,7 +1567,7 @@ exports.getApplicants = (offerId) => {
                                         name: 1,
                                         username: 1,
                                         type: 1,
-                                        profileImage: 1,
+                                        profileImage: '$profileImageX50',
                                         profileImageType: 1,
                                         followersCount: 1,
                                         offersCompleted: { $size: '$offersCompleted' }
@@ -1599,7 +1599,7 @@ exports.getApplicants = (offerId) => {
                 pipeline: [
                     { $match: { $expr: { $in: ['$_id', '$$applications.userId'] } } },
                     
-                    { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } }
+                    { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } }
                 ],
                 as: 'followlinksApplicants'
             }
@@ -1612,7 +1612,7 @@ exports.getApplicants = (offerId) => {
                 pipeline: [
                     { $match: { $expr: { $in: ['$_id', '$$applications.userId'] } } },
                     
-                    { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } }
+                    { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } }
                 ],
                 as: 'funlinksApplicants'
             }
@@ -1631,7 +1631,7 @@ exports.getApplicants = (offerId) => {
                             isDeleted: false, isSuspended: false
                         }
                     },
-                    { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1 } },
+                    { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
                     
                 ],
                 as: 'createdBy'
@@ -1714,7 +1714,7 @@ exports.getApplicants = (offerId) => {
                                         ]
                                     }
                                 },
-                                { $project: { type: 1, username: 1, name: 1, profileImage: 1, profileImageType: 1, profileFollowlinks: 1, profileFunlinks: 1, followersCount: 1 } },
+                                { $project: { type: 1, username: 1, name: 1, profileImage: '$profileImageX50', profileImageType: 1, profileFollowlinks: 1, profileFunlinks: 1, followersCount: 1 } },
                                 
                                 {
                                     $lookup: {
@@ -1740,7 +1740,7 @@ exports.getApplicants = (offerId) => {
                                 {
                                     $project: {
                                         name: 1,
-                                        profileImage: 1,
+                                        profileImage: '$profileImageX50',
                                         profileImageType: 1,
                                         followersCount: 1,
                                         offersCompleted: { $size: '$offersCompleted' }

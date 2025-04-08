@@ -49,7 +49,7 @@ exports.deletePostMedia = (postId, userId, mediaName) => {
 //                 pipeline: [{
 //                     $match: { $expr: { $eq: ["$_id", "$$userId"] } }
 //                 }, {
-//                     $project: { name: 1, dob: 1, bio: 1, profession: 1, profileImage: 1 }
+//                     $project: { name: 1, dob: 1, bio: 1, profession: 1, profileImageX50: 1 }
 //                 }],
 //                 as: 'user'
 //             }
@@ -95,7 +95,7 @@ exports.deletePostMedia = (postId, userId, mediaName) => {
 //             challenges: 1,
 //             user: 1,
 //             description: 1,
-//             profileImage: 1,
+//             profileImage: '$profileImageX50',
 //             followStatus: { $ifNull: [{ $toBool: '$followStatus' }, false] },
 //             likesCount: 1,
 //             commentsCount: 1,
@@ -283,7 +283,7 @@ exports.getMyFollowLinks = (
                 name: "$profileFollowlinks.name",
                 bio: "$profileFollowlinks.bio",
                 profession: "$profileFollowlinks.profession",
-                profileImage: "$profileFollowlinks.profileImage",
+                profileImage: "$profileFollowlinks.profileImageX50",
                 profileImageType: "$profileFollowlinks.profileImageType",
               }
             },
@@ -508,7 +508,7 @@ exports.getMyFollowLinks = (
         viewCount: { $size: '$reachIds' },
         commentsCount: 1,
         description: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         likeStatus: { $ifNull: ["$likeStatus", null] },
         tag: { $ifNull: ["$tag", null] },
@@ -620,7 +620,7 @@ exports.getFollowLinks = (followLinksId, userId, page, filterObj) => {
                   name: "$profileFollowlinks.name",
                   bio: "$profileFollowlinks.bio",
                   profession: "$profileFollowlinks.profession",
-                  profileImage: "$profileFollowlinks.profileImage",
+                  profileImage: "$profileFollowlinks.profileImageX50",
                   profileImageType: "$profileFollowlinks.profileImageType",
                 }
               },
@@ -844,7 +844,7 @@ exports.getFollowLinks = (followLinksId, userId, page, filterObj) => {
           product: 1,
           user: 1,
           description: 1,
-          profileImage: 1,
+          profileImage: '$profileImageX50',
           profileImageType: 1,
           likesCount: 1,
           commentsCount: 1,
@@ -969,7 +969,7 @@ exports.getOnePost = (postId) => {
 // //                             state: 1,
 // //                             country: 1,
 // //                             gender: 1,
-// //                             profileImage: 1
+// //                             profileImageX50: 1
 // //                         }
 // //                     }
 // //                 ],
@@ -1071,7 +1071,7 @@ exports.getFollowLinksById = (profileId, userId, postId) => {
                 name: "$profileFollowlinks.name",
                 bio: "$profileFollowlinks.bio",
                 profession: "$profileFollowlinks.profession",
-                profileImage: "$profileFollowlinks.profileImage",
+                profileImage: "$profileFollowlinks.profileImageX50",
                 profileImageType: "$profileFollowlinks.profileImageType",
               }
             },
@@ -1218,7 +1218,7 @@ exports.getFollowLinksById = (profileId, userId, postId) => {
         challenges: 1,
         user: 1,
         description: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         likes0Count: 1,
         likes1Count: 1,

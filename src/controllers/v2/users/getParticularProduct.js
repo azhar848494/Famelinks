@@ -1,28 +1,22 @@
 const serializeHttpResponse = require('../../../helpers/serialize-http-response');
-const getMyFollowLinksService = require('../../../services/v2/followlinks/getMyFollowLinks');
+const getParticularProductService = require('../../../services/v2/users/getParticularProduct');
 const { isValidObjectId } = require('../../../utils/db');
 
 module.exports = async (request) => {
-    let hashTagId = request.query.hashTagId;
-    let productId = request.query.productId;
-
     if (!isValidObjectId(request.params.userId)) {
         return serializeHttpResponse(400, {
             message: 'Invalid Object Id'
         });
     }
     
-    const result = await getMyFollowLinksService(
+    const result = await getParticularProductService(
         request.params.userId,
         request.query.page,
         request.user._id,
-        request.user._id,
-        hashTagId,
-        productId,
     );
 
     return serializeHttpResponse(200, {
-        message: 'FollowLinks Fetched',
+        message: 'Products Fetched',
         result
     });
 };

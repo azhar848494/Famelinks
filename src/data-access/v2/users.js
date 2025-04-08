@@ -49,6 +49,10 @@ exports.findUserByEmail = (email) => {
   return UserDB.findOne({ email }).lean();
 };
 
+exports.getAllotedCoins = (productId) => {
+  return brandProductDB.findOne({ _id: productId }, {}).lean();
+};
+
 exports.updateUser = (userId, data) => {
   if (data.location) {
     data.location = ObjectId.createFromHexString(data.location);
@@ -157,7 +161,7 @@ exports.getOneUser = (userId) => {
       profession: 1,
       location: 1,
       gender: 1,
-      profileImage: 1,
+      profileImage: '$profileImageX50',
       dob: 1,
       ageGroup: 1,
       mobileNumber: 1,
@@ -190,34 +194,34 @@ exports.getOneUser = (userId) => {
       isFirstLogin: 1,
       profileFamelinks: {
         name: '$profileFamelinks.name',
-        profileImage: '$profileFamelinks.profileImage',
+        profileImage: '$profileFamelinks.profileImageX50',
         profileImageType: '$profileFamelinks.profileImageType',
       },
       profileFunlinks: {
         name: '$profileFunlinks.name',
-        profileImage: '$profileFunlinks.profileImage',
+        profileImage: '$profileFunlinks.profileImageX50',
         profileImageType: '$profileFunlinks.profileImageType',
       },
       profileFollowlinks: {
         name: '$profileFollowlinks.name',
-        profileImage: '$profileFollowlinks.profileImage',
+        profileImage: '$profileFollowlinks.profileImageX50',
         profileImageType: '$profileFollowlinks.profileImageType',
       },
       profileJoblinks: {
         name: '$profileJoblinks.name',
-        profileImage: '$profileJoblinks.profileImage',
+        profileImage: '$profileJoblinks.profileImageX50',
         profileImageType: '$profileJoblinks.profileImageType',
         savedJobs: 1,
         savedTalents: 1,
       },
       profileStorelinks: {
         name: '$profileStorelinks.name',
-        profileImage: '$profileStorelinks.profileImage',
+        profileImage: '$profileStorelinks.profileImageX50',
         profileImageType: '$profileStorelinks.profileImageType',
       },
       profileCollablinks: {
         name: '$profileCollablinks.name',
-        profileImage: '$profileCollablinks.profileImage',
+        profileImage: '$profileCollablinks.profileImageX50',
         profileImageType: '$profileCollablinks.profileImageType',
       },
       profileImageType: 1,
@@ -232,7 +236,7 @@ exports.getOneUser = (userId) => {
 exports.getUserByTag = (tag) => {
   return UserDB.findOne(
     { _id: tag },
-    { _id: 1, profileImage: 1, pushToken: 1 }
+    { _id: 1, profileImage: '$profileImageX50', pushToken: 1 }
   ).lean();
 };
 
@@ -270,7 +274,7 @@ exports.getUserProfileImages = (userId) => {
         profession: 1,
         location: { $first: "$location" },
         gender: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         dob: 1,
         ageGroup: 1,
         mobileNumber: 1,
@@ -300,27 +304,27 @@ exports.getUserProfileImages = (userId) => {
         thanksBalance: { $add: [3000, 0] },
         isFirstLogin: 1,
         profileFamelinks: {
-          profileImage: "$profileFamelinks.profileImage",
+          profileImage: "$profileFamelinks.profileImageX50",
           profileImageType: "$profileFamelinks.profileImageType",
         },
         profileFunlinks: {
-          profileImage: "$profileFunlinks.profileImage",
+          profileImage: "$profileFunlinks.profileImageX50",
           profileImageType: "$profileFunlinks.profileImageType",
         },
         profileFollowlinks: {
-          profileImage: "$profileFollowlinks.profileImage",
+          profileImage: "$profileFollowlinks.profileImageX50",
           profileImageType: "$profileFollowlinks.profileImageType",
         },
         profileJoblinks: {
-          profileImage: "$profileJoblinks.profileImage",
+          profileImage: "$profileJoblinks.profileImageX50",
           profileImageType: "$profileJoblinks.profileImageType",
         },
         profileStorelinks: {
-          profileImage: "$profileCollablinks.profileImage",
+          profileImage: "$profileCollablinks.profileImageX50",
           profileImageType: "$profileCollablinks.profileImageType",
         },
         profileCollablinks: {
-          profileImage: "$profileCollablinks.profileImage",
+          profileImage: "$profileCollablinks.profileImageX50",
           profileImageType: "$profileCollablinks.profileImageType",
         },
         profileImageType: 1,
@@ -483,13 +487,13 @@ exports.getFollowers = (userId, page, selfUserId, search) => {
               type: 1,
               name: 1,
               username: 1,
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profileImageType: 1,
               location: { $first: "$location" },
               //MasterIdMigration
               profile: {
                 name: "$profileFollowlinks.name",
-                profileImage: "$profileFollowlinks.profileImage",
+                profileImage: "$profileFollowlinks.profileImageX50",
                 profileImageType: "$profileFollowlinks.profileImageType",
               }
             },
@@ -774,13 +778,13 @@ exports.getFollowees = (userId, page, selfUserId, type, search) => {
                   type: 1,
                   name: 1,
                   username: 1,
-                  profileImage: 1,
+                  profileImage: '$profileImageX50',
                   profileImageType: 1,
                   location: { $first: "$location" },
                   //MasterIdMigration
                   profile: {
                     name: "$profileFollowlinks.name",
-                    profileImage: "$profileFollowlinks.profileImage",
+                    profileImage: "$profileFollowlinks.profileImageX50",
                     profileImageType: "$profileFollowlinks.profileImageType",
                   },
                 },
@@ -1081,13 +1085,13 @@ exports.getFollowees = (userId, page, selfUserId, type, search) => {
                   type: 1,
                   name: 1,
                   username: 1,
-                  profileImage: 1,
+                  profileImage: '$profileImageX50',
                   profileImageType: 1,
                   location: { $first: "$location" },
                   //MasterIdMigration
                   profile: {
                     name: "$profileFollowlinks.name",
-                    profileImage: "$profileFollowlinks.profileImage",
+                    profileImage: "$profileFollowlinks.profileImageX50",
                     profileImageType: "$profileFollowlinks.profileImageType",
                   },
                 },
@@ -1206,13 +1210,13 @@ exports.getFollowSuggestions = (userId, page, search) => {
                     type: 1,
                     name: 1,
                     username: 1,
-                    profileImage: 1,
+                    profileImage: '$profileImageX50',
                     profileImageType: 1,
                     location: { $first: "$location" },
                     //MasterIdMigration
                     profile: {
                       name: "$profileFollowlinks.name",
-                      profileImage: "$profileFollowlinks.profileImage",
+                      profileImage: "$profileFollowlinks.profileImageX50",
                       profileImageType: "$profileFollowlinks.profileImageType",
                     }
                   },
@@ -1265,14 +1269,14 @@ exports.getFollowSuggestions = (userId, page, search) => {
         type: 1,
         name: 1,
         username: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         location: { $first: "$location" },
         followedBy: 1,
         //MasterIdMigration
         profile: {
           name: "$profileFollowlinks.name",
-          profileImage: "$profileFollowlinks.profileImage",
+          profileImage: "$profileFollowlinks.profileImageX50",
           profileImageType: "$profileFollowlinks.profileImageType",
         },
         followStatus: 1,
@@ -1320,7 +1324,7 @@ exports.getFollowSuggestions = (userId, page, search) => {
 //             $project: {
 //               name: 1,
 //               updatedAt: 1,
-//               profileImage: 1,
+//               profileImage: '$profileImageX50',
 //               profileImageType: 1,
 //               district: 1,
 //               state: 1,
@@ -1341,7 +1345,7 @@ exports.getFollowSuggestions = (userId, page, search) => {
 //       $project: {
 //         _id: "$user._id",
 //         name: "$user.name",
-//         profileImage: "$user.profileImage",
+//         profileImage: "$user.profileImageX50",
 //         profileImageType: "$user.profileImageType",
 //         district: "$user.district",
 //         state: "$user.state",
@@ -1459,12 +1463,12 @@ exports.getContestants = (search, page) => {
         location: { $first: "$location" },
         gender: 1,
         ageGroup: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         type: 1,
         profile: {
           name: "$profileFamelinks.name",
-          profileImage: "$profileFamelinks.profileImage",
+          profileImage: "$profileFamelinks.profileImageX50",
           profileImageType: "$profileFamelinks.profileImageType",
         }
       },
@@ -1479,7 +1483,7 @@ exports.getContestants = (search, page) => {
   //   continent: 1,
   //   gender: 1,
   //   ageGroup: 1,
-  //   profileImage: 1,
+  //   profileImage: '$profileImageX50',
   //   profileImageType: 1,
   //   type: 1,
   //   profileFamelinks: 1,
@@ -1560,11 +1564,11 @@ exports.getSearchContestants = (search, page, userId, postType) => {
         location: { $first: "$location" },
         gender: 1,
         ageGroup: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         profile: {
           name: `$${linkType}.name`,
-          profileImage: `$${linkType}.profileImage`,
+          profileImage: `$${linkType}.profileImageX50`,
           profileImageType: `$${linkType}.profileImageType`,
         },
         followStatus: '$followStatus',
@@ -1580,7 +1584,7 @@ exports.getSearchContestants = (search, page, userId, postType) => {
   //   continent: 1,
   //   gender: 1,
   //   ageGroup: 1,
-  //   profileImage: 1,
+  //   profileImage: '$profileImageX50',
   //   profileImageType: 1,
   //   type: 1,
   //   profileFamelinks: 1,
@@ -1634,7 +1638,7 @@ exports.getRecommendedContestants = (condition, page) => {
         location: { $first: "$location" },
         gender: 1,
         ageGroup: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         type: 1,
         profileFamelinks: 1,
@@ -1656,7 +1660,7 @@ exports.getTrendingContestants = (condition, page) => {
   //   continent: 1,
   //   gender: 1,
   //   ageGroup: 1,
-  //   profileImage: 1,
+  //   profileImage: '$profileImageX50',
   //   profileImageType: 1,
   //   type: 1,
   //   profileFamelinks: 1,
@@ -1707,7 +1711,7 @@ exports.getTrendingContestants = (condition, page) => {
         location: { $first: "$location" },
         gender: 1,
         ageGroup: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         type: 1,
         profileFamelinks: 1,
@@ -1792,7 +1796,7 @@ exports.getFollowRequest = (userId, page) => {
               type: 1,
               name: 1,
               username: 1,
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profileImageType: 1,
               location: { $first: "$location" },
             },
@@ -1809,7 +1813,7 @@ exports.getFollowRequest = (userId, page) => {
         username: { $first: "$masterUser.username" },
         location: { $first: "$masterUser.location" },
         profileImageType: { $first: "$masterUser.profileImageType" },
-        profileImage: { $first: "$masterUser.profileImage" },
+        profileImage: { $first: "$masterUser.profileImageX50" },
       },
     },
     {
@@ -1821,7 +1825,7 @@ exports.getFollowRequest = (userId, page) => {
         location: { $first: "$location" },
         createdAt: { $first: "$createdAt" },
         profileImageType: { $first: "$profileImageType" },
-        profileImage: { $first: "$profileImage" },
+        profileImage: { $first: ".profileImageX50" },
       },
     },
     { $skip: (page - 1) * 10 },
@@ -2104,7 +2108,7 @@ exports.getRecommendations = (recommendedBy, agencyId) => {
               bio: 1,
               profession: 1,
               dob: 1,
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profileImageType: 1,
               username: 1,
             },
@@ -2683,6 +2687,8 @@ exports.getProfileFamelinks = (profileId, followerId, page) => {
         bio: "$profileFamelinks.bio",
         profession: "$profileFamelinks.profession",
         profileImage: "$profileFamelinks.profileImage",
+        profileImageX50: "$profileFamelinks.profileImageX50",
+        profileImageX300: "$profileFamelinks.profileImageX300",
         profileImageType: "$profileFamelinks.profileImageType",
         likes0Count: "$profileFamelinks.likes0Count",
         likes1Count: "$profileFamelinks.likes1Count",
@@ -2692,7 +2698,6 @@ exports.getProfileFamelinks = (profileId, followerId, page) => {
         isBlocked: "$profileFamelinks.isBlocked",
         isDeleted: "$profileFamelinks.isDeleted",
         createdAt: "$profileFamelinks.createdAt",
-        profileImage: "$profileFamelinks.profileImage",
         masterUser: {
           _id: "$_id",
           name: "$name",
@@ -2701,6 +2706,8 @@ exports.getProfileFamelinks = (profileId, followerId, page) => {
           username: "$username",
           fameCoins: "$fameCoins",
           profileImage: "$profileImage",
+          profileImageX50: "$profileImageX50",
+          profileImageX300: "$profileImageX300",
           profileImageType: "$profileImageType",
           dob: "$dob",
           isVerified: "$isVerified",
@@ -2851,7 +2858,7 @@ exports.getProfileFollowlinks = async (profileId, followerId, page) => {
                     type: 1,
                     name: 1,
                     username: 1,
-                    profileImage: 1,
+                    profileImage: '$profileImageX50',
                     profileImageType: 1,
                     location: { $first: "$location" },
                   },
@@ -2868,7 +2875,7 @@ exports.getProfileFollowlinks = async (profileId, followerId, page) => {
               username: { $first: "$masterUser.username" },
               location: { $first: "$masterUser.location" },
               profileImageType: { $first: "$masterUser.profileImageType" },
-              profileImage: { $first: "$masterUser.profileImage" },
+              profileImage: { $first: "$masterUser.profileImageX50" },
             },
           },
           {
@@ -2880,7 +2887,7 @@ exports.getProfileFollowlinks = async (profileId, followerId, page) => {
               location: { $first: "$location" },
               createdAt: { $first: "$createdAt" },
               profileImageType: { $first: "$profileImageType" },
-              profileImage: { $first: "$profileImage" },
+              profileImage: { $first: ".profileImageX50" },
             },
           },
         ],
@@ -3133,6 +3140,8 @@ exports.getProfileFollowlinks = async (profileId, followerId, page) => {
         bio: "$profileFollowlinks.bio",
         profession: "$profileFollowlinks.profession",
         profileImage: "$profileFollowlinks.profileImage",
+        profileImageX50: "$profileFollowlinks.profileImageX50",
+        profileImageX300: "$profileFollowlinks.profileImageX300",
         profileImageType: "$profileFollowlinks.profileImageType",
         restrictedList: "$profileFollowlinks.restrictedList",
         isRegistered: "$profileFollowlinks.isRegistered",
@@ -3146,6 +3155,8 @@ exports.getProfileFollowlinks = async (profileId, followerId, page) => {
           username: "$username",
           fameCoins: "$fameCoins",
           profileImage: "$profileImage",
+          profileImageX50: "$profileImageX50",
+          profileImageX300: "$profileImageX300",
           profileImageType: "$profileImageType",
           dob: "$dob",
           isVerified: "$isVerified",
@@ -3357,6 +3368,8 @@ exports.getProfileFunlinks = async (profileId, followerId, page) => {
         isBlocked: "$profileFunlinks.isBlocked",
         isDeleted: "$profileFunlinks.isDeleted",
         profileImage: "$profileFunlinks.profileImage",
+        profileImageX50: "$profileFunlinks.profileImageX50",
+        profileImageX300: "$profileFunlinks.profileImageX300",
         profileImageType: "$profileFunlinks.profileImageType",
         masterUser: {
           _id: "$_id",
@@ -3365,6 +3378,8 @@ exports.getProfileFunlinks = async (profileId, followerId, page) => {
           username: "$username",
           fameCoins: "$fameCoins",
           profileImage: "$profileImage",
+          profileImageX50: "$profileImageX50",
+          profileImageX300: "$profileImageX300",
           profileImageType: "$profileImageType",
           dob: "$dob",
           isVerified: "$isVerified",
@@ -3587,6 +3602,8 @@ exports.getOtherProfileFunlinks = async (profileId, followerId, page) => {
         isBlocked: "$profileFunlinks.isBlocked",
         isDeleted: "$profileFunlinks.isDeleted",
         profileImage: "$profileFunlinks.profileImage",
+        profileImageX50: "$profileFunlinks.profileImageX50",
+        profileImageX300: "$profileFunlinks.profileImageX300",
         profileImageType: "$profileFunlinks.profileImageType",
         masterUser: {
           _id: "$_id",
@@ -3596,6 +3613,8 @@ exports.getOtherProfileFunlinks = async (profileId, followerId, page) => {
           username: "$username",
           fameCoins: "$fameCoins",
           profileImage: "$profileImage",
+          profileImageX50: "$profileImageX50",
+          profileImageX300: "$profileImageX300",
           profileImageType: "$profileImageType",
           dob: "$dob",
           isVerified: "$isVerified",
@@ -3985,14 +4004,14 @@ exports.getProfileJoblinks = (profileId, page) => {
                     let: { userId: "$userId" },
                     pipeline: [
                       { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
-                      { $project: { profileImage: 1, profileImageType: 1 } },
+                      { $project: { profileImage: '$profileImageX50', profileImageType: 1 } },
                     ],
                     as: "user",
                   },
                 },
                 {
                   $addFields: {
-                    profileImage: { $first: "$user.profileImage" },
+                    profileImage: { $first: "$user.profileImageX50" },
                     profileImageType: { $first: "$user.profileImageType" },
                     _id: { $first: "$user._id" },
                   },
@@ -4000,7 +4019,7 @@ exports.getProfileJoblinks = (profileId, page) => {
                 {
                   $group: {
                     _id: "$_id",
-                    profileImage: { $first: "$profileImage" },
+                    profileImage: { $first: ".profileImageX50" },
                     profileImageType: { $first: "$profileImageType" },
                   },
                 },
@@ -4102,7 +4121,7 @@ exports.getProfileJoblinks = (profileId, page) => {
         name: "$profileJoblinks.name",
         bio: "$profileJoblinks.bio",
         profession: "$profileJoblinks.profession",
-        profileImage: "$profileJoblinks.profileImage",
+        profileImage: "$profileJoblinks.profileImageX50",
         profileImageType: "$profileJoblinks.profileImageType",
         greetText: "$profileJoblinks.greetText",
         greetVideo: "$profileJoblinks.greetVideo",
@@ -4113,7 +4132,7 @@ exports.getProfileJoblinks = (profileId, page) => {
           type: "$type",
           username: "$username",
           fameCoins: "$fameCoins",
-          profileImage: "$profileImage",
+          profileImage: "$profileImageX50",
           profileImageType: "$profileImageType",
           dob: "$dob",
           isVerified: "$isVerified",
@@ -4587,14 +4606,14 @@ exports.getOtherProfileJoblinks = (
                       let: { userId: "$userId" },
                       pipeline: [
                         { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
-                        { $project: { profileImage: "$profileJoblinks.profileImage", profileImageType: "$profileJoblinks.profileImageType" } },
+                        { $project: { profileImage: "$profileJoblinks.profileImage", profileImageType: "$profileJoblinks.profileImageX50Type" } },
                       ],
                       as: "user",
                     },
                   },
                   {
                     $addFields: {
-                      profileImage: { $first: "$user.profileImage" },
+                      profileImage: { $first: "$user.profileImageX50" },
                       profileImageType: { $first: "$user.profileImageType" },
                       _id: { $first: "$user._id" },
                     },
@@ -4602,7 +4621,7 @@ exports.getOtherProfileJoblinks = (
                   {
                     $group: {
                       _id: "$_id",
-                      profileImage: { $first: "$profileImage" },
+                      profileImage: { $first: ".profileImageX50" },
                       profileImageType: { $first: "$profileImageType" },
                     },
                   },
@@ -4781,11 +4800,11 @@ exports.getOtherProfileJoblinks = (
                       type: 1,
                       name: 1,
                       username: 1,
-                      profileImage: 1,
+                      profileImage: '$profileImageX50',
                       profileImageType: 1,
                       profile: {
                         name: "$profileJoblinks.name",
-                        profileImage: "$profileJoblinks.profileImage",
+                        profileImage: "$profileJoblinks.profileImageX50",
                         profileImageType: "$profileJoblinks.profileImageType",
                       },
                     },
@@ -4930,11 +4949,11 @@ exports.getOtherProfileJoblinks = (
                       type: 1,
                       name: 1,
                       username: 1,
-                      profileImage: 1,
+                      profileImage: '$profileImageX50',
                       profileImageType: 1,
                       profile: {
                         name: "$profileJoblinks.name",
-                        profileImage: "$profileJoblinks.profileImage",
+                        profileImage: "$profileJoblinks.profileImageX50",
                         profileImageType: "$profileJoblinks.profileImageType",
                       },
                     },
@@ -5381,7 +5400,7 @@ exports.getOtherProfileJoblinks = (
           name: "$profileJoblinks.name",
           bio: "$profileJoblinks.bio",
           profession: "$profileJoblinks.profession",
-          profileImage: "$profileJoblinks.profileImage",
+          profileImage: "$profileJoblinks.profileImageX50",
           profileImageType: "$profileJoblinks.profileImageType",
           greetText: "$profileJoblinks.greetText",
           greetVideo: "$profileJoblinks.greetVideo",
@@ -5393,7 +5412,7 @@ exports.getOtherProfileJoblinks = (
             type: "$type",
             username: "$username",
             fameCoins: "$fameCoins",
-            profileImage: "$profileImage",
+            profileImage: "$profileImageX50",
             profileImageType: "$profileImageType",
             dob: "$dob",
             isVerified: "$isVerified",
@@ -5701,11 +5720,11 @@ exports.getOtherProfileJoblinks = (
                       type: 1,
                       name: 1,
                       username: 1,
-                      profileImage: 1,
+                      profileImage: '$profileImageX50',
                       profileImageType: 1,
                       profile: {
                         name: "$profileJoblinks.name",
-                        profileImage: "$profileJoblinks.profileImage",
+                        profileImage: "$profileJoblinks.profileImageX50",
                         profileImageType: "$profileJoblinks.profileImageType",
                       },
                     },
@@ -5867,11 +5886,11 @@ exports.getOtherProfileJoblinks = (
                       type: 1,
                       name: 1,
                       username: 1,
-                      profileImage: 1,
+                      profileImage: '$profileImageX50',
                       profileImageType: 1,
                       profile: {
                         name: "$profileJoblinks.name",
-                        profileImage: "$profileJoblinks.profileImage",
+                        profileImage: "$profileJoblinks.profileImageX50",
                         profileImageType: "$profileJoblinks.profileImageType",
                       },
                     },
@@ -5958,7 +5977,7 @@ exports.getOtherProfileJoblinks = (
           name: "$profileJoblinks.name",
           bio: "$profileJoblinks.bio",
           profession: "$profileJoblinks.profession",
-          profileImage: "$profileJoblinks.profileImage",
+          profileImage: "$profileJoblinks.profileImageX50",
           profileImageType: "$profileJoblinks.profileImageType",
           greetText: "$profileJoblinks.greetText",
           greetVideo: "$profileJoblinks.greetVideo",
@@ -5970,7 +5989,7 @@ exports.getOtherProfileJoblinks = (
             type: "$type",
             username: "$username",
             fameCoins: "$fameCoins",
-            profileImage: "$profileImage",
+            profileImage: "$profileImageX50",
             profileImageType: "$profileImageType",
             dob: "$dob",
             isVerified: "$isVerified",
@@ -6288,7 +6307,7 @@ exports.getStorelinks = (profileId, followerId, page) => {
         isRegistered: "$profileStorelinks.isRegistered",
         isBlocked: "$profileStorelinks.isBlocked",
         isDeleted: "$profileStorelinks.isDeleted",
-        profileImage: "$profileStorelinks.profileImage",
+        profileImage: "$profileStorelinks.profileImageX50",
         profileImageType: "$profileStorelinks.profileImageType",
         masterUser: {
           _id: "$_id",
@@ -6297,7 +6316,7 @@ exports.getStorelinks = (profileId, followerId, page) => {
           type: "$type",
           username: "$username",
           fameCoins: "$fameCoins",
-          profileImage: "$profileImage",
+          profileImage: "$profileImageX50",
           profileImageType: "$profileImageType",
           dob: "$dob",
           isVerified: "$isVerified",
@@ -6427,7 +6446,7 @@ exports.getSelfCollablinks = (profileId, followerId, page, masterId) => {
                 {
                   $project: {
                     type: 1,
-                    profileImage: 1,
+                    profileImage: '$profileImageX50',
                     profileImageType: 1,
                   },
                 },
@@ -6439,7 +6458,7 @@ exports.getSelfCollablinks = (profileId, followerId, page, masterId) => {
             $addFields: {
               userId: { $first: "$followlinksPosts._id" },
               type: { $first: "$followlinksPosts.type" },
-              profileImage: { $first: "$followlinksPosts.profileImage" },
+              profileImage: { $first: "$followlinksPosts.profileImageX50" },
             },
           },
           {
@@ -6447,7 +6466,7 @@ exports.getSelfCollablinks = (profileId, followerId, page, masterId) => {
               _id: "$_id",
               userId: { $first: "$userId" },
               type: { $first: "$type" },
-              profileImage: { $first: "$profileImage" },
+              profileImage: { $first: ".profileImageX50" },
             },
           },
         ],
@@ -6770,7 +6789,7 @@ exports.getSelfCollablinks = (profileId, followerId, page, masterId) => {
         isRegistered: "$profileCollablinks.isRegistered",
         isBlocked: "$profileCollablinks.isBlocked",
         isDeleted: "$profileCollablinks.isDeleted",
-        profileImage: "$profileCollablinks.profileImage",
+        profileImage: "$profileCollablinks.profileImageX50",
         profileImageType: "$profileCollablinks.profileImageType",
         masterUser: {
           _id: "$_id",
@@ -6779,7 +6798,7 @@ exports.getSelfCollablinks = (profileId, followerId, page, masterId) => {
           type: "$type",
           username: "$username",
           fameCoins: "$fameCoins",
-          profileImage: "$profileImage",
+          profileImage: "$profileImageX50",
           profileImageType: "$profileImageType",
           dob: "$dob",
           isVerified: "$isVerified",
@@ -6902,7 +6921,7 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
                 {
                   $project: {
                     type: 1,
-                    profileImage: 1,
+                    profileImage: '$profileImageX50',
                     profileImageType: 1,
                   },
                 },
@@ -6914,7 +6933,7 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
             $addFields: {
               userId: { $first: "$followlinksPosts._id" },
               type: { $first: "$followlinksPosts.type" },
-              profileImage: { $first: "$followlinksPosts.profileImage" },
+              profileImage: { $first: "$followlinksPosts.profileImageX50" },
             },
           },
           {
@@ -6922,7 +6941,7 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
               _id: "$_id",
               userId: { $first: "$userId" },
               type: { $first: "$type" },
-              profileImage: { $first: "$profileImage" },
+              profileImage: { $first: ".profileImageX50" },
             },
           },
         ],
@@ -7249,7 +7268,7 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
         isRegistered: "$profileCollablinks.isRegistered",
         isBlocked: "$profileCollablinks.isBlocked",
         isDeleted: "$profileCollablinks.isDeleted",
-        profileImage: "$profileCollablinks.profileImage",
+        profileImage: "$profileCollablinks.profileImageX50",
         profileImageType: "$profileCollablinks.profileImageType",
         masterUser: {
           _id: "$_id",
@@ -7258,7 +7277,7 @@ exports.getOtherCollablinks = (profileId, followerId, page) => {
           type: "$type",
           username: "$username",
           fameCoins: "$fameCoins",
-          profileImage: "$profileImage",
+          profileImage: "$profileImageX50",
           profileImageType: "$profileImageType",
           dob: "$dob",
           isVerified: "$isVerified",
@@ -7505,11 +7524,11 @@ exports.getBrandProfileJoblinks = (userId, page) => {
                           type: 1,
                           name: 1,
                           username: 1,
-                          profileImage: 1,
+                          profileImage: '$profileImageX50',
                           profileImageType: 1,
                           profile: {
                             name: "$profileJoblinks.name",
-                            profileImage: "$profileJoblinks.profileImage",
+                            profileImage: "$profileJoblinks.profileImageX50",
                             profileImageType: "$profileJoblinks.profileImageType",
                           },
                         },
@@ -7525,7 +7544,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
                     type: "$user.type",
                     name: "$user.name",
                     username: "$user.username",
-                    profileImage: "$user.profileImage",
+                    profileImage: "$user.profileImageX50",
                     profileImageType: "$user.profileImageType",
                     profile: "$user.profile",
                     status: 1,
@@ -7570,11 +7589,11 @@ exports.getBrandProfileJoblinks = (userId, page) => {
                           type: 1,
                           name: 1,
                           username: 1,
-                          profileImage: 1,
+                          profileImage: '$profileImageX50',
                           profileImageType: 1,
                           profile: {
                             name: "$profileJoblinks.name",
-                            profileImage: "$profileJoblinks.profileImage",
+                            profileImage: "$profileJoblinks.profileImageX50",
                             profileImageType: "$profileJoblinks.profileImageType",
                           },
                         },
@@ -7590,7 +7609,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
                     type: "$user.type",
                     name: "$user.name",
                     username: "$user.username",
-                    profileImage: "$user.profileImage",
+                    profileImage: "$user.profileImageX50",
                     profileImageType: "$user.profileImageType",
                     profile: "$user.profile",
                     status: 1,
@@ -7962,7 +7981,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
         name: "$profileJoblinks.name",
         bio: "$profileJoblinks.bio",
         profession: "$profileJoblinks.profession",
-        profileImage: "$profileJoblinks.profileImage",
+        profileImage: "$profileJoblinks.profileImageX50",
         profileImageType: "$profileJoblinks.profileImageType",
         savedTalents: "$profileJoblinks.savedTalents",
         masterUser: {
@@ -7972,7 +7991,7 @@ exports.getBrandProfileJoblinks = (userId, page) => {
           type: "$type",
           username: "$username",
           fameCoins: "$fameCoins",
-          profileImage: "$profileImage",
+          profileImage: "$profileImageX50",
           profileImageType: "$profileImageType",
           dob: "$dob",
           isVerified: "$isVerified",
@@ -8135,14 +8154,14 @@ exports.getAgencyProfileJoblinks = (userId) => {
                     let: { userId: "$userId" },
                     pipeline: [
                       { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
-                      { $project: { profileImage: "$profileJoblinks.profileImage", profileImageType: "$profileJoblinks.profileImageType" } },
+                      { $project: { profileImage: "$profileJoblinks.profileImage", profileImageType: "$profileJoblinks.profileImageX50Type" } },
                     ],
                     as: "user",
                   },
                 },
                 {
                   $addFields: {
-                    profileImage: { $first: "$user.profileImage" },
+                    profileImage: { $first: "$user.profileImageX50" },
                     profileImageType: { $first: "$user.profileImageType" },
                     _id: { $first: "$user._id" },
                   },
@@ -8150,7 +8169,7 @@ exports.getAgencyProfileJoblinks = (userId) => {
                 {
                   $group: {
                     _id: "$_id",
-                    profileImage: { $first: "$profileImage" },
+                    profileImage: { $first: ".profileImageX50" },
                     profileImageType: { $first: "$profileImageType" },
                   },
                 },
@@ -8298,7 +8317,7 @@ exports.getAgencyProfileJoblinks = (userId) => {
         username: 1,
         dob: 1,
         fameCoins: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         isVerified: 1,
         type: 1,
@@ -8306,7 +8325,7 @@ exports.getAgencyProfileJoblinks = (userId) => {
           name: "$profileJoblinks.name",
           bio: "$profileJoblinks.bio",
           profession: "$profileJoblinks.profession",
-          profileImage: "$profileJoblinks.profileImage",
+          profileImage: "$profileJoblinks.profileImageX50",
           profileImageType: "$profileJoblinks.profileImageType",
           greetText: "$profileJoblinks.greetText",
           greetVideo: "$profileJoblinks.greetVideo",
@@ -8432,7 +8451,7 @@ exports.getInviteSuggestions = (selfMasterId, page) => {
     { $match: { $expr: { $eq: [0, { $size: "$followStatus" }] } } },
 
     { $sort: { updatedAt: -1 } },
-    { $project: { _id: 1, profileImage: 1, profileImageType: 1 } },
+    { $project: { _id: 1, profileImage: '$profileImageX50', profileImageType: 1 } },
     { $skip: (pagination - 1) * 10 },
     { $limit: 10 },
   ]);
@@ -8546,7 +8565,7 @@ exports.getUsers = (selfMasterId, search, page) => {
         location: { $first: "$location" },
         gender: 1,
         ageGroup: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         type: 1,
         profileFamelinks: 1,
@@ -8713,37 +8732,37 @@ exports.deleteTag = (postId) => {
 
 exports.getUserFamelinksImage = (userId) => {
   return UserDB
-    .findOne({ _id: userId }, { profileImage: "$profileFamelinks.profileImage", profileImageType: "$profileFamelinks.profileImageType" })
+    .findOne({ _id: userId }, { profileImage: "$profileFamelinks.profileImage", profileImageType: "$profileFamelinks.profileImageX50Type" })
     .lean();
 };
 
 exports.getUserFunlinksImage = (userId) => {
   return UserDB
-    .findOne({ _id: userId }, { profileImage: "$profileFunlinks.profileImage", profileImageType: "$profileFunlinks.profileImageType" })
+    .findOne({ _id: userId }, { profileImage: "$profileFunlinks.profileImage", profileImageType: "$profileFunlinks.profileImageX50Type" })
     .lean();
 };
 
 exports.getUserFollowlinksImage = (userId) => {
   return UserDB
-    .findOne({ _id: userId }, { profileImage: "$profileFollowlinks.profileImage", profileImageType: "$profileFollowlinks.profileImageType" })
+    .findOne({ _id: userId }, { profileImage: "$profileFollowlinks.profileImage", profileImageType: "$profileFollowlinks.profileImageX50Type" })
     .lean();
 };
 
 exports.getUserJoblinksImage = (userId) => {
   return UserDB
-    .findOne({ _id: userId }, { profileImage: "$profileJoblinks.profileImage", profileImageType: "$profileJoblinks.profileImageType" })
+    .findOne({ _id: userId }, { profileImage: "$profileJoblinks.profileImage", profileImageType: "$profileJoblinks.profileImageX50Type" })
     .lean();
 };
 
 exports.getUserStorelinksImage = (userId) => {
   return UserDB
-    .findOne({ _id: userId }, { profileImage: "$profileStorelinks.profileImage", profileImageType: "$profileStorelinks.profileImageType" })
+    .findOne({ _id: userId }, { profileImage: "$profileStorelinks.profileImage", profileImageType: "$profileStorelinks.profileImageX50Type" })
     .lean();
 };
 
 exports.getUserCollablinksImage = (userId) => {
   return UserDB
-    .findOne({ _id: userId }, { profileImage: "$profileCollablinks.profileImage", profileImageType: "$profileCollablinks.profileImageType" })
+    .findOne({ _id: userId }, { profileImage: "$profileCollablinks.profileImage", profileImageType: "$profileCollablinks.profileImageX50Type" })
     .lean();
 };
 
@@ -8988,7 +9007,7 @@ exports.getWinners = (data) => {
               type: 1,
               name: 1,
               username: 1,
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profileImageType: 1,
               fameProfile: "$profileFamelinks",
             },
@@ -9004,7 +9023,7 @@ exports.getWinners = (data) => {
         type: { $arrayElemAt: ["$users.type", 0] },
         name: { $arrayElemAt: ["$users.name", 0] },
         username: { $arrayElemAt: ["$users.username", 0] },
-        profileImage: { $arrayElemAt: ["$users.profileImage", 0] },
+        profileImage: { $arrayElemAt: ["$users.profileImageX50", 0] },
         profileImageType: { $arrayElemAt: ["$users.profileImageType", 0] },
         fameProfile: "$users.fameProfile",
       },
@@ -9061,4 +9080,371 @@ exports.canUnfollow = async (data) => {
   });
 
   return count < limit;
+};
+
+exports.getProductGrid = (data) => {
+  return brandProductDB.aggregate([
+    {
+      $match: {
+        _id: ObjectId(data.id),
+        isDeleted: false,
+        isSafe: true,
+      },
+    },
+    { $sort: { createdAt: 1 } },
+    {
+      $lookup: {
+        from: "users",
+        let: { userId: "$userId" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$_id", "$$userId"] },
+              isDeleted: false,
+              isSuspended: false,
+            },
+          },
+          {
+            $project: {
+              username: 1,
+              type: 1,
+              _id: 1,
+              dob: 1,
+              profile: {
+                name: "$profileFollowlinks.name",
+                bio: "$profileFollowlinks.bio",
+                profession: "$profileFollowlinks.profession",
+                profileImage: "$profileFollowlinks.profileImageX50",
+                profileImageType: "$profileFollowlinks.profileImageType",
+              }
+            },
+          },
+        ],
+        as: "user",
+      },
+    },
+    { $addFields: { user: { $first: "$user" } } },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        purchaseUrl: 1,
+        buttonName: 1,
+        price: 1,
+        user: 1,
+      },
+    },
+    {
+      $lookup: {
+        from: "followlinks",
+        let: { value: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$productId", "$$value"] },
+            },
+          },
+          { $project: { _id: 1 } },
+        ],
+        as: "postCount",
+      },
+    },
+    { $addFields: { postCount: { $size: "$postCount" } } },
+    {
+      $lookup: {
+        from: "followlinks",
+        let: { productId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$productId", "$$productId"] },
+              isDeleted: false,
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              closeUp: 1,
+              medium: 1,
+              long: 1,
+              pose1: 1,
+              pose2: 1,
+              additional: 1,
+              video: 1,
+              likesCount: 1,
+              userId: 1,
+              viewCount: { $size: '$reachIds' },
+            },
+          },
+          { $sort: { viewCount: -1 } },
+          { $skip: (data.page - 1) * 10 },
+          { $limit: 10 },
+          {
+            $lookup: {
+              from: "users",
+              let: { userId: "$userId" },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                {
+                  $project: {
+                    name: "$profileFollowlinks.name",
+                    _id: 0,
+                  },
+                },
+              ],
+              as: "user",
+            },
+          },
+          { $addFields: { name: { $first: "$user.name" } } },
+          {
+            $project: {
+              likesCount: 0,
+              user: 0,
+            },
+          },
+        ],
+        as: "posts",
+      },
+    },
+    {
+      $lookup: {
+        from: "followlinks",
+        let: { productId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$productId", "$$productId"] },
+              isDeleted: false,
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              closeUp: 1,
+              medium: 1,
+              long: 1,
+              pose1: 1,
+              pose2: 1,
+              additional: 1,
+              video: 1,
+              userId: 1,
+            },
+          },
+          { $limit: 1 },
+          {
+            $lookup: {
+              from: "users",
+              let: { userId: "$userId" },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+                {
+                  $project: {
+                    name: "$profileFollowlinks.name",
+                    _id: 0,
+                  },
+                },
+              ],
+              as: "user",
+            },
+          },
+          { $addFields: { name: { $first: "$user.name" } } },
+          {
+            $project: {
+              user: 0,
+            },
+          },
+        ],
+        as: "firstPosts",
+      },
+    },
+    { $addFields: { firstPosts: { $first: "$firstPosts" } } },
+  ]);
+};
+
+
+exports.getParticularProduct = (
+  userId,
+  page,
+  filterObj,
+  sortObj
+) => {
+  return brandProductDB.aggregate([
+    { $match: { ...filterObj, isWelcomeVideo: { $exists: false } } },
+    {
+      $sort: { ...sortObj },
+    },
+    // User
+    {
+      $lookup: {
+        from: "users",
+        let: { userId: "$userId" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+          {
+            $project: {
+              name: 1,
+              dob: 1,
+              bio: 1,
+              profession: 1,
+              profileImage: '$profileImageX50',
+              profileImageType: 1,
+              username: 1,
+              _id: 1,
+              type: 1,
+            },
+          },
+        ],
+        as: "user",
+      },
+    },
+    { $addFields: { user: { $first: "$user" } } },
+    {
+      $lookup: {
+        from: "users",
+        let: { userId: ObjectId(userId) },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
+          { $project: { _id: 0, savedProducts: 1 } },
+        ],
+        as: "savedProducts",
+      },
+    },
+    {
+      $addFields: { savedProducts: { $first: "$savedProducts.savedProducts" } },
+    },
+    { $addFields: { savedStatus: { $in: ["$_id", "$savedProducts"] } } },
+    {
+      $lookup: {
+        from: "users",
+        let: { value: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $in: ["$$value", "$savedProducts"] },
+            },
+          },
+          { $project: { _id: 1 } },
+        ],
+        as: "savedCount",
+      },
+    },
+    { $addFields: { savedCount: { $size: "$savedCount" } } },
+    {
+      $lookup: {
+        from: "followlinks",
+        let: { value: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$productId", "$$value"] },
+            },
+          },
+          { $project: { _id: 1 } },
+        ],
+        as: "tagCount",
+      },
+    },
+    { $addFields: { tagCount: { $size: "$tagCount" } } },
+    { $addFields: { followStatus: 0 } },
+    {
+      $lookup: {
+        from: "followers",
+        let: { followeeId: "$user._id" }, //master user Id
+        pipeline: [
+          {
+            $match: {
+              followerId: ObjectId(userId),
+              $expr: { $eq: ["$followeeId", "$$followeeId"] },
+              acceptedDate: { $eq: null },
+              type: "user",
+            },
+          },
+          { $project: { _id: 1 } },
+        ],
+        as: "requested",
+      },
+    },
+    {
+      $addFields: {
+        followStatus: {
+          $cond: [{ $eq: [{ $size: "$requested" }, 1] }, 1, "$followStatus"],
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "followers",
+        let: { followeeId: "$user._id" }, //master user Id
+        pipeline: [
+          {
+            $match: {
+              followerId: ObjectId(userId),
+              $expr: { $eq: ["$followeeId", "$$followeeId"] },
+              acceptedDate: { $ne: null },
+              type: "user",
+            },
+          },
+          { $project: { _id: 1 } },
+        ],
+        as: "following",
+      },
+    },
+    {
+      $addFields: {
+        followStatus: {
+          $cond: [{ $eq: [{ $size: "$following" }, 1] }, 2, "$followStatus"],
+        },
+      },
+    },
+    {
+      $addFields: {
+        followStatus: {
+          $switch: {
+            branches: [
+              { case: { $eq: ["$followStatus", 0] }, then: "Follow" },
+              { case: { $eq: ["$followStatus", 1] }, then: "Requested" },
+              { case: { $eq: ["$followStatus", 2] }, then: "Following" },
+            ],
+            default: "Follow",
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        tags: {
+          $cond: {
+            if: { $isArray: "$tags" },
+            then: { $size: "$tags" },
+            else: 0,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        profession: 1,
+        price: 1,
+        hashTag: 1,
+        purchaseUrl: 1,
+        gender: 1,
+        user: 1,
+        description: 1,
+        profileImage: '$profileImageX50',
+        profileImageType: 1,
+        buttonName: 1,
+        commentsCount: 1,
+        followStatus: 1,
+        media: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        savedStatus: 1,
+        savedCount: 1,
+        tagCount: 1,
+      },
+    },
+  ])
+    .skip((page - 1) * 10)
+    .limit(10);
 };

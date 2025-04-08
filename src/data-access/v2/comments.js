@@ -82,13 +82,13 @@ exports.getComments = (userId, postId, page, postType) => {
               type: 1,
               dob: 1,
               name: 1,
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profileImageType: 1,
               profile: {
                 name: `${field}.name`,
                 bio: `${field}.bio`,
                 profession: `${field}.profession`,
-                profileImage: `${field}.profileImage`,
+                profileImage: `${field}.profileImageX50`,
                 profileImageType: `${field}.profileImageType`,
               }
             },
@@ -177,13 +177,13 @@ exports.getCommentReplies = (userId, commentId, page, postType) => {
               type: 1,
               dob: 1,
               name: 1,
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profileImageType: 1,
               profile: {
                 name: `${field}.name`,
                 bio: `${field}.bio`,
                 profession: `${field}.profession`,
-                profileImage: `${field}.profileImage`,
+                profileImage: `${field}.profileImageX50`,
                 profileImageType: `${field}.profileImageType`,
               }
             },

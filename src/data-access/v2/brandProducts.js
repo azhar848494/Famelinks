@@ -68,7 +68,7 @@ exports.getBrandProductCoinsById = (productId) => {
 //         let: { userId: '$userId' },
 //         pipeline: [
 //           { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
-//           { $project: { name: 1, dob: 1, bio: 1, profession: 1, profileImage: 1, username: 1, _id: 1, type: 1 } }
+//           { $project: { name: 1, dob: 1, bio: 1, profession: 1, profileImage: '$profileImageX50', username: 1, _id: 1, type: 1 } }
 //         ],
 //         as: 'users'
 //       }
@@ -125,7 +125,7 @@ exports.getBrandProductCoinsById = (productId) => {
 //         likesCount: 1,
 //         commentsCount: 1,
 //         description: 1,
-//         profileImage: 1,
+//         profileImage: '$profileImageX50',
 //         likeStatus: { $ifNull: ["$likeStatus", null] },
 //         media: 1,
 //       },
@@ -167,7 +167,7 @@ exports.getBrandProducts = (brandId, page) => {
                 name: "$profileStorelinks.name",
                 bio: "$profileStorelinks.bio",
                 profession: "$profileStorelinks.profession",
-                profileImage: "$profileStorelinks.profileImage",
+                profileImage: "$profileStorelinks.profileImageX50",
               }
             },
           },
@@ -187,7 +187,7 @@ exports.getBrandProducts = (brandId, page) => {
           },
           {
             $project: {
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profileImageType: 1,
               name: 1,
             },
@@ -208,7 +208,7 @@ exports.getBrandProducts = (brandId, page) => {
           },
           {
             $project: {
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profileImageType: 1,
               name: 1,
             },
@@ -271,7 +271,7 @@ exports.getBrandProducts = (brandId, page) => {
         // likesCount: 1,
         commentsCount: 1,
         description: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         tagBy: 1,
         // likeStatus: { $ifNull: ["$likeStatus", null] },
         media: 1,
@@ -314,7 +314,7 @@ exports.getMyBrandProducts = (userId, page, filterObj) => {
                 name: "$profileStorelinks.name",
                 bio: "$profileStorelinks.bio",
                 profession: "$profileStorelinks.profession",
-                profileImage: "$profileStorelinks.profileImage",
+                profileImage: "$profileStorelinks.profileImageX50",
               }
             },
           },
@@ -385,7 +385,7 @@ exports.getMyBrandProducts = (userId, page, filterObj) => {
         // likesCount: 1,
         commentsCount: 1,
         description: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         // likeStatus: { $ifNull: ["$likeStatus", null] },
         media: 1,
@@ -441,7 +441,7 @@ exports.getBrandPosts = (userId, page) => {
                 name: "$profileStorelinks.name",
                 bio: "$profileStorelinks.bio",
                 profession: "$profileStorelinks.profession",
-                profileImage: "$profileStorelinks.profileImage",
+                profileImage: "$profileStorelinks.profileImageX50",
               }
             },
           },
@@ -615,7 +615,7 @@ exports.getBrandPosts = (userId, page) => {
         // challenges: 1,
         user: 1,
         description: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         likes0Count: 1,
         likes1Count: 1,
@@ -717,7 +717,7 @@ exports.getsAdBrandPosts = (userId, page) => {
               dob: 1,
               bio: 1,
               profession: 1,
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profileImageType: 1,
               username: 1,
               _id: 1,
@@ -842,7 +842,7 @@ exports.getsAdBrandPosts = (userId, page) => {
         // challenges: 1,
         user: 1,
         description: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         likes0Count: 1,
         likes1Count: 1,
@@ -926,7 +926,7 @@ exports.getAdBrandPosts = (userId, page) => {
               dob: 1,
               bio: 1,
               profession: 1,
-              profileImage: 1,
+              profileImage: '$profileImageX50',
               profileImageType: 1,
               username: 1,
               _id: 1,
@@ -1006,7 +1006,7 @@ exports.getAdBrandPosts = (userId, page) => {
         // challenges: 1,
         user: 1,
         description: 1,
-        profileImage: 1,
+        profileImage: '$profileImageX50',
         profileImageType: 1,
         likes0Count: 1,
         likes1Count: 1,
