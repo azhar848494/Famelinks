@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const appConfig = require('../../../../configs/app.config');
 
 const { addPost, updatePost } = require("../../../data-access/v2/followlinks");
-const { updateUser } = require("../../../data-access/v2/users");
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -62,11 +61,6 @@ module.exports = async (profileId, user, files, payload, token, isWelcomeVideo) 
   //     });
 
   const post = await addPost(postObject);
-  if (payload.productId && payload.productId != "") {
-    let updateObj = {}
-    updateObj.fameCoins = (user.fameCoins + allotedCoins)
-    await updateUser(user._id, updateObj)
-  }
   return post
   // let result = await axios.post(`${appConfig.mediaFilter.baseUrl}/filter/images`, {
   //     method: 'put',
