@@ -20,7 +20,7 @@ const {
   getBrandProductCoinsById,
   updateProductCoins,
   addBrandProductsTags,
-  updateBrandProductsTag, 
+  updateBrandProductsTag,
 } = require("../../../data-access/v2/brandProducts");
 const {
   updateUser,
@@ -31,12 +31,12 @@ const {
 
 module.exports = async (request) => {
   let agencyTags = request.body.agencyTags;
-  let brandProductTags = request.body.brandProductTags;
+  let brandProductTags = [request.body.productId];
   let brandHashtags = [];
   let updateBrandProducts = [];
   let earnedFamecoins = 0;
   let brandProductCoins;
-  
+
   let channelId = request.body.channelId
   let offerCode = request.body.offerCode
   let clubOffer
@@ -45,8 +45,8 @@ module.exports = async (request) => {
     let uploadPost;
 
     let result = await getWelcomeVideo(request.user._id);
-    if (result && result.length > 0) { 
-      result[0].video = request.files["video"]; 
+    if (result && result.length > 0) {
+      result[0].video = request.files["video"];
       await updatePost(result[0]._id, result[0]);
 
       return serializeHttpResponse(200, {
@@ -132,8 +132,9 @@ module.exports = async (request) => {
     );
 
     brandProductCoins = await Promise.all(
-      request.body.brandProductTags.map(async (tag) => {
+      brandProductTags.map(async (tag) => {
         let brandProductCoins = await getBrandProductCoinsById(tag);
+        console.log('brandProductCoins ::: ', brandProductCoins)
         return brandProductCoins;
       })
     );
@@ -208,11 +209,11 @@ module.exports = async (request) => {
   }
 
   if (
-    request.body.brandProductTags &&
-    request.body.brandProductTags.length > 0
+    brandProductTags &&
+    brandProductTags.length > 0
   ) {
-    request.body.brandProductTags = await Promise.all(
-      request.body.brandProductTags.map(async (tag) => {
+    brandProductTags = await Promise.all(
+      brandProductTags.map(async (tag) => {
         let product = await getBrandProductsById(tag);
         let brandProductCoins = await getBrandProductCoinsById(tag);
 
@@ -260,33 +261,33 @@ module.exports = async (request) => {
   //     })
   //   );
 
-    if (agencyTags && agencyTags.length > 0) {
-      agencyTags.map(async (user) => {
-        let User = await getUserByTag(user);
-        let TagId = await addAgencyTags(User._id, result._id);
-        await sendNotificationsService(
-          "tag",
-          {
-            sourceName: request.user.name,
-            sourceId: request.user._id,
-            sourceMedia: request.user.profileImage,
-            sourceType: request.user.type,
-          },
-          null,
-          {
-            targetId: User._id,
-            pushToken: User.pushToken,
-            //count: onePost.commentsCount,
-            userId: User._id,
-            targetMedia: User.profileImage,
-            category: "request",
-            tagId: TagId.postId,
-          },
-          true,
-          true
-        );
-      });
-    }
+  if (agencyTags && agencyTags.length > 0) {
+    agencyTags.map(async (user) => {
+      let User = await getUserByTag(user);
+      let TagId = await addAgencyTags(User._id, result._id);
+      await sendNotificationsService(
+        "tag",
+        {
+          sourceName: request.user.name,
+          sourceId: request.user._id,
+          sourceMedia: request.user.profileImage,
+          sourceType: request.user.type,
+        },
+        null,
+        {
+          targetId: User._id,
+          pushToken: User.pushToken,
+          //count: onePost.commentsCount,
+          userId: User._id,
+          targetMedia: User.profileImage,
+          category: "request",
+          tagId: TagId.postId,
+        },
+        true,
+        true
+      );
+    });
+  }
   //}
 
   if (updateBrandProducts && updateBrandProducts.length > 0) {

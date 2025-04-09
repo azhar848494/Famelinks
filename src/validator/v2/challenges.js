@@ -14,6 +14,7 @@ module.exports = {
   getTrend: {
     query: joi.object().keys({
       page: joi.number().min(1).required(),
+      sponsorId: joi.string(),
     }),
   },
 
@@ -24,6 +25,13 @@ module.exports = {
     query: joi.object().keys({
       page: joi.number().min(1).required(),
       sponsorId: joi.string(),
+    }),
+  },
+
+  getAllTrendz: {
+    query: joi.object().keys({
+      page: joi.number().min(1).required(),
+      sponsorId: joi.string().trim().required(),
     }),
   },
 

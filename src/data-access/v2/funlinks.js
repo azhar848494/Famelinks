@@ -1122,8 +1122,13 @@ exports.updatePostCommentCounter = (postId, incBy) => {
   );
 };
 
-exports.getMusic2 = (page, search, type, savedMusic) => {
+exports.getMusic2 = (page, search, type, savedMusic, userId, isMyMusic) => {
   const obj = {};
+  console.log('userId ::: ', userId)
+  console.log('isMyMusic ::: ', isMyMusic)
+  if (isMyMusic) {
+    obj.uploadedBy = userId;
+  }
   if (savedMusic && savedMusic.length) {
     obj._id = { $in: savedMusic };
   }
@@ -1366,7 +1371,7 @@ exports.deletePost = (postId, userId) => {
   return FunlinksDB.findOneAndDelete({ _id: postId, userId });
 };
 
-exports.addMusic = (music, name, duration, thumbnail) => {
+exports.addMusic = (music, name, duration, thumbnail, userId) => {
   return MusicDB.create({
     music,
     by: "Unknown",
@@ -1374,6 +1379,7 @@ exports.addMusic = (music, name, duration, thumbnail) => {
     duration,
     addedBy: "user",
     thumbnail,
+    uploadedBy: userId,
   });
 };
 

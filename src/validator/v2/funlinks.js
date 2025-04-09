@@ -7,6 +7,7 @@ module.exports = {
       challenges: joi.array().items(joi.string().trim()),
       musicName: joi.string().trim(),
       musicId: joi.string().trim(),
+      audioDuration: joi.number(),
       tags: joi.array().items(joi.string().trim()),
       talentCategory: joi.array().items(joi.string().trim()),
       isWelcomeVideo: joi.boolean(),
@@ -110,6 +111,7 @@ module.exports = {
         .string()
         .valid("trending", "voice", "songs", "saved")
         .default("trending"),
+      isMyMusic: joi.boolean(),
     }),
   },
 

@@ -14,8 +14,8 @@ module.exports = async (
   isWelcomeVideo
 ) => {
   let musicId = null;
-  if (files.audio && !payload.musicId && payload.musicName) {
-    const music = await addMusic(files["audio"], payload.musicName, 30, files["video"].concat("-xs"));
+  if (files.audio) {
+    const music = await addMusic(files.audio, 'music_' + Date.now(), payload.audioDuration, files["video"].concat("-xs"), profileId);
     musicId = music._id;
   }
 

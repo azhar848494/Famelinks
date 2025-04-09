@@ -7,6 +7,7 @@ const requestValidatorCallback = require('../../helpers/request-validator-callba
 const getOpenChallengesController = require('../../controllers/v2/challenges/getOpenChallenges');
 const getTrendController = require('../../controllers/v2/challenges/getTrend');
 const getUpcomingChallengesController = require('../../controllers/v2/challenges/getUpcomingChallenges');
+const getAllTrendzController = require('../../controllers/v2/challenges/getAllTrendz');
 const getChallengePostsController = require('../../controllers/v2/challenges/getChallengePosts');
 const getDashboardOpenChallengesController = require('../../controllers/v2/challenges/getDashboardOpenChallenges');
 const getOneChallengeController = require('../../controllers/v2/challenges/getOneChallenge');
@@ -31,6 +32,7 @@ router.get('/search/:data/:linkType', requestValidatorCallback(validator.searchC
 router.get('/:type/slider', requestValidatorCallback(validator.slider), expressCallback(getChallengeSliderController));
 router.get('/open/:type', requestValidatorCallback(validator.getOpenChallenges), expressCallback(getOpenChallengesController));
 router.get('/upcoming/:type', requestValidatorCallback(validator.getUpcomingChallenges), expressCallback(getUpcomingChallengesController));
+router.get('/all', requestValidatorCallback(validator.getAllTrendz), expressCallback(getAllTrendzController));
 router.get('/:challengeId', requestValidatorCallback(validator.getOneChallenge), expressCallback(getOneChallengeController));
 router.get('/:challengeId/:type', requestValidatorCallback(validator.getChallengesPosts), expressCallback(getChallengePostsController));
 router.get('/brand/hashTag/:data', requestValidatorCallback(validator.searchHashTag), expressCallback(searchHashtagController));

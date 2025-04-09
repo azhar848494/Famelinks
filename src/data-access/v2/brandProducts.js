@@ -26,8 +26,8 @@ exports.updatePost2 = (postId, post) => {
 exports.addBrandProductCoins = (productId, allotedCoins, giftCoins, balance) => {
   return brandProductCoins.create({
     productId,
-    allotedCoins,
-    giftCoins,
+    totalAllotedCoins: allotedCoins,
+    perTagCoins: giftCoins,
     balance,
   });
 };
@@ -49,7 +49,7 @@ exports.getBrandProductsById = (_id) => {
 };
 
 exports.getBrandProductCoinsById = (productId) => {
-  return brandProductCoins.findOne({ productId: ObjectId(productId) }).lean();
+  return brandProductCoins.findOne({ productId: productId }).lean();
 };
 
 // exports.getMyBrandProducts = (userId, page, selfUserId) => {
