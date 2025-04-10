@@ -1456,6 +1456,7 @@ exports.getFameChallengeDetails = (data) => {
         totalImpressions: 1,
         totalPost: 1,
         milestoneValue: '$milestoneAggrement.milestoneValue',
+        isCompleted: { $ifNull: ["$isCompleted", false] },
         rewardWinner: 1,
         rewardRunnerUp: 1,
         sponsor: 1,

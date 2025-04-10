@@ -1,5 +1,5 @@
 const notificationConfig = require("../../configs/notifications.config");
-const firebaseAdmin = require("firebase-admin"); 
+const firebaseAdmin = require("firebase-admin");
 const firebaseConfig = require("../../configs/firebase-adminsdk.json");
 
 firebaseAdmin.initializeApp({
@@ -14,9 +14,8 @@ exports.generateNotification = ({ type, source, data, targetName }) => {
     return {
       pushNotification: {
         title: notification.title,
-        body: `${source || ""} ${action || ""} ${data || ""} ${
-          notification.body || ""
-        } ${targetName || ""}`,
+        body: `${source || ""} ${action || ""} ${data || ""} ${notification.body || ""
+          } ${targetName || ""}`,
       },
       inAppNotification: { source, data, body, action },
     };
@@ -24,9 +23,8 @@ exports.generateNotification = ({ type, source, data, targetName }) => {
   return {
     pushNotification: {
       title: notification.title,
-      body: `${source || ""} ${action || ""} ${data || ""} ${
-        notification.body || ""
-      } ${targetName || ""}`,
+      body: `${source || ""} ${action || ""} ${data || ""} ${notification.body || ""
+        } ${targetName || ""}`,
     },
     inAppNotification: { source, data, body, action },
   };
@@ -34,17 +32,30 @@ exports.generateNotification = ({ type, source, data, targetName }) => {
 
 exports.sendPushNotifications = async ({ title, body }, pushToken, meta) => {
   try {
-    const payload = {
-            notification: { title, body },
-            data: {
-                body: JSON.stringify(meta)
-            }
-        };
-        if (payload.notification.title === 'FameCoin gifted' || payload.notification.title === 'FameCoin received'){
-            return;
-        }
+    if (title === 'FameCoin gifted' || title === 'FameCoin received') {
+      return;
+    }
 
-    return await firebaseAdmin.messaging().sendToDevice(pushToken, payload);
+    const message = {
+      token: pushToken,
+      notification: {
+        title: title,
+        body: body,
+      },
+      android: {
+        priority: "high",
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: "default",
+          },
+        },
+      },
+    };
+
+    // return await firebaseAdmin.messaging().sendToDevice(pushToken, payload);
+    return await firebaseAdmin.messaging().send(message);
   } catch (error) {
     console.log(error);
   }
