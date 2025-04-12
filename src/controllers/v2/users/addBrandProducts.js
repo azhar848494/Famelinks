@@ -123,20 +123,16 @@ module.exports = async (request) => {
       giftCoins,
       allotedCoins
     );
+
+    let updateObj = {}
+    updateObj.fameCoins = (request.user.fameCoins - allotedCoins)
+    await updateUser(request.user._id, updateObj)
   }
 
   if (!result) {
     return serializeHttpResponse(200, {
       message: "Brand Product not added",
     });
-  }
-
-
-
-  if (result && request.body.hashTag && request.body.hashTag != "") {
-    let updateObj = {}
-    updateObj.fameCoins = (request.user.fameCoins - allotedCoins)
-    await updateUser(request.user._id, updateObj)
   }
 
   return serializeHttpResponse(200, {

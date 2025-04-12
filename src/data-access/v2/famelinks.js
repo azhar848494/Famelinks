@@ -405,7 +405,6 @@ exports.getMyFameLinks = (
   return (
     FamelinksDB.aggregate([
       { $match: { ...filterObj, isWelcomeVideo: { $exists: false } } },
-      { $sort: sorted },
       //MasterIdMigration
       {
         $lookup: {
@@ -550,6 +549,12 @@ exports.getMyFameLinks = (
           as: "location",
         },
       },
+      {
+        $addFields: {
+          likesCount: { $add: ["$likes1Count", "$likes2Count"] },
+        },
+      },
+      { $sort: sorted },
       {
         $project: {
           followStatus: 1,

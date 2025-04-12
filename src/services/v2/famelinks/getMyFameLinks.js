@@ -23,6 +23,7 @@ module.exports = async (profileId, page, childProfileId, selfMasterId, hashTagId
       isSafe: true,
       isBlocked: false,
     };
+    sorted = { likesCount: -1 };
   } else {
     filterObj = {
       userId: ObjectId(profileId),
@@ -30,8 +31,8 @@ module.exports = async (profileId, page, childProfileId, selfMasterId, hashTagId
       isSafe: true,
       isBlocked: false,
     };
+    sorted = { createdAt: -1 };
   }
-  sorted = { createdAt: -1 };
 
   // if (postId != "*") {
   //   filterObj = {

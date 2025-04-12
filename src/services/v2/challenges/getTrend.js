@@ -20,5 +20,5 @@ module.exports = async (data) => {
       return item;
     })
   );
-  return result;  
+  return result;
 };

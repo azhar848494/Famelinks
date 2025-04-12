@@ -713,7 +713,7 @@ exports.getAlltrendzs = (page, userId, sponsorId) => {
           $size: "$participantsCount"
         },
       },
-    },    
+    },
     {
       $lookup: {
         from: 'fametrendzs',
@@ -885,7 +885,7 @@ exports.getTrend = (data) => {
                 },
                 {
                   $addFields: {
-                    likesCount: "$likes2Count",
+                    likesCount: { $max: ["$likes2Count", 0] },
                   },
                 },
                 { $project: { _id: 1, likesCount: 1 } },

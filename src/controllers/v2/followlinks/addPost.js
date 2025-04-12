@@ -138,6 +138,7 @@ module.exports = async (request) => {
         return brandProductCoins;
       })
     );
+    console.log('brandProductCoins list ::: ', brandProductCoins)
     if (
       brandProductCoins[0].balance < brandProductCoins[0].giftCoins ||
       brandProductCoins[0].balance == 0
@@ -148,6 +149,7 @@ module.exports = async (request) => {
     }
 
     brandProductTags = brandProductTags.filter((x) => !!x);
+    console.log('brandProductTags ::: ', brandProductTags)
 
     //   if (brandProductTags && brandProductTags.length > 1) {
     //     return serializeHttpResponse(400, {
@@ -198,6 +200,7 @@ module.exports = async (request) => {
   }
 
   if (brandProductTags && brandProductTags.length > 0) {
+    console.log('brandProductTags ::: ', brandProductTags)
     let temp = brandProductCoins.filter((product) => {
       if (product.allotedCoins >= product.giftCoins) {
         product.balance = product.balance - product.giftCoins;
@@ -290,17 +293,39 @@ module.exports = async (request) => {
   }
   //}
 
+  console.log('updateBrandProducts ::: ', updateBrandProducts)
   if (updateBrandProducts && updateBrandProducts.length > 0) {
     updateBrandProducts.map(async (product) => {
       await updateProductCoins(product.productId, product.balance);
     });
   }
 
+  console.log('earnedFamecoins ::: ', earnedFamecoins)
   if (earnedFamecoins) {
     let payload = {};
     payload.fameCoins = request.user.fameCoins + earnedFamecoins;
 
     await updateUser(request.user._id, payload);
+  }
+
+  if (request.body.productId) {
+    //When user tag brand product
+    let productCoin = await getBrandProductCoinsById(request.body.productId);
+    console.log('productCoin ::: ', productCoin)
+    if (productCoin.balance < productCoin.giftCoins || productCoin.balance == 0) {
+      return serializeHttpResponse(400, {
+        message: "Cannot tag selected brand product. Insufficient famecoins",
+      });
+    }
+    //User get the coins
+    let payload = {};
+    payload.fameCoins = request.user.fameCoins + productCoin.perTagCoins;
+
+    await updateUser(request.user._id, payload);
+
+    //Update coin balance
+    let balance = productCoin.balance - productCoin.perTagCoins;
+    await updateProductCoins(request.body.productId, balance);
   }
 
   if (offerCode && clubOffer) {
