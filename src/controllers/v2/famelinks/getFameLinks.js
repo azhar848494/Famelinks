@@ -34,7 +34,9 @@ module.exports = async (request) => {
     }
   }
 
-  const recommendations = await getData(request.user._id);
+  const recommendations = [];
+  //Uncomment below line to get recommendation data
+  // const recommendations = await getData(request.user._id);
   let limit = 12;
 
   const result1 = await getFameLinksService(
